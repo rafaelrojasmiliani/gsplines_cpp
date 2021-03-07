@@ -2,7 +2,7 @@
 #define BASISLEGENDRE_H
 
 #include <eigen3/Eigen/Core>
-#include <gsplines++/basis.hpp>
+#include <gsplines++/Basis.hpp>
 namespace gsplines {
 
 namespace basis {
