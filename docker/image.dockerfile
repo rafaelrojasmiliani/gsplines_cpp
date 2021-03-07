@@ -10,11 +10,9 @@ RUN apt-get update
 
 # Install packages
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    cmake libgsl-dev libeigen3-dev python3-pybind11 pybind11-dev net-tools netcat screen build-essential sudo
+                    cmake libgsl-dev libeigen3-dev net-tools netcat screen build-essential sudo
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    valgrind
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    python3-pip
+                    valgrind python3-pip vim
 # user handling
 ARG myuser
 ARG myuid

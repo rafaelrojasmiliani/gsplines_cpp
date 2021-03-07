@@ -12,7 +12,7 @@ private:
 
 public:
   Basis(std::size_t _dim) : dim_(_dim){};
-  virtual ~Basis();
+  virtual ~Basis() {}
   size_t get_dim() const { return dim_; }
   virtual void eval_on_window(double _s, double _tau, double _buff[]) = 0;
   virtual void eval_derivative_on_window(double _s, double _tau,
