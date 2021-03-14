@@ -13,58 +13,47 @@ BasisLegendre::BasisLegendre(std::size_t _dim)
 
 BasisLegendre::~BasisLegendre() {}
 
-void BasisLegendre::eval_derivative_on_window(double _s, double _tau,
-                                              unsigned int _deg,
-                                              double _buff[]) {
-  double buff_next[20];
+void BasisLegendre::eval_derivative_on_window(
+    double _s, double _tau, unsigned int _deg,
+    Eigen::Ref<Eigen::VectorXd> _buff) {
+  Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
-  _buff[0] = 1.0;
-  _buff[1] = _s;
+  _buff(0) = 1.0;
+  _buff(1) = _s;
   for (int i = 1; i < get_dim() - 1; i++) {
-    _buff[i + 1] =
+    _buff(i + 1) =
         1.0 / ((double)i + 1.0) *
-        ((2.0 * (double)i + 1.0) * _s * _buff[i] - (double)i * _buff[i - 1]);
+        ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
   }
+  aux = 1.0;
+  for (int d = 1; d <= _deg; d++) {
+    buff_next(d - 1) = 0.0;
+    buff_next(d) = aux;
 
-  buff_next[0] = 0;
-  buff_next[1] = 1.0;
-  for (int i = 1; i < get_dim() - 1; i++) {
-    term = _buff[i] + _s * buff_next[i];
-    buff_next[i + 1] =
-        1.0 / ((double)i + 1.0) *
-        ((2.0 * (double)i + 1.0) * term - (double)i * buff_next[i - 1]);
-  }
-  memcpy(_buff, buff_next, get_dim() * sizeof(double));
-  buff_next[1] = 0.0;
-  buff_next[2] = 3.0;
-  for (int d = 2; d <= _deg; d++) {
     for (int i = d; i < get_dim() - 1; i++) {
-      term = (1.0 + _s) * buff_next[i] + (d - 1.0) * _buff[i];
-      buff_next[i + 1] =
-          1.0 / ((double)i + 1.0) *
-          ((2.0 * (double)i + 1.0) * term - (double)i * buff_next[i - 1]);
+      term =
+          (2.0 * (double)i + 1.0) * ((double)d * _buff(i) + _s * buff_next(i));
+      buff_next(i + 1) =
+          1.0 / ((double)i + 1.0) * (term - (double)i * buff_next(i - 1));
     }
-    term = (2.0) * buff_next[d + 1] + (d - 1) * _buff[d];
-    memcpy(_buff, buff_next, get_dim() * sizeof(double));
-    buff_next[d] = 0.0;
-    buff_next[d + 1] =
-        1.0 / ((double)d + 1.0) * ((2.0 * (double)d + 1.0) * term);
+    aux = (2.0 * (double)d + 1.0) / ((double)d + 1.0) * ((double)d + 1.0) * aux;
+    _buff = buff_next;
   }
 }
 
-void BasisLegendre::eval_derivative_wrt_tau_on_window(double _s, double _tau,
-                                                      unsigned int _deg,
-                                                      double _buff[]) {}
+void BasisLegendre::eval_derivative_wrt_tau_on_window(
+    double _s, double _tau, unsigned int _deg,
+    Eigen::Ref<Eigen::VectorXd> _buff) {}
 
-void BasisLegendre::eval_on_window(double _s, double _tau, double _buff[]) {
-
-  _buff[0] = 1.0;
-  _buff[1] = _s;
+void BasisLegendre::eval_on_window(double _s, double _tau,
+                                   Eigen::Ref<Eigen::VectorXd> _buff) {
+  _buff(0) = 1.0;
+  _buff(1) = _s;
   for (int i = 1; i < get_dim() - 1; i++) {
-    _buff[i + 1] =
+    _buff(i + 1) =
         1.0 / ((double)i + 1.0) *
-        ((2.0 * (double)i + 1.0) * _s * _buff[i] - (double)i * _buff[i - 1]);
+        ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
   }
 }
 double alpha(int i) { return (double)(i + 1.0) / (double)(2.0 * i + 1.0); }

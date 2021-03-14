@@ -17,12 +17,14 @@ private:
 public:
   BasisLegendre(std::size_t _dim);
   virtual ~BasisLegendre();
-  void eval_on_window(double _s, double _tau, double _buff[]);
+  void eval_on_window(double _s, double _tau,
+                      Eigen::Ref<Eigen::VectorXd> _buff);
   void eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
-                                 double _buff[]);
+                                 Eigen::Ref<Eigen::VectorXd> _buff);
 
   void eval_derivative_wrt_tau_on_window(double _s, double _tau,
-                                         unsigned int _deg, double _buff[]);
+                                         unsigned int _deg,
+                                         Eigen::Ref<Eigen::VectorXd> _buff);
 };
 
 } // namespace basis
