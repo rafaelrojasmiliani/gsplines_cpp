@@ -8,7 +8,8 @@ set(PYTHON_VERSION
     CACHE STRING "Build bindings for Python version")
 find_package(GSL REQUIRED)
 find_package(Eigen3 REQUIRED)
-add_library(gsplines SHARED ${CMAKE_SOURCE_DIR}/src/BasisLegendre.cpp)
+add_library(gsplines SHARED ${CMAKE_SOURCE_DIR}/src/BasisLegendre.cpp
+                            ${CMAKE_SOURCE_DIR}/src/interpolator.cpp)
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES})
 target_include_directories(
   gsplines PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}

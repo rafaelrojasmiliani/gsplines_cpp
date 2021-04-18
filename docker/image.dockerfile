@@ -15,11 +15,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o
                     python3-pip git iputils-ping net-tools netcat screen build-essential lsb-release gnupg2 curl
 RUN echo "deb [arch=amd64] http://robotpkg.openrobots.org/packages/debian/pub $(lsb_release -cs) robotpkg" | tee /etc/apt/sources.list.d/robotpkg.list
 RUN curl http://robotpkg.openrobots.org/packages/debian/robotpkg.key | apt-key add -
+RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    robotpkg-py36-pinocchio python3-sympy coinor-libipopt-dev sudo
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    build-essential pkg-config git
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
+                    robotpkg-py36-pinocchio python3-sympy coinor-libipopt-dev sudo valgrind \
+                    build-essential pkg-config git \
                     liblapack-dev liblapack3 libopenblas-base libopenblas-dev libgfortran-7-dev cmake libgsl-dev
 
 RUN pip3 install setuptools matplotlib Mosek scipy quadpy six cython tk

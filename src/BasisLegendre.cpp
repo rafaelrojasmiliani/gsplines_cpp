@@ -5,17 +5,18 @@ namespace gsplines {
 namespace basis {
 
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
-BasisLegendre::BasisLegendre(std::size_t _dim)
-    : Basis(_dim), dmat_(_dim, _dim) {
+BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
 
-  gsplines_legendre_dmat(_dim, dmat_);
+  gsplines_legendre_dmat(_dim, derivative_matrix_);
 }
 
+BasisLegendre::BasisLegendre(const BasisLegendre &that) : Basis(that) {}
 BasisLegendre::~BasisLegendre() {}
 
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd> _buff) {
+
   Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
@@ -64,8 +65,8 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
 
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (int i = 0; i < _dim; i++) {
-    for (int j = 0; j < _dim - 1; j++) {
+  for (int i = 0; i < _dim; i++) {       // for on i
+    for (int j = 0; j < _dim - 1; j++) { // for on j
       if (i == j + 1) {
         _dmat(i, j) = (i) / alpha(i - 1);
       } else if (i > j + 1) {
@@ -77,8 +78,8 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
         _dmat(i, j) = 1.0f / alpha(i - 1) *
                       (firstTerm + secondTerm + thirdTerm - fourthTerm);
       }
-    }
-  }
+    } // for on j
+  }   // for on i
 }
 } // namespace basis
 } // namespace gsplines
