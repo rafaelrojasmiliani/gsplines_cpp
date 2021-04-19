@@ -28,9 +28,7 @@ PiecewiseFunction::PiecewiseFunction(std::size_t _codom_dim,
 PiecewiseFunction::~PiecewiseFunction() {}
 
 void PiecewiseFunction::operator()(double _domain_point,
-                                   Eigen::VectorXd &_result) const {
-  basis_;
-}
+                                   Eigen::VectorXd &_result) const {}
 void PiecewiseFunction::operator()(const Eigen::VectorXd &_domain_points,
                                    Eigen::MatrixXd &_result) const {
   std::size_t result_size(_domain_points.size());

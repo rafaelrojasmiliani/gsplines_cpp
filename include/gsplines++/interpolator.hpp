@@ -13,6 +13,7 @@ private:
   std::size_t codom_dim_;
   std::size_t num_intervals_;
   Eigen::SparseMatrix<double> interpolating_matrix_;
+  Eigen::VectorXd interpolating_vector_;
   std::size_t matrix_size_;
   std::size_t nnz_size_;
   std::size_t k_factor_; // maxisum derivative present on the cost function
@@ -26,7 +27,12 @@ public:
   Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
                basis::Basis &_basis);
   virtual ~Interpolator();
-  void fill_interpolating_matrix(Eigen::Ref<Eigen::VectorXd> _interval_lengths);
+  void fill_interpolating_matrix(
+      const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
+  void
+  fill_interpolating_vector(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+  void interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+                   const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
 };
 
 } // namespace gsplines
