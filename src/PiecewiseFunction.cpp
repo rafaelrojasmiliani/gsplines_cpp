@@ -1,8 +1,25 @@
 #include <gsplines++/PiecewiseFunction.hpp>
+#include <iostream>
 
 namespace gsplines {
 
-PiecewiseFunction PiecewiseFunction::deriv(std::size_t _deg) { return *this; }
+PiecewiseFunction PiecewiseFunction::deriv(std::size_t _deg) {
+  Eigen::VectorXd result_coeff(coefficients_);
+  for (int d = 1; d <= _deg; d++) {
+    for (int interval = 0; interval < number_of_intervals_; interval++) {
+      for (int comp = 0; comp < codom_dim_; comp++) {
+        int i0 = interval * comp + comp * basis_->get_dim();
+        result_coeff.segment(i0, basis_->get_dim()) =
+            basis_->get_derivative_matrix().transpose() *
+            result_coeff.segment(i0, basis_->get_dim()) * 2 /
+            domain_interval_lengths_(interval);
+      }
+    }
+  }
+
+  return PiecewiseFunction(codom_dim_, number_of_intervals_, *basis_,
+                           result_coeff, domain_interval_lengths_);
+}
 
 PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
     : coefficients_(that.coefficients_), codom_dim_(that.codom_dim_),
@@ -29,41 +46,16 @@ PiecewiseFunction::PiecewiseFunction(
     printf("Error: The number of coefficients is incorrect\n");
     fflush(stdout);
   }
-  printf("codon dim = %zu\n", codom_dim_);
   double time_instant = 0.0;
   domain_break_points_(0) = time_instant;
   for (int i = 1; i < number_of_intervals_ + 1; i++) {
-    domain_break_points_(i) = time_instant;
     time_instant += domain_interval_lengths_(i - 1);
+    domain_break_points_(i) = time_instant;
   }
 }
 
 PiecewiseFunction::~PiecewiseFunction() {}
-/*
-void PiecewiseFunction::operator()(double _domain_point,
-                                   Eigen::VectorXd &_result) {
 
-  std::size_t current_interval = 0;
-  current_interval = get_interval(_domain_point);
-  basis_->eval_on_window(interval_to_window(_domain_point, current_interval),
-                         domain_interval_lengths_(current_interval),
-                         basis_buffer_);
-}
-void PiecewiseFunction::operator()(const Eigen::VectorXd &_domain_points,
-                                   Eigen::MatrixXd &_result) {
-  std::size_t result_size(_domain_points.size());
-  std::size_t current_interval = 0;
-  for (int i = 0; i < result_size; i++) {
-    current_interval = get_interval(_domain_points(i));
-    basis_->eval_on_window(
-        interval_to_window(_domain_points(i), current_interval),
-        domain_interval_lengths_(current_interval), basis_buffer_);
-    for (int j = 0; j < codom_dim_; j++) {
-      _result(i, j) =
-          coefficient_segment(current_interval, j).adjoint() * basis_buffer_;
-    }
-  }
-*/
 Eigen::MatrixXd PiecewiseFunction::operator()(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
 
@@ -86,12 +78,13 @@ Eigen::MatrixXd PiecewiseFunction::operator()(
 }
 
 std::size_t PiecewiseFunction::get_interval(double _domain_point) const {
-  if (_domain_point < domain_break_points_(0))
+  if (_domain_point <= domain_break_points_(0))
     return 0.0;
   for (int i = 0; i < number_of_intervals_; i++) {
     if (domain_break_points_(i) < _domain_point and
-        _domain_point < domain_break_points_(i + 1))
+        _domain_point <= domain_break_points_(i + 1)) {
       return i;
+    }
   }
   if (domain_break_points_.tail(1)(0) < _domain_point)
     return number_of_intervals_ - 1;

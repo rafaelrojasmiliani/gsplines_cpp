@@ -36,6 +36,14 @@ public:
   //                  Eigen::MatrixXd &_result) const;
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+
+  std::size_t get_codom_dim() { return codom_dim_; }
+  double get_exec_time() {
+    return domain_break_points_.tail(1)(0) - domain_break_points_(0);
+  }
+  const Eigen::Ref<const Eigen::VectorXd> get_domain_breakpoints() {
+    return domain_break_points_;
+  }
 };
 } // namespace gsplines
 

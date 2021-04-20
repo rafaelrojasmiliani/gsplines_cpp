@@ -1,4 +1,5 @@
 #include <gsplines++/BasisLegendre.hpp>
+#include <iostream>
 #include <math.h>
 namespace gsplines {
 
@@ -6,7 +7,6 @@ namespace basis {
 
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
-
   gsplines_legendre_dmat(_dim, derivative_matrix_);
 }
 
@@ -57,26 +57,29 @@ void BasisLegendre::eval_on_window(double _s, double _tau,
         ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
   }
 }
-double alpha(int i) { return (double)(i + 1.0) / (double)(2.0 * i + 1.0); }
+double alpha(int i) { return ((double)(i + 1.0)) / ((double)(2.0 * i + 1.0)); }
 
-double gamma(int i) { return (double)i / (double)(2.0 * i + 1.0); }
+double gamma(int i) { return ((double)i) / ((double)(2.0 * i + 1.0)); }
 
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
 
+  _dmat = Eigen::MatrixXd::Zero(_dim, _dim);
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (int i = 0; i < _dim; i++) {       // for on i
+  for (int i = 1; i < _dim; i++) {       // for on i
     for (int j = 0; j < _dim - 1; j++) { // for on j
       if (i == j + 1) {
-        _dmat(i, j) = (i) / alpha(i - 1);
+        _dmat(i, j) = ((double)i) / alpha(i - 1);
       } else if (i > j + 1) {
         firstTerm = 0.0;
         secondTerm = (j >= 1) ? alpha(j - 1) * _dmat(i - 1, j - 1) : 0.0;
         thirdTerm = (i >= 1) ? gamma(j + 1) * _dmat(i - 1, j + 1) : 0.0;
         fourthTerm = (i >= 2) ? gamma(i - 1) * _dmat(i - 2, j) : 0.0;
 
-        _dmat(i, j) = 1.0f / alpha(i - 1) *
+        _dmat(i, j) = 1.0 / alpha(i - 1) *
                       (firstTerm + secondTerm + thirdTerm - fourthTerm);
+      } else {
+        _dmat(i, j) = 0.0;
       }
     } // for on j
   }   // for on i

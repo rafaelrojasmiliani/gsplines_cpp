@@ -70,7 +70,11 @@ PYBIND11_MODULE(pygsplines, m) {
       .def(py::init<std::size_t, std::size_t, Basis &,
                     const Eigen::Ref<const Eigen::VectorXd>,
                     const Eigen::Ref<const Eigen::VectorXd>>())
-      .def("__call__", &PiecewiseFunction::operator());
+      .def("__call__", &PiecewiseFunction::operator())
+      .def("get_exec_time", &PiecewiseFunction::get_exec_time)
+      .def("get_codom_dim", &PiecewiseFunction::get_codom_dim)
+      .def("get_domain_breakpoints", &PiecewiseFunction::get_domain_breakpoints)
+      .def("deriv", &PiecewiseFunction::deriv);
 
   py::class_<Interpolator>(m, "Interpolator")
       .def(py::init<std::size_t, std::size_t, Basis &>());
