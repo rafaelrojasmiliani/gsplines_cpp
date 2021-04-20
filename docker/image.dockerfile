@@ -19,7 +19,8 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
                     robotpkg-py36-pinocchio python3-sympy coinor-libipopt-dev sudo valgrind \
                     build-essential pkg-config git \
-                    liblapack-dev liblapack3 libopenblas-base libopenblas-dev libgfortran-7-dev cmake libgsl-dev
+                    liblapack-dev liblapack3 libopenblas-base libopenblas-dev \
+                    libgfortran-7-dev cmake libgsl-dev gdb python3-tk
 
 RUN pip3 install setuptools matplotlib Mosek scipy quadpy six cython tk
 

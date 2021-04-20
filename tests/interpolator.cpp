@@ -1,7 +1,7 @@
 
 
 #include <gsplines++/BasisLegendre.hpp>
-#include <gsplines++/interpolator.hpp>
+#include <gsplines++/Interpolator.hpp>
 #include <iostream>
 #include <stdio.h>
 int main() {

@@ -1,5 +1,5 @@
 #include <eigen3/Eigen/SparseLU>
-#include <gsplines++/interpolator.hpp>
+#include <gsplines++/Interpolator.hpp>
 #include <iostream>
 
 namespace gsplines {
@@ -9,20 +9,15 @@ Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
     : basis_(&_basis), num_intervals_(_num_intervals),
       matrix_size_(_basis.get_dim() * _codom_dim * _num_intervals),
       boundary_buffer_tranposed_(_basis.get_dim(), _basis.get_dim() / 2),
-      codom_dim_(_codom_dim), nnz_vec_(), interpolating_vector_(matrix_size_) {
+      codom_dim_(_codom_dim) {
   interpolating_matrix_.resize(matrix_size_, matrix_size_);
   interpolating_vector_.resize(matrix_size_);
 
-  printf("rows %zu cols %zu\n", interpolating_matrix_.rows(),
-         interpolating_matrix_.cols());
-  printf("matriz size %zu\n", matrix_size_);
   std::size_t nnz_per_col =
       2 * (basis_->get_dim() / 2 - 1) + 2 + 2 * (basis_->get_dim() - 2);
   interpolating_matrix_.reserve(
       Eigen::VectorXi::Constant(matrix_size_, nnz_per_col));
   interpolating_matrix_.makeCompressed();
-  printf("rows %zu cols %zu\n", interpolating_matrix_.rows(),
-         interpolating_matrix_.cols());
 }
 
 Interpolator::~Interpolator() {}
@@ -39,8 +34,6 @@ void Interpolator::fill_interpolating_matrix(
   for (int j = 0; j < basis_->get_dim() * codom_dim_; j++) {
     i0 = (j / basis_->get_dim()) * basis_->get_dim() / 2;
     for (int i = i0; i < i0 + basis_->get_dim() / 2; i++) {
-      printf("i %i j %i\n", i, j);
-      fflush(stdout);
       interpolating_matrix_.insert(i, j) =
           boundary_buffer_tranposed_(j % basis_->get_dim(), i - i0);
     }
@@ -53,8 +46,6 @@ void Interpolator::fill_interpolating_matrix(
     for (int j = 0; j < basis_->get_dim() * codom_dim_; j++) {
       i0 = (j / basis_->get_dim()) * basis_->get_dim() / 2 + i0_prev;
       for (int i = i0; i < i0 + basis_->get_dim() / 2; i++) {
-        printf("i %i j %i\n", i, j);
-        fflush(stdout);
         interpolating_matrix_.insert(i, j) =
             boundary_buffer_tranposed_(j % basis_->get_dim(), i - i0);
       }
@@ -72,7 +63,6 @@ void Interpolator::fill_interpolating_vector(
     interpolating_vector_(i) = _waypoints(0, d);
     i++;
     for (int j = 1; j < basis_->get_dim() / 2; j++) {
-      printf("i=%i\n", i);
       interpolating_vector_(i) = 0;
       i++;
     }
@@ -89,14 +79,20 @@ void Interpolator::fill_interpolating_vector(
     return;
   }
 }
-void Interpolator::interpolate(
+PiecewiseFunction Interpolator::interpolate(
     const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
   Eigen::VectorXd vector_resut;
+  // 1. fill the interpolating matrix
   fill_interpolating_matrix(_interval_lengths);
+  // 2. fill the interpolating vector
   fill_interpolating_vector(_waypoints);
+  // 3. Solve the interpolation problem
   Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
   solver.compute(interpolating_matrix_);
   vector_resut = solver.solve(interpolating_vector_);
+  // 4. Return the interpolating function
+  return PiecewiseFunction(codom_dim_, num_intervals_, *basis_, vector_resut,
+                           _interval_lengths);
 }
 } // namespace gsplines

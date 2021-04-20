@@ -2,6 +2,7 @@
 #define INTERPOLATOR_H
 #include <eigen3/Eigen/SparseCore>
 #include <gsplines++/Basis.hpp>
+#include <gsplines++/PiecewiseFunction.hpp>
 
 namespace gsplines {
 
@@ -31,8 +32,9 @@ public:
       const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
   void
   fill_interpolating_vector(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
-  void interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-                   const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+  PiecewiseFunction
+  interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+              const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
 };
 
 } // namespace gsplines
