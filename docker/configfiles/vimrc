@@ -8,6 +8,7 @@ set tabstop=4   		"Number of spaces that a <Tab> in the file counts for
 set expandtab           "set tab to spaces
 set smarttab     		"When on, a <Tab> in front of a line inserts blanks according to
 set backspace=2			"Fix BS issue
+au BufRead,BufNewFile *.tex syntax spell toplevel " enable spelling without sections
 colorscheme desert
 nnoremap <silent><Up> gk
 nnoremap <silent><Down> gj
@@ -56,13 +57,59 @@ let g:ale_lint_on_enter = 1
 let g:ale_lint_on_insert_leave = 1
 let g:ale_fix_on_save = 1
 let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
+" ------- vim-substitute -------
 Plugin 'vim-substitute'
+let g:substitute_SingleWordSize=100
 Plugin 'ultisnips'
 let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 Plugin 'vim-snippets'
 Plugin 'vim-fugitive'
+Plugin 'xmledit'
 call vundle#end()
 filetype plugin indent on
 filetype plugin on
+" ----------------------------------------------------
+" ---------------- Status Line -----------------------
+" ----------------------------------------------------
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?'('.l:branchname.')':''
+endfunction
+
+" jamessan's
+set laststatus=2
+set statusline=   " clear the statusline for when vimrc is reloaded
+set statusline+=%1*[\ WS00\ ]%*   
+"set statusline+=%{StatuslineGit()}
+set statusline+=%-2.2n                       " buffer number
+set statusline+=%t\                          " tail of file name
+set statusline+=%h%m%r%w                     " flags
+set statusline+=[
+"set statusline+=[%{strlen(&ft)?&ft:'none'},  " filetype
+"set statusline+=%{strlen(&fenc)?&fenc:&enc}, " encoding
+set statusline+=%{&fileformat}]               " file format
+set statusline+=%=                            " right align
+set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\  "show hi
+set statusline+={%b,0x%B}\                   " current char
+set statusline+=(%(%l,%c%V%))\ %<%P        " offset
+
+" ----------------------------------------------------
+" ---------------- Sentece for each line format ------
+" ----------------------------------------------------
+function! MyFormatExpr(start, end)
+  silent execute a:start.','.a:end.'j'
+  silent execute a:start.','.a:end.'s/\(e\.g\|\<al\|i\.e\)\@<![.!?]\zs /\r/g'
+"\zs     Matches at any position, and sets the start of the match there: The
+"        next char is the first char of the whole match. /zero-width
+"        I.E. This only substitute the space after [.!?]
+  silent execute a:start.','.a:end.'g/^\s*$/d'
+"\s      whitespace character: <Space> and <Tab>  
+endfunction
+
+set formatexpr=MyFormatExpr(v:lnum,v:lnum+v:count-1)

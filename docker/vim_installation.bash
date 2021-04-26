@@ -34,6 +34,7 @@ install_vim_plugins(){
     git clone https://github.com/SirVer/ultisnips.git /etc/vim/bundle/ultisnips
     git clone https://github.com/honza/vim-snippets.git /etc/vim/bundle/vim-snippets
     git clone https://github.com/tpope/vim-fugitive.git /etc/vim/bundle/vim-fugitive
+    git clone https://github.com/sukima/xmledit.git /etc/vim/bundle/xmledit
     cd /etc/vim/bundle/YouCompleteMe && git submodule update --init --recursive && python3 install.py --clang-completer --ts-completer --java-completer --cs-completer
 }
 
