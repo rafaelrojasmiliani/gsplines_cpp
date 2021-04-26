@@ -1,0 +1,68 @@
+set mouse=r
+set guifont=Monospace
+set si 					"Smart indent see help
+set ai 					"Auto indent Copy indent from current line when starting a new line
+set shiftwidth=4 		"Number of spaces to use for each step of (auto)indent
+set softtabstop=4               
+set tabstop=4   		"Number of spaces that a <Tab> in the file counts for
+set expandtab           "set tab to spaces
+set smarttab     		"When on, a <Tab> in front of a line inserts blanks according to
+set backspace=2			"Fix BS issue
+colorscheme desert
+nnoremap <silent><Up> gk
+nnoremap <silent><Down> gj
+vnoremap <silent><Up> gk
+vnoremap <silent><Down> gj
+inoremap <silent><Up> <C-o>gk
+inoremap <silent><Down> <C-o>gj
+set display+=lastline "prevent @ when a line doesn't fit on screen
+" ---------------------------------------
+set nocompatible
+filetype off
+set rtp+=/etc/vim/bundle/Vundle.vim
+call vundle#begin('/etc/vim/bundle/')
+Plugin 'Vundle.vim'
+Plugin 'YouCompleteMe'
+set encoding=utf-8
+let g:ycm_key_list_select_completion = ['<C-n>']
+let g:ycm_key_list_previous_completion = ['<C-p>']
+let g:ycm_python_binary_path='/usr/bin/python3'
+let g:ycm_enable_diagnostic_signs=0
+let g:ycm_enable_diagnostic_highlighting=0
+let g:ycm_global_ycm_extra_conf='/etc/vim/ycm_extra_conf.py'
+let g:ycm_confirm_extra_conf = 1
+let g:SuperTabDefaultCompletionType = '<C-n>'
+Plugin 'vim-latex'
+" ------- tagbar -------
+Plugin 'tagbar'
+map  <F4>          :TagbarToggle<CR>
+"let g:tagbar_ctags_options = ['C:\Users\Administrator\.ctags']
+"let g:tagbar_type_xml = {
+"            \ 'kinds' : ['j:joints', 'l:links', 'p:properties', 'm:macros', 'i:includes', 'n:nodes']
+"            \}
+" ------- bufer exampler -------
+Plugin 'bufexplorer'
+" ------- ale -------
+Plugin 'ale'
+let g:ale_completion_enabled = 0
+let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace']}
+let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
+let g:ale_cpp_clangtidy_executable='clang-tidy'
+let g:ale_cpp_clangtidy_extra_options='-extra-arg=-I/opt/ros/melodic/include -extra-arg=-I../include -extra-arg=-I../../include'
+let g:ale_sign_error = 'E'
+let g:ale_sign_warning = 'W'
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_insert_leave = 1
+let g:ale_fix_on_save = 1
+let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
+Plugin 'vim-substitute'
+Plugin 'ultisnips'
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+Plugin 'vim-snippets'
+Plugin 'vim-fugitive'
+call vundle#end()
+filetype plugin indent on
+filetype plugin on
