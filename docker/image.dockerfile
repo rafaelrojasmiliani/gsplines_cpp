@@ -12,7 +12,7 @@ RUN apt-get update
 
 # Install packages
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    python3-pip git iputils-ping net-tools netcat screen build-essential lsb-release gnupg2 curl
+                    python3-pip git iputils-ping net-tools netcat screen build-essential lsb-release gnupg2 curl less
 #RUN echo "deb [arch=amd64] http://robotpkg.openrobots.org/packages/debian/pub $(lsb_release -cs) robotpkg" | tee /etc/apt/sources.list.d/robotpkg.list
 #RUN curl http://robotpkg.openrobots.org/packages/debian/robotpkg.key | apt-key add -
 RUN apt-get update

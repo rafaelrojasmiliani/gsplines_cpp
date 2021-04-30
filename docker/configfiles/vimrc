@@ -8,6 +8,7 @@ set tabstop=4   		"Number of spaces that a <Tab> in the file counts for
 set expandtab           "set tab to spaces
 set smarttab     		"When on, a <Tab> in front of a line inserts blanks according to
 set backspace=2			"Fix BS issue
+set hidden
 au BufRead,BufNewFile *.tex syntax spell toplevel " enable spelling without sections
 colorscheme desert
 nnoremap <silent><Up> gk
@@ -46,7 +47,7 @@ Plugin 'bufexplorer'
 " ------- ale -------
 Plugin 'ale'
 let g:ale_completion_enabled = 0
-let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace']}
+let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace'], 'json':['jq'], 'yaml':['prettier']}
 let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
 let g:ale_cpp_clangtidy_executable='clang-tidy'
 let g:ale_cpp_clangtidy_extra_options='-extra-arg=-I/opt/ros/melodic/include -extra-arg=-I../include -extra-arg=-I../../include'
@@ -67,6 +68,8 @@ let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 Plugin 'vim-snippets'
 Plugin 'vim-fugitive'
 Plugin 'xmledit'
+Plugin 'vimspector'
+let g:vimspector_enable_mappings = 'HUMAN'
 call vundle#end()
 filetype plugin indent on
 filetype plugin on
