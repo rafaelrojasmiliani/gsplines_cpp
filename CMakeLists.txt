@@ -1,3 +1,4 @@
+project(gsplines)
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 set(CMAKE_BUILD_TYPE Debug)
 # project( gplines++ VERSION 0.0.1 DESCRIPTION "Generalized Splines in c++")
@@ -6,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(PYTHON_VERSION
     3.6
     CACHE STRING "Build bindings for Python version")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(GSL REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(

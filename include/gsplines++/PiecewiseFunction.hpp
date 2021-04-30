@@ -9,13 +9,13 @@ namespace gsplines {
 class PiecewiseFunction {
 private:
   PiecewiseFunction &operator=(const PiecewiseFunction &);
+  const std::size_t codom_dim_;
+  const std::size_t number_of_intervals_;
+  basis::Basis *const basis_;
   Eigen::VectorXd coefficients_;
   Eigen::VectorXd domain_break_points_;
   Eigen::VectorXd domain_interval_lengths_;
   Eigen::VectorXd basis_buffer_;
-  const std::size_t codom_dim_;
-  const std::size_t number_of_intervals_;
-  basis::Basis *const basis_;
   std::size_t get_interval(double _domain_point) const;
   double interval_to_window(double _t, std::size_t _interval) const;
 

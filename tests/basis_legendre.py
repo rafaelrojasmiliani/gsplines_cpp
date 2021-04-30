@@ -1,11 +1,10 @@
 
 import pathlib
-import os
 import sys
 import unittest
 import numpy as np
-from .tools import debug_on
 from numpy.polynomial.legendre import Legendre
+from .tools import debug_on
 try:
     from pygsplines import BasisLegendre
 except ImportError:
@@ -15,14 +14,14 @@ except ImportError:
     from pygsplines import BasisLegendre
 
 
-class cMyTest(unittest.TestCase):
+class MyTest(unittest.TestCase):
     @debug_on()
     def __init__(self, *args, **kwargs):
-        super(cMyTest, self).__init__(*args, **kwargs)
+        super(MyTest, self).__init__(*args, **kwargs)
 
     @debug_on()
     def test(self):
-        n = np.random.randint(2, 5)
+        n = 2*np.random.randint(1, 8)
         basis = BasisLegendre(n)
 
         vec = np.zeros((n,))
@@ -41,7 +40,11 @@ class cMyTest(unittest.TestCase):
             print('n={:d} d={:d}'.format(n, d))
             basis.eval_derivative_on_window(tval, 2.0, d, vec)
             for j in range(n):
-                assert abs(basis_nominal[j].deriv(d)(tval)-vec[j]) < 1.0e-7
+                if abs(basis_nominal[j].deriv(d)(tval)-vec[j]) > 1.0e-7:
+                    print([basis_nominal[m].deriv(d)(tval)
+                          for m in range(0, n)])
+                    print([vec[m]
+                          for m in range(0, n)])
 
 
 if __name__ == '__main__':

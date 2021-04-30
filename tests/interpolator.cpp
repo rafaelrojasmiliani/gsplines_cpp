@@ -4,17 +4,21 @@
 #include <gsplines++/Interpolator.hpp>
 #include <iostream>
 #include <stdio.h>
+
+#include <random>
+
 int main() {
 
-  gsplines::basis::BasisLegendre basis(6);
-  std::size_t dim = 2;
-  std::size_t intervals = 1;
-  gsplines::Interpolator inter(dim, intervals, basis);
-  Eigen::VectorXd tauv(1);
-  Eigen::MatrixXd wp(2, dim);
-  wp = Eigen::MatrixXd::Random(2, dim);
-  std::cout << wp << '\n';
-  fflush(stdout);
-  tauv(0) = 1.0;
-  inter.interpolate(tauv, wp);
+  for (int i = 1; i < 10; i++) {
+    gsplines::basis::BasisLegendre basis(2 * i);
+    std::size_t dim = 2;
+    std::size_t intervals = 4;
+    Eigen::MatrixXd wp = Eigen::MatrixXd::Random(intervals + 1, dim);
+    gsplines::Interpolator inter(dim, intervals, basis);
+    Eigen::VectorXd tauv(intervals);
+    inter.fill_interpolating_matrix(tauv);
+    printf("--------- fillinf vector ------------\n");
+    inter.fill_interpolating_vector(wp);
+    printf("-----------------------------\n");
+  }
 }

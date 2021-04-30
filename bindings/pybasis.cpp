@@ -81,7 +81,11 @@ PYBIND11_MODULE(pygsplines, m) {
 
   py::class_<PyInterpolator, Interpolator>(m, "PyInterpolator")
       .def(py::init<std::size_t, std::size_t, Basis &>())
-      .def("interpolate", &PyInterpolator::py_interpolate);
+      .def("interpolate", &PyInterpolator::py_interpolate)
+      .def("print_interpolating_matrix",
+           &PyInterpolator::print_interpolating_matrix)
+      .def("print_interpolating_vector",
+           &PyInterpolator::print_interpolating_vector);
 }
 
 } // namespace basis

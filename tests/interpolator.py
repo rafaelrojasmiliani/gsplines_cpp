@@ -49,20 +49,22 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
     plt.show()
 
 
-class cMyTest(unittest.TestCase):
+class MyTest(unittest.TestCase):
     @debug_on()
     def __init__(self, *args, **kwargs):
-        super(cMyTest, self).__init__(*args, **kwargs)
+        super(MyTest, self).__init__(*args, **kwargs)
 
     @debug_on()
     def test(self):
-        basis = BasisLegendre(2*np.random.randint(1, 10))
-        dim = 3
-        intervals = 1
+        basis = BasisLegendre(6)
+        dim = 2
+        intervals = 2
         wp = np.random.rand(intervals+1, dim)
-        tau = np.array([1])
+        tau = np.array(intervals*[1])
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(tau, wp)
+        inter.print_interpolating_matrix()
+        inter.print_interpolating_vector()
 
         show_piecewisefunction(res, 5, 0.001)
 

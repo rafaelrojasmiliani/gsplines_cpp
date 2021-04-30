@@ -16,13 +16,12 @@ BasisLegendre::~BasisLegendre() {}
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd> _buff) {
-
   Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
   _buff(0) = 1.0;
   _buff(1) = _s;
-  for (int i = 1; i < get_dim() - 1; i++) {
+  for (unsigned int i = 1; i < get_dim() - 1; i++) {
     _buff(i + 1) =
         1.0 / ((double)i + 1.0) *
         ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
