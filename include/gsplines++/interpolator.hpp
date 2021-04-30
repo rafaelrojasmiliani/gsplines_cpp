@@ -18,6 +18,7 @@ private:
   std::size_t k_factor_; // maxisum derivative present on the cost function
   Eigen::SparseMatrix<double> interpolating_matrix_;
   Eigen::VectorXd interpolating_vector_;
+  Eigen::VectorXd coefficients_vector_;
   Eigen::MatrixXd
       boundary_buffer_tranposed_; // this is  basis.dim \times basis.dim/2
   Eigen::MatrixXd
@@ -46,6 +47,13 @@ public:
   void fill_continuity_derivative_block(unsigned int i0, unsigned int j0,
                                         bool _minus);
   void fill_buffers(double s, double tau);
+
+  void fill_buffers_deriv_wrt_tau(double s, double tau);
+
+  Eigen::Ref<const Eigen::VectorXd> get_coeff_derivative_wrt_tau(
+      Eigen::Ref<const Eigen::VectorXd> _coeff,
+      Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+      std::size_t _tau_idx);
 };
 
 } // namespace gsplines

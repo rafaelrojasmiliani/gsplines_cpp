@@ -19,6 +19,7 @@ void BasisLegendre::eval_derivative_on_window(
   Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
+  double mutiplier = 1.0;
   _buff(0) = 1.0;
   _buff(1) = _s;
   for (unsigned int i = 1; i < get_dim() - 1; i++) {
@@ -39,12 +40,18 @@ void BasisLegendre::eval_derivative_on_window(
     }
     aux = (2.0 * (double)d + 1.0) / ((double)d + 1.0) * ((double)d + 1.0) * aux;
     _buff = buff_next;
+    mutiplier *= (2.0 / _tau);
   }
+  _buff *= mutiplier;
 }
 
 void BasisLegendre::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
-    Eigen::Ref<Eigen::VectorXd> _buff) {}
+    Eigen::Ref<Eigen::VectorXd> _buff) {
+
+  eval_derivative_on_window(_s, _tau, _deg, _buff);
+  _buff *= -0.5 * _deg * (2.0 / _tau);
+}
 
 void BasisLegendre::eval_on_window(double _s, double _tau,
                                    Eigen::Ref<Eigen::VectorXd> _buff) {

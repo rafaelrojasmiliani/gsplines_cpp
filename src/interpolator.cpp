@@ -13,6 +13,7 @@ Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
   interpolating_matrix_.resize(matrix_size_, matrix_size_);
   interpolating_vector_.resize(matrix_size_);
   interpolating_vector_.setZero();
+  coefficients_vector_.resize(matrix_size_);
 
   derivative_buffer_tranposed_.resize(basis_->get_dim(), basis_->get_dim() - 2);
 
@@ -38,33 +39,17 @@ void Interpolator::fill_interpolating_matrix(
                     "the requred dimention");
     return;
   }
-  printf("fill buffer ");
-  fflush(stdout);
   fill_buffers(-1.0, _interval_lengths(0));
-  printf("ok\n");
-  fflush(stdout);
 
-  printf("fill position block ");
-  fflush(stdout);
   fill_position_block(i0, j0);
-  printf("ok\n");
-  fflush(stdout);
   i0 += codom_dim_;
 
-  printf("fill boundary der block ");
-  fflush(stdout);
   fill_boundary_derivative_block(i0, j0);
-  printf("ok\n");
-  fflush(stdout);
   i0 += codom_dim_ * (basis_->get_dim() / 2 - 1);
 
   fill_buffers(1.0, _interval_lengths(0));
 
-  printf("fill position block ");
-  fflush(stdout);
   fill_position_block(i0, j0);
-  printf("ok\n");
-  fflush(stdout);
   i0 += codom_dim_;
 
   if (num_intervals_ == 1) {
@@ -154,19 +139,15 @@ PiecewiseFunction Interpolator::interpolate(
     const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
   Eigen::VectorXd vector_resut;
-  printf("// 1. fill the interpolating matrix\n");
-  fflush(stdout);
+  // 1. fill the interpolating matrix
   fill_interpolating_matrix(_interval_lengths);
-  printf("// 2. fill the interpolating vector\n");
-  fflush(stdout);
+  // 2. fill the interpolating vector
   fill_interpolating_vector(_waypoints);
-  printf("// 3. Solve the interpolation problem\n");
-  fflush(stdout);
+  // 3. Solve the interpolation problem
   Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
   solver.compute(interpolating_matrix_);
   vector_resut = solver.solve(interpolating_vector_);
-  printf("// 4. Return the interpolating function\n");
-  fflush(stdout);
+  // 4. Return the interpolating function
   return PiecewiseFunction(codom_dim_, num_intervals_, *basis_, vector_resut,
                            _interval_lengths);
 }
@@ -182,8 +163,6 @@ void Interpolator::print_interpolating_vector() {
 }
 void Interpolator::fill_position_block(unsigned int i0, unsigned int j0) {
   unsigned int i, j;
-  printf("-- position block");
-  fflush(stdout);
   for (unsigned int codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
     for (unsigned int basis_coor = 0; basis_coor < basis_->get_dim();
          basis_coor++) {
@@ -192,8 +171,6 @@ void Interpolator::fill_position_block(unsigned int i0, unsigned int j0) {
       interpolating_matrix_.insert(i, j) = position_buffer_(basis_coor);
     }
   }
-  printf("ok\n");
-  fflush(stdout);
 }
 void Interpolator::fill_continuity_derivative_block(unsigned int _i0,
                                                     unsigned int _j0,
@@ -202,8 +179,6 @@ void Interpolator::fill_continuity_derivative_block(unsigned int _i0,
   unsigned int codom_coor;
   unsigned int basis_coor;
   unsigned int der_coor;
-  printf("-- fill continuty matrix -- ");
-  fflush(stdout);
   double mutiplier;
   if (_minus) {
     mutiplier = -1.0;
@@ -220,8 +195,6 @@ void Interpolator::fill_continuity_derivative_block(unsigned int _i0,
       }
     }
   }
-  printf("ok\n");
-  fflush(stdout);
 }
 
 void Interpolator::fill_boundary_derivative_block(unsigned int _i0,
@@ -230,8 +203,6 @@ void Interpolator::fill_boundary_derivative_block(unsigned int _i0,
   unsigned int codom_coor;
   unsigned int basis_coor;
   unsigned int der_coor;
-  printf("-- fill boundary matrix ");
-  fflush(stdout);
   for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
     for (der_coor = 0; der_coor < basis_->get_dim() / 2 - 1; der_coor++) {
       for (basis_coor = 0; basis_coor < basis_->get_dim(); basis_coor++) {
@@ -243,20 +214,62 @@ void Interpolator::fill_boundary_derivative_block(unsigned int _i0,
       }
     }
   }
-  printf("ok\n");
-  fflush(stdout);
 }
 void Interpolator::fill_buffers(double s, double tau) {
 
-  printf("-- fill buffers ");
-  fflush(stdout);
   basis_->eval_derivative_on_window(s, tau, 0, position_buffer_);
 
   for (unsigned int der = 0; der < basis_->get_dim() - 2; der++) {
     basis_->eval_derivative_on_window(s, tau, der + 1,
                                       derivative_buffer_tranposed_.col(der));
   }
-  printf("ok\n");
-  fflush(stdout);
+}
+
+void Interpolator::fill_buffers_deriv_wrt_tau(double s, double tau) {
+
+  basis_->eval_derivative_wrt_tau_on_window(s, tau, 0, position_buffer_);
+
+  for (unsigned int der = 0; der < basis_->get_dim() - 2; der++) {
+    basis_->eval_derivative_wrt_tau_on_window(
+        s, tau, der + 1, derivative_buffer_tranposed_.col(der));
+  }
+}
+
+Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
+    Eigen::Ref<const Eigen::VectorXd> _coeff,
+    Eigen::Ref<const Eigen::VectorXd> _interval_lengths, std::size_t _tau_idx) {
+
+  if (_interval_lengths.size() != num_intervals_) {
+    fprintf(stderr, "Cannot fill matrix. Vector of interval lenghts is not of "
+                    "the requred dimention");
+    return coefficients_vector_;
+  }
+  Eigen::SparseMatrix<double> int_mat_wrt_tau(matrix_size_, matrix_size_);
+
+  unsigned int interval_coor = 0;
+  unsigned int i0 = 0;
+  unsigned int j0 = 0;
+
+  if (_tau_idx == 0) {
+
+    fill_buffers_deriv_wrt_tau(-1.0, _interval_lengths(0));
+
+    fill_position_block(i0, j0);
+    i0 += codom_dim_;
+
+    fill_boundary_derivative_block(i0, j0);
+    i0 += codom_dim_ * (basis_->get_dim() / 2 - 1);
+
+    fill_buffers(1.0, _interval_lengths(0));
+
+    fill_position_block(i0, j0);
+    i0 += codom_dim_;
+
+    if (num_intervals_ == 1) {
+      fill_boundary_derivative_block(i0, j0);
+      return coefficients_vector_;
+    }
+  }
+  return coefficients_vector_;
 }
 } // namespace gsplines

@@ -6,6 +6,7 @@ import numpy as np
 from .tools import debug_on
 from numpy.polynomial.legendre import Legendre
 import matplotlib.pyplot as plt
+import time
 try:
     from pygsplines import BasisLegendre
     from pygsplines import PyInterpolator as Interpolator
@@ -56,17 +57,36 @@ class MyTest(unittest.TestCase):
 
     @debug_on()
     def test(self):
-        basis = BasisLegendre(6)
-        dim = 2
-        intervals = 2
-        wp = np.random.rand(intervals+1, dim)
+        basis = BasisLegendre(10)
+        dim = 6
+        intervals = 1
+        waypoints = np.random.rand(intervals+1, dim)
         tau = np.array(intervals*[1])
         inter = Interpolator(dim, intervals, basis)
-        res = inter.interpolate(tau, wp)
+        res = inter.interpolate(tau, waypoints)
         inter.print_interpolating_matrix()
         inter.print_interpolating_vector()
 
         show_piecewisefunction(res, 5, 0.001)
+
+    @debug_on()
+    def testtime(self):
+        basis = BasisLegendre(6)
+        dim = 7
+        intervals = 10
+        waypoints = np.random.rand(intervals+1, dim)
+        tau = np.array(intervals*[1])
+
+        iters = 100
+        tmean = 0
+        for _ in range(iters):
+            time_0 = time.time()
+            inter = Interpolator(dim, intervals, basis)
+            _ = inter.interpolate(tau, waypoints)
+            time_1 = time.time()
+            tmean += (time_1 - time_0)
+
+        print('mean time = ', tmean/iters)
 
 
 if __name__ == '__main__':
