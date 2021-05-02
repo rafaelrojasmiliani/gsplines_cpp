@@ -3,6 +3,7 @@
 #include <gsplines++/BasisLegendre.hpp>
 #include <gsplines++/Interpolator.hpp>
 #include <gsplines++/PiecewiseFunction.hpp>
+#include <gsplines++/Sobolev.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -106,6 +107,12 @@ PYBIND11_MODULE(pygsplines, m) {
            &PyInterpolator::get_coeff_derivative_wrt_tau)
       .def("print_interpolating_vector",
            &PyInterpolator::print_interpolating_vector);
+
+  py::class_<SobolevNorm>(m, "SobolevNorm")
+      .def(py::init<const Eigen::Ref<const Eigen::MatrixXd>, basis::Basis &,
+                    std::vector<std::pair<std::size_t, double>>>())
+      .def("__call__", &SobolevNorm::operator())
+      .def("deriv_wrt_interval_len", &SobolevNorm::deriv_wrt_interval_len);
 }
 
 } // namespace basis

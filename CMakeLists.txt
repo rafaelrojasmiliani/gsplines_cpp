@@ -1,6 +1,6 @@
 project(gsplines)
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 # project( gplines++ VERSION 0.0.1 DESCRIPTION "Generalized Splines in c++")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -14,7 +14,9 @@ add_library(
   gsplines SHARED
   ${CMAKE_SOURCE_DIR}/src/BasisLegendre.cpp
   ${CMAKE_SOURCE_DIR}/src/Interpolator.cpp
-  ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp)
+  ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp
+  ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp)
+
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES})
 target_include_directories(
   gsplines PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}

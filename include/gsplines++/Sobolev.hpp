@@ -17,7 +17,7 @@ class SobolevNorm {
 
 private:
   SobolevNorm &operator=(const SobolevNorm &);
-  std::unique_ptr<basis::Basis> basis_;
+  basis::Basis *basis_;
   std::size_t num_intervals_;
   std::size_t codom_dim_;
   Interpolator interpolator_;
@@ -37,12 +37,12 @@ public:
   SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
               basis::Basis &_basis,
               std::vector<std::pair<std::size_t, double>> _weights);
-  ~SobolevNorm() {}
+  virtual ~SobolevNorm() {}
 
   double operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
   void deriv_wrt_interval_len(
       const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-      const Eigen::Ref<const Eigen::VectorXd> _buff);
+      Eigen::Ref<Eigen::VectorXd> _buff);
 };
 } // namespace gsplines
 

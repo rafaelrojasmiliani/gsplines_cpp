@@ -118,8 +118,8 @@ double PiecewiseFunction::interval_to_window(double _domain_point,
 
 Eigen::VectorXd PiecewiseFunction::get_coeff() { return coefficients_; }
 
-Eigen::Ref<Eigen::VectorXd>
-get_coefficient_segment(Eigen::Ref<Eigen::VectorXd> _coefficients,
+const Eigen::Ref<const Eigen::VectorXd>
+get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficients,
                         basis::Basis &_basis, std::size_t _num_interval,
                         std::size_t _codom_dim, std::size_t _interval,
                         std::size_t _component) {

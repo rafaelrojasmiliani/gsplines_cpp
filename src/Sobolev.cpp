@@ -21,7 +21,7 @@ operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths) {
 }
 
 void SobolevNorm::deriv_wrt_interval_len(
-    Eigen::Ref<Eigen::VectorXd> _interval_lengths,
+    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     Eigen::Ref<Eigen::VectorXd> _buff) {
   /* y = coefficients
    * tau = _interval_lengths
@@ -37,20 +37,20 @@ void SobolevNorm::deriv_wrt_interval_len(
 
   for (interval_coor = 0; interval_coor < num_intervals_; interval_coor++) {
     // get the derivaties of y wrt tau_i
-    const Eigen::VectorXd dy_dtau_i =
+    const Eigen::Ref<const Eigen::VectorXd> dy_dtau_i =
         interpolator_.get_coeff_derivative_wrt_tau(coeff, _interval_lengths,
                                                    interval_coor);
     // get the value of the current interval length
     tau = _interval_lengths(interval_coor);
     // initialize the matrix buffers and compute the de matrix values
-    matrix_ = Eigen::MatrixXd::Zero(basis_->get_dim(), basis_->get_dim());
+    matrix_.setZero();
     for (std::pair<std::size_t, double> w : weights_) {
       basis_->add_derivative_matrix_deriv_wrt_tau(tau, w.first, matrix_);
       matrix_ *= w.second;
     }
     // compute y^T dQdtau_i y
     for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
-      Eigen::Ref<Eigen::VectorXd> v1 =
+      const Eigen::Ref<const Eigen::VectorXd> v1 =
           get_coefficient_segment(coeff, *basis_, num_intervals_, codom_dim_,
                                   interval_coor, codom_coor);
       result += v1.transpose() * matrix_ * v1;
@@ -80,9 +80,9 @@ double SobolevNorm::inner_prod(
       matrix_ *= w.second;
     }
     for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
-      Eigen::Ref<Eigen::VectorXd> v1 = get_coefficient_segment(
+      const Eigen::Ref<const Eigen::VectorXd> v1 = get_coefficient_segment(
           _v1, *basis_, num_intervals_, codom_dim_, interval_coor, codom_coor);
-      Eigen::Ref<Eigen::VectorXd> v2 = get_coefficient_segment(
+      const Eigen::Ref<const Eigen::VectorXd> v2 = get_coefficient_segment(
           _v2, *basis_, num_intervals_, codom_dim_, interval_coor, codom_coor);
       result += v1.transpose() * matrix_ * v2;
     }
