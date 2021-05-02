@@ -115,4 +115,17 @@ double PiecewiseFunction::interval_to_window(double _domain_point,
              domain_interval_lengths_[_interval] -
          1.0;
 }
+
+Eigen::VectorXd PiecewiseFunction::get_coeff() { return coefficients_; }
+
+Eigen::Ref<Eigen::VectorXd>
+get_coefficient_segment(Eigen::Ref<Eigen::VectorXd> _coefficients,
+                        basis::Basis &_basis, std::size_t _num_interval,
+                        std::size_t _codom_dim, std::size_t _interval,
+                        std::size_t _component) {
+
+  int i0 =
+      _interval * _basis.get_dim() * _codom_dim + _basis.get_dim() * _component;
+  return _coefficients.segment(i0, _basis.get_dim());
+}
 } // namespace gsplines

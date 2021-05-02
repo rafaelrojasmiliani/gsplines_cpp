@@ -8,6 +8,13 @@ namespace basis {
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
   gsplines_legendre_dmat(_dim, derivative_matrix_);
+
+  Eigen::MatrixXd mat(derivative_matrix_);
+
+  for (int i = 0; i < _dim; i++) {
+    derivative_matrices_buffer_.push_back(mat);
+    mat *= mat.transpose();
+  }
 }
 
 BasisLegendre::BasisLegendre(const BasisLegendre &that) : Basis(that) {}
@@ -89,6 +96,24 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
       }
     } // for on j
   }   // for on i
+}
+
+void BasisLegendre::add_derivative_matrix(double tau, std::size_t _deg,
+                                          Eigen::Ref<Eigen::MatrixXd> _mat) {
+  unsigned int i, j;
+  double scale = pow(2 / tau, _deg);
+  for (i = _deg; i < get_dim(); i++)
+    for (j = _deg; j < get_dim(); j++)
+      _mat(i, j) += derivative_matrices_buffer_[_deg](i, j) * scale;
+}
+
+void BasisLegendre::add_derivative_matrix_deriv_wrt_tau(
+    double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
+  unsigned int i, j;
+  double scale = _deg > 0 ? -pow(2.0 / tau, _deg + 1) / 2.0 : 1.0;
+  for (i = _deg; i < get_dim(); i++)
+    for (j = _deg; j < get_dim(); j++)
+      _mat(i, j) += derivative_matrices_buffer_[_deg](i, j) * scale;
 }
 } // namespace basis
 } // namespace gsplines

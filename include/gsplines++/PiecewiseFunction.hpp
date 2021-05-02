@@ -5,8 +5,10 @@
 #include <gsplines++/Basis.hpp>
 
 namespace gsplines {
-
+class SobolevNorm;
 class PiecewiseFunction {
+  friend SobolevNorm;
+
 private:
   PiecewiseFunction &operator=(const PiecewiseFunction &);
   const std::size_t codom_dim_;
@@ -38,13 +40,22 @@ public:
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
   std::size_t get_codom_dim() { return codom_dim_; }
+  std::size_t get_intervals_num() { return number_of_intervals_; }
   double get_exec_time() {
     return domain_break_points_.tail(1)(0) - domain_break_points_(0);
   }
   const Eigen::Ref<const Eigen::VectorXd> get_domain_breakpoints() {
     return domain_break_points_;
   }
+  Eigen::VectorXd get_coeff();
 };
+
+Eigen::Ref<Eigen::VectorXd>
+get_coefficient_segment(Eigen::Ref<Eigen::VectorXd> _coefficents,
+                        basis::Basis &_basis, std::size_t _num_interval,
+                        std::size_t _codom_dim, std::size_t _interval,
+                        std::size_t _component);
+
 } // namespace gsplines
 
 #endif /* PIECEWISE_FUNCTION_H */

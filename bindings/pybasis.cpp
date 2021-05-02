@@ -34,6 +34,19 @@ public:
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_derivative_wrt_tau_on_window, _s,
                            _tau, _deg, _buff);
   }
+  void add_derivative_matrix(double _tau, std::size_t _deg,
+                             Eigen::Ref<Eigen::MatrixXd> _mat) override {
+
+    PYBIND11_OVERRIDE_PURE(void, Basis, add_derivative_matrix, _tau, _deg,
+                           _mat);
+  }
+  void add_derivative_matrix_deriv_wrt_tau(
+      double _tau, std::size_t _deg,
+      Eigen::Ref<Eigen::MatrixXd> _mat) override {
+
+    PYBIND11_OVERRIDE_PURE(void, Basis, add_derivative_matrix_deriv_wrt_tau,
+                           _tau, _deg, _mat);
+  }
 };
 
 class PyInterpolator : public Interpolator {
@@ -43,9 +56,12 @@ public:
   PiecewiseFunction
   py_interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
                  const py::EigenDRef<const Eigen::MatrixXd> _waypoints) {
-    printf("PyInterpolator\n");
-    fflush(stdout);
     return interpolate(_interval_lengths, _waypoints);
+  }
+  const Eigen::Ref<const Eigen::VectorXd> py_solve_interpolation(
+      const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+      const py::EigenDRef<const Eigen::MatrixXd> _waypoints) {
+    return solve_interpolation(_interval_lengths, _waypoints);
   }
 };
 
@@ -74,6 +90,7 @@ PYBIND11_MODULE(pygsplines, m) {
       .def("get_exec_time", &PiecewiseFunction::get_exec_time)
       .def("get_codom_dim", &PiecewiseFunction::get_codom_dim)
       .def("get_domain_breakpoints", &PiecewiseFunction::get_domain_breakpoints)
+      .def("get_coeff", &PiecewiseFunction::get_coeff)
       .def("deriv", &PiecewiseFunction::deriv);
 
   py::class_<Interpolator>(m, "Interpolator")
@@ -82,8 +99,11 @@ PYBIND11_MODULE(pygsplines, m) {
   py::class_<PyInterpolator, Interpolator>(m, "PyInterpolator")
       .def(py::init<std::size_t, std::size_t, Basis &>())
       .def("interpolate", &PyInterpolator::py_interpolate)
+      .def("solve_interpolation", &PyInterpolator::py_solve_interpolation)
       .def("print_interpolating_matrix",
            &PyInterpolator::print_interpolating_matrix)
+      .def("get_coeff_derivative_wrt_tau",
+           &PyInterpolator::get_coeff_derivative_wrt_tau)
       .def("print_interpolating_vector",
            &PyInterpolator::print_interpolating_vector);
 }
