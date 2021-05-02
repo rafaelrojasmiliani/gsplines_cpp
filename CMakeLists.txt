@@ -8,7 +8,10 @@ set(PYTHON_VERSION
     3.6
     CACHE STRING "Build bindings for Python version")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# include ifopt with custon ROS installation
+set(ifopt_DIR /opt/ros/melodic/share/ifopt/cmake)
 find_package(GSL REQUIRED)
+find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
   gsplines SHARED
@@ -17,10 +20,12 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp
   ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp)
 
-target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES})
+target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
+                      ${ifopt_LIBRARIES})
 target_include_directories(
-  gsplines PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
-                  ${Eigen3_INCLUDE_DIRS})
+  gsplines
+  PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS} ${Eigen3_INCLUDE_DIRS}
+         ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
 # set_target_properties(gsplines PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib)
 
 set(PYBIND11_PYTHON_VERSION "3.6")
@@ -30,6 +35,6 @@ pybind11_add_module(pygsplines ${CMAKE_SOURCE_DIR}/bindings/pybasis.cpp)
 target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
                                              /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
-                                        gsplines)
+                                        ${ifopt_LIBRARIES} gsplines)
 enable_testing()
 add_subdirectory(tests)
