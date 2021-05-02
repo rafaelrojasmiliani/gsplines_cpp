@@ -58,8 +58,8 @@ class MyTest(unittest.TestCase):
 
     @debug_on()
     def test(self):
-        basis = BasisLegendre(2*np.random.randint(1, 5))
-        dim = np.random.randint(1, 10)
+        basis = BasisLegendre(4)
+        dim = 3  # np.random.randint(1, 10)
         intervals = np.random.randint(1, 6)
         waypoints = np.random.rand(intervals+1, dim)
         interval_lengths = 1.0 + np.random.rand(intervals) * 2.0

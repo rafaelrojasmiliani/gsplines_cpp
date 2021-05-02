@@ -66,6 +66,14 @@ public:
   }
 };
 
+class PySobolevNorm : public SobolevNorm {
+public:
+  PySobolevNorm(const py::EigenDRef<const Eigen::MatrixXd> _waypoints,
+                basis::Basis &_basis,
+                std::vector<std::pair<std::size_t, double>> _weights)
+      : SobolevNorm(_waypoints, _basis, _weights) {}
+};
+
 PYBIND11_MODULE(pygsplines, m) {
   py::class_<Basis, PyBasis>(m, "Basis")
       .def(py::init<std::size_t>())
@@ -110,6 +118,12 @@ PYBIND11_MODULE(pygsplines, m) {
 
   py::class_<SobolevNorm>(m, "SobolevNorm")
       .def(py::init<const Eigen::Ref<const Eigen::MatrixXd>, basis::Basis &,
+                    std::vector<std::pair<std::size_t, double>>>())
+      .def("__call__", &SobolevNorm::operator())
+      .def("deriv_wrt_interval_len", &SobolevNorm::deriv_wrt_interval_len);
+
+  py::class_<PySobolevNorm>(m, "PySobolevNorm")
+      .def(py::init<const py::EigenDRef<const Eigen::MatrixXd>, basis::Basis &,
                     std::vector<std::pair<std::size_t, double>>>())
       .def("__call__", &SobolevNorm::operator())
       .def("deriv_wrt_interval_len", &SobolevNorm::deriv_wrt_interval_len);

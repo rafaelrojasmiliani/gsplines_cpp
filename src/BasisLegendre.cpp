@@ -9,11 +9,19 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
   gsplines_legendre_dmat(_dim, derivative_matrix_);
 
-  Eigen::MatrixXd mat(derivative_matrix_);
+  Eigen::MatrixXd dmat(derivative_matrix_);
 
+  Eigen::MatrixXd l2normbase_matrix(get_dim(), get_dim());
+  l2normbase_matrix.setZero();
   for (int i = 0; i < _dim; i++) {
-    derivative_matrices_buffer_.push_back(mat);
-    mat *= mat.transpose();
+    l2normbase_matrix(i, i) = 2.0 / (2.0 * i + 1.0);
+  }
+
+  derivative_matrices_buffer_.push_back(l2normbase_matrix);
+  for (int i = 1; i < _dim + 1; i++) {
+    derivative_matrices_buffer_.push_back(dmat * l2normbase_matrix *
+                                          dmat.transpose());
+    dmat *= derivative_matrix_;
   }
 }
 
@@ -100,20 +108,20 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
 
 void BasisLegendre::add_derivative_matrix(double tau, std::size_t _deg,
                                           Eigen::Ref<Eigen::MatrixXd> _mat) {
+
   unsigned int i, j;
-  double scale = pow(2 / tau, _deg);
-  for (i = _deg; i < get_dim(); i++)
-    for (j = _deg; j < get_dim(); j++)
-      _mat(i, j) += derivative_matrices_buffer_[_deg](i, j) * scale;
+  double scale = _deg > 0 ? pow(2.0 / tau, 2 * _deg - 1) : tau / 2.0;
+  if (_deg < get_dim() + 1)
+    _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
 }
 
 void BasisLegendre::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
   unsigned int i, j;
-  double scale = _deg > 0 ? -pow(2.0 / tau, _deg + 1) / 2.0 : 1.0;
-  for (i = _deg; i < get_dim(); i++)
-    for (j = _deg; j < get_dim(); j++)
-      _mat(i, j) += derivative_matrices_buffer_[_deg](i, j) * scale;
+  double scale = _deg > 0 ? -0.5 * (2.0 * _deg - 1.0) * pow(2.0 / tau, 2 * _deg)
+                          : 1.0 / 2.0;
+  if (_deg < get_dim() + 1)
+    _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
 }
 } // namespace basis
 } // namespace gsplines

@@ -32,40 +32,31 @@ def pairwise(iterable):
 class cMyTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(cMyTest, self).__init__(*args, **kwargs)
-        self.N_ = N = 20  # np.random.randint(2, 10)
-        self.dim_ = dim = 8  # np.random.randint(1, 8)
+        np.random.seed()
+        self.N_ = N = 6  # np.random.randint(2, 10)
+        self.dim_ = dim = 2  # np.random.randint(1, 8)
         self.wp_ = wp = np.random.rand(N + 1, dim)
-        b_dim = 2*np.random.randint(1, 10)
+        b_dim = 6
         basis = BasisLegendre(b_dim)
         self.basis_ = basis
         self.cost_ = SobolevNorm(wp, basis, [(3, 1.0)])
         self.inter_ = Interpolator(dim, N, basis)
 
-    def test_run(self):
-
-        cost = self.cost_
-        N = self.N_
-
-        res = np.zeros((N, ))
-        for i in range(5):
-            tauv = np.random.rand(N)
-            _ = cost(tauv)
-            _ = cost.deriv_wrt_interval_len(tauv, res)
-
     def test_value(self):
         print('testing value')
         wp = self.wp_
         N = self.N_
-        tauv = np.random.rand(N)
-        T = np.sum(tauv)
+        tauv = np.array([1.0]*N)
 
         cost = self.cost_
         q = self.inter_.interpolate(tauv, wp)
 
+        qd = q.deriv(1)
+        qdd = q.deriv(2)
         qddd = q.deriv(3)
 
         def qd3norm(t):
-            return np.einsum('ij,ij->i', qddd(t), qddd(t))
+            return np.einsum('ij,ij->i', qdd(t), qdd(t))
 
         def runningcost(t):
             return qd3norm(t)
@@ -73,35 +64,35 @@ class cMyTest(unittest.TestCase):
         Inom = cost(tauv)
         err = 1.e100
         badtrentCounter = 0
-        for Ngl in range(100, 500, 100):
+        for Ngl in [12, 200]:
             lr, lw = roots_legendre(Ngl)
-            time_partition = np.linspace(0, T, 50)
+            time_partition = q.get_domain_breakpoints()
             Itest_1 = 0.0
             for t0, tf in pairwise(time_partition):
-                Itest_1 += sum([w*runningcost(np.array([s]))[0]*(tf-t0)/2.0 for w,
-                               s in zip(lw, (lr+1.0)/2.0*(tf-t0)+t0)])
+                Itest_1 += sum([w*runningcost(np.array([s]))[0]*(tf-t0)/2.0
+                                for w, s in zip(lw, (lr+1.0)/2.0*(tf-t0)+t0)])
             if abs(Itest_1 - Inom) > err:
                 badtrentCounter += 1
             else:
                 badtrentCounter = 0
             assert badtrentCounter < 3
             err = abs(Itest_1 - Inom)
-            print('Error w.r.t quadrature = {:.3f}'.format(err))
-            print('Nomial cost  = {:14.7e}, Quadrature = {:14.7e}'.format(
-                Inom, Itest_1))
+            if err > 1.0e-4:
+                print('Error w.r.t quadrature = {:.3f}'.format(err))
+                print('Nomial cost  = {:14.7e}, Quadrature = {:14.7e}'.format(
+                    Inom, Itest_1))
             if err < 1.0e-4:
                 break
 
     def test_gradient(self):
-        wp = self.wp_
         N = self.N_
 
         cost = self.cost_
         nom_grad = np.zeros((N, ))
         test_grad = np.zeros((N, ))
-        dt = 1.0e-10
+        dt = 1.0e-6
         for _ in range(3):
-            tauv = np.random.rand(N)
+            tauv = 1+np.random.rand(N)*2
             cost.deriv_wrt_interval_len(tauv, nom_grad)
             for i in range(N):
                 tauv_aux = tauv.copy()
@@ -110,6 +101,11 @@ class cMyTest(unittest.TestCase):
                 tauv_aux[i] += 2*dt
                 cost1 = cost(tauv_aux)
                 test_grad[i] = (cost1 - cost0)/(2*dt)
+            err = np.linalg.norm(test_grad - nom_grad)
+            print('test grad err', err)
+            print(test_grad - nom_grad)
+            print(nom_grad)
+            print(test_grad)
 
 
 def main():

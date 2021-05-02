@@ -1,6 +1,7 @@
 
 #include <gsplines++/PiecewiseFunction.hpp>
 #include <gsplines++/Sobolev.hpp>
+#include <iostream>
 
 namespace gsplines {
 SobolevNorm::SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
@@ -14,6 +15,7 @@ SobolevNorm::SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
 
 double SobolevNorm::
 operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths) {
+
   const Eigen::Ref<const Eigen::VectorXd> coeff =
       interpolator_.solve_interpolation(_interval_lengths, waypoints_);
 
@@ -33,9 +35,9 @@ void SobolevNorm::deriv_wrt_interval_len(
   double tau;
   const Eigen::Ref<const Eigen::VectorXd> coeff =
       interpolator_.solve_interpolation(_interval_lengths, waypoints_);
-  double result = 0.0;
 
   for (interval_coor = 0; interval_coor < num_intervals_; interval_coor++) {
+    double result = 0.0;
     // get the derivaties of y wrt tau_i
     const Eigen::Ref<const Eigen::VectorXd> dy_dtau_i =
         interpolator_.get_coeff_derivative_wrt_tau(coeff, _interval_lengths,
@@ -64,16 +66,14 @@ double SobolevNorm::inner_prod(
     const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     const Eigen::Ref<const Eigen::VectorXd> _v1,
     const Eigen::Ref<const Eigen::VectorXd> _v2) {
-  if (_v1 != _v2) {
-    return 0.0;
-  }
 
   unsigned int interval_coor;
   unsigned int codom_coor;
   double tau;
   double result = 0.0;
+
   for (interval_coor = 0; interval_coor < num_intervals_; interval_coor++) {
-    matrix_ = Eigen::MatrixXd::Zero(basis_->get_dim(), basis_->get_dim());
+    matrix_.setZero();
     tau = _interval_lengths(interval_coor);
     for (std::pair<std::size_t, double> w : weights_) {
       basis_->add_derivative_matrix(tau, w.first, matrix_);
@@ -87,6 +87,7 @@ double SobolevNorm::inner_prod(
       result += v1.transpose() * matrix_ * v2;
     }
   }
+
   return result;
 }
 } // namespace gsplines
