@@ -25,7 +25,9 @@ BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
   }
 }
 
-BasisLegendre::BasisLegendre(const BasisLegendre &that) : Basis(that) {}
+BasisLegendre::BasisLegendre(const BasisLegendre &that)
+    : Basis(that),
+      derivative_matrices_buffer_(that.derivative_matrices_buffer_) {}
 BasisLegendre::~BasisLegendre() {}
 
 void BasisLegendre::eval_derivative_on_window(

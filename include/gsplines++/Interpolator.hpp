@@ -9,7 +9,7 @@ class Interpolator {
 private:
   Interpolator(const Interpolator &that);
   Interpolator &operator=(const Interpolator &);
-  basis::Basis *const basis_;
+  std::unique_ptr<basis::Basis> basis_;
   std::size_t codom_dim_;
   std::size_t num_intervals_;
   std::size_t matrix_size_;
@@ -31,7 +31,7 @@ private:
 
 public:
   Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
-               basis::Basis &_basis);
+               const basis::Basis &_basis);
   virtual ~Interpolator();
   void fill_interpolating_matrix(
       const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);

@@ -4,6 +4,7 @@
 namespace gsplines {
 
 PiecewiseFunction PiecewiseFunction::deriv(std::size_t _deg) {
+
   Eigen::VectorXd result_coeff(coefficients_);
   int der_coor;
   int interval_coor;
@@ -30,8 +31,8 @@ PiecewiseFunction PiecewiseFunction::deriv(std::size_t _deg) {
 
 PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
     : codom_dim_(that.codom_dim_),
-      number_of_intervals_(that.number_of_intervals_), basis_(that.basis_),
-      coefficients_(that.coefficients_),
+      number_of_intervals_(that.number_of_intervals_),
+      basis_(that.basis_->clone()), coefficients_(that.coefficients_),
       domain_break_points_(that.domain_break_points_),
       domain_interval_lengths_(that.domain_interval_lengths_),
       basis_buffer_(that.basis_->get_dim()) {
@@ -44,11 +45,12 @@ PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
 }
 
 PiecewiseFunction::PiecewiseFunction(
-    std::size_t _codom_dim, std::size_t _n_intervals, basis::Basis &_basis,
+    std::size_t _codom_dim, std::size_t _n_intervals,
+    const basis::Basis &_basis,
     const Eigen::Ref<const Eigen::VectorXd> _coefficents,
     const Eigen::Ref<const Eigen::VectorXd> _tauv)
     : codom_dim_(_codom_dim), number_of_intervals_(_n_intervals),
-      basis_(&_basis), coefficients_(_coefficents),
+      basis_(_basis.clone()), coefficients_(_coefficents),
       domain_break_points_(_n_intervals + 1), domain_interval_lengths_(_tauv),
       basis_buffer_(_basis.get_dim()) {
 

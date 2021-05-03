@@ -2,6 +2,7 @@
 #define BASIS_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
+#include <memory>
 #include <vector>
 
 namespace gsplines {
@@ -13,11 +14,11 @@ private:
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
-  Eigen::MatrixXd sobolev_ip_matrix_;
 
 public:
   Basis(std::size_t _dim) : dim_(_dim), derivative_matrix_(dim_, dim_) {}
-  Basis(const Basis &that) : dim_(that.get_dim()) {}
+  Basis(const Basis &that)
+      : dim_(that.get_dim()), derivative_matrix_(that.derivative_matrix_) {}
   virtual ~Basis() {}
   std::size_t get_dim() const { return dim_; }
   virtual void eval_on_window(double _s, double _tau,
@@ -37,6 +38,8 @@ public:
   virtual void
   add_derivative_matrix_deriv_wrt_tau(double tau, std::size_t _deg,
                                       Eigen::Ref<Eigen::MatrixXd> _mat) = 0;
+
+  virtual std::unique_ptr<Basis> clone() const = 0;
 };
 } // namespace basis
 } // namespace gsplines

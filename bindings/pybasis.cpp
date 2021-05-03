@@ -48,6 +48,7 @@ public:
     PYBIND11_OVERRIDE_PURE(void, Basis, add_derivative_matrix_deriv_wrt_tau,
                            _tau, _deg, _mat);
   }
+  std::unique_ptr<Basis> clone() const override { return nullptr; }
 };
 
 class PyInterpolator : public Interpolator {

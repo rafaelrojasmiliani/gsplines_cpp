@@ -29,6 +29,10 @@ public:
                              Eigen::Ref<Eigen::MatrixXd> _mat);
   void add_derivative_matrix_deriv_wrt_tau(double tau, std::size_t _deg,
                                            Eigen::Ref<Eigen::MatrixXd> _mat);
+
+  virtual std::unique_ptr<Basis> clone() const override {
+    return std::make_unique<BasisLegendre>(*this);
+  };
 };
 
 } // namespace basis

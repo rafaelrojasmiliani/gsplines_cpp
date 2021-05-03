@@ -13,7 +13,7 @@ private:
   PiecewiseFunction &operator=(const PiecewiseFunction &);
   const std::size_t codom_dim_;
   const std::size_t number_of_intervals_;
-  basis::Basis *const basis_;
+  std::unique_ptr<basis::Basis> basis_;
   Eigen::VectorXd coefficients_;
   Eigen::VectorXd domain_break_points_;
   Eigen::VectorXd domain_interval_lengths_;
@@ -26,7 +26,7 @@ private:
 
 public:
   PiecewiseFunction(std::size_t _codom_dim, std::size_t _n_intervals,
-                    basis::Basis &_basis,
+                    const basis::Basis &_basis,
                     const Eigen::Ref<const Eigen::VectorXd> _coefficents,
                     const Eigen::Ref<const Eigen::VectorXd> _tauv);
   PiecewiseFunction(const PiecewiseFunction &that);

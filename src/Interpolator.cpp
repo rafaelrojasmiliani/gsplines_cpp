@@ -5,8 +5,9 @@
 namespace gsplines {
 
 Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
-                           basis::Basis &_basis)
-    : basis_(&_basis), codom_dim_(_codom_dim), num_intervals_(_num_intervals),
+                           const basis::Basis &_basis)
+    : basis_(_basis.clone()), codom_dim_(_codom_dim),
+      num_intervals_(_num_intervals),
       matrix_size_(_basis.get_dim() * _codom_dim * _num_intervals),
       boundary_buffer_tranposed_(_basis.get_dim(), _basis.get_dim() / 2) {
 

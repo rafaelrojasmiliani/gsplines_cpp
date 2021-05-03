@@ -32,6 +32,7 @@ def pairwise(iterable):
 class cMyTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(cMyTest, self).__init__(*args, **kwargs)
+        print('a')
         np.random.seed()
         self.N_ = N = 6  # np.random.randint(2, 10)
         self.dim_ = dim = 2  # np.random.randint(1, 8)
@@ -41,6 +42,7 @@ class cMyTest(unittest.TestCase):
         self.basis_ = basis
         self.cost_ = SobolevNorm(wp, basis, [(3, 1.0)])
         self.inter_ = Interpolator(dim, N, basis)
+        print('b')
 
     def test_value(self):
         print('testing value')
@@ -50,9 +52,12 @@ class cMyTest(unittest.TestCase):
 
         cost = self.cost_
         q = self.inter_.interpolate(tauv, wp)
+        print('------')
 
         qd = q.deriv(1)
+        print('------')
         qdd = q.deriv(2)
+        print('------')
         qddd = q.deriv(3)
 
         def qd3norm(t):
@@ -61,6 +66,7 @@ class cMyTest(unittest.TestCase):
         def runningcost(t):
             return qd3norm(t)
 
+        print('b')
         Inom = cost(tauv)
         err = 1.e100
         badtrentCounter = 0
@@ -84,28 +90,31 @@ class cMyTest(unittest.TestCase):
             if err < 1.0e-4:
                 break
 
-    def test_gradient(self):
-        N = self.N_
-
-        cost = self.cost_
-        nom_grad = np.zeros((N, ))
-        test_grad = np.zeros((N, ))
-        dt = 1.0e-6
-        for _ in range(3):
-            tauv = 1+np.random.rand(N)*2
-            cost.deriv_wrt_interval_len(tauv, nom_grad)
-            for i in range(N):
-                tauv_aux = tauv.copy()
-                tauv_aux[i] -= dt
-                cost0 = cost(tauv_aux)
-                tauv_aux[i] += 2*dt
-                cost1 = cost(tauv_aux)
-                test_grad[i] = (cost1 - cost0)/(2*dt)
-            err = np.linalg.norm(test_grad - nom_grad)
-            print('test grad err', err)
-            print(test_grad - nom_grad)
-            print(nom_grad)
-            print(test_grad)
+#    def test_gradient(self):
+#        print('a')
+#        N = self.N_
+#
+#        cost = self.cost_
+#        nom_grad = np.zeros((N, ))
+#        test_grad = np.zeros((N, ))
+#        dt = 1.0e-6
+#        print('a')
+#        for _ in range(3):
+#            tauv = 1+np.random.rand(N)*2
+#            cost.deriv_wrt_interval_len(tauv, nom_grad)
+#            for i in range(N):
+#                tauv_aux = tauv.copy()
+#                tauv_aux[i] -= dt
+#                cost0 = cost(tauv_aux)
+#                tauv_aux[i] += 2*dt
+#                cost1 = cost(tauv_aux)
+#                test_grad[i] = (cost1 - cost0)/(2*dt)
+#            err = np.linalg.norm(test_grad - nom_grad)
+#            print('test grad err', err)
+#            print(test_grad - nom_grad)
+#            print(nom_grad)
+#            print(test_grad)
+#
 
 
 def main():

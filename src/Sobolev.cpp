@@ -5,9 +5,9 @@
 
 namespace gsplines {
 SobolevNorm::SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
-                         basis::Basis &_basis,
+                         const basis::Basis &_basis,
                          std::vector<std::pair<std::size_t, double>> _weights)
-    : basis_(&_basis), num_intervals_(_waypoints.rows() - 1),
+    : basis_(_basis.clone()), num_intervals_(_waypoints.rows() - 1),
       codom_dim_(_waypoints.cols()),
       interpolator_(codom_dim_, num_intervals_, _basis), weights_(_weights),
       waypoints_(_waypoints), matrix_(_basis.get_dim(), _basis.get_dim()),

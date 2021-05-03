@@ -17,7 +17,7 @@ class SobolevNorm {
 
 private:
   SobolevNorm &operator=(const SobolevNorm &);
-  basis::Basis *basis_;
+  std::unique_ptr<basis::Basis> basis_;
   std::size_t num_intervals_;
   std::size_t codom_dim_;
   Interpolator interpolator_;
@@ -35,9 +35,12 @@ protected:
 
 public:
   SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
-              basis::Basis &_basis,
+              const basis::Basis &_basis,
               std::vector<std::pair<std::size_t, double>> _weights);
-  virtual ~SobolevNorm() {}
+  virtual ~SobolevNorm() {
+    printf("destrozer\n");
+    fflush(stdout);
+  }
 
   double operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
   void deriv_wrt_interval_len(
