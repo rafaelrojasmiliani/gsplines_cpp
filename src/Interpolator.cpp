@@ -248,8 +248,7 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
 
   if (_interval_lengths.size() != num_intervals_ or _tau_idx < 0 or
       _tau_idx >= num_intervals_) {
-    fprintf(stderr, "Cannot fill matrix. Vector of interval lenghts is not of "
-                    "the requred dimention");
+    fprintf(stderr, "Cannot compute derivative of coefficients wrt tau ");
     return coefficients_vector_;
   }
 
@@ -323,7 +322,7 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     fill_position_block(i0, j0, mat);
   }
   mat.makeCompressed();
-  coefficients_vector_ = mat * _coeff;
+  coefficients_vector_.noalias() = mat * _coeff;
   fill_interpolating_matrix(_interval_lengths);
   Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
   solver.compute(interpolating_matrix_);

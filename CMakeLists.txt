@@ -18,7 +18,9 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/BasisLegendre.cpp
   ${CMAKE_SOURCE_DIR}/src/Interpolator.cpp
   ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp
-  ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp)
+  ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp
+  ${CMAKE_SOURCE_DIR}/src/ipopt_interface.cpp
+  ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                       ${ifopt_LIBRARIES})

@@ -57,7 +57,7 @@ void SobolevNorm::deriv_wrt_interval_len(
                                   interval_coor, codom_coor);
       result += v1.transpose() * matrix_ * v1;
     }
-    result += inner_prod(_interval_lengths, coeff, dy_dtau_i);
+    result += 2.0 * inner_prod(_interval_lengths, coeff, dy_dtau_i);
     _buff[interval_coor] = result;
   }
 }

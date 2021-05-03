@@ -17,18 +17,17 @@ public:
   BasisLegendre(const BasisLegendre &that);
   virtual ~BasisLegendre();
   void eval_on_window(double _s, double _tau,
-                      Eigen::Ref<Eigen::VectorXd> _buff);
+                      Eigen::Ref<Eigen::VectorXd> _buff) override;
   void eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
-                                 Eigen::Ref<Eigen::VectorXd> _buff);
+                                 Eigen::Ref<Eigen::VectorXd> _buff) override;
 
-  void eval_derivative_wrt_tau_on_window(double _s, double _tau,
-                                         unsigned int _deg,
-                                         Eigen::Ref<Eigen::VectorXd> _buff);
-  const Eigen::MatrixXd &get_derivative_matrix(double _tau, std::size_t _deg);
+  void
+  eval_derivative_wrt_tau_on_window(double _s, double _tau, unsigned int _deg,
+                                    Eigen::Ref<Eigen::VectorXd> _buff) override;
   void add_derivative_matrix(double tau, std::size_t _deg,
-                             Eigen::Ref<Eigen::MatrixXd> _mat);
-  void add_derivative_matrix_deriv_wrt_tau(double tau, std::size_t _deg,
-                                           Eigen::Ref<Eigen::MatrixXd> _mat);
+                             Eigen::Ref<Eigen::MatrixXd> _mat) override;
+  void add_derivative_matrix_deriv_wrt_tau(
+      double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) override;
 
   virtual std::unique_ptr<Basis> clone() const override {
     return std::make_unique<BasisLegendre>(*this);

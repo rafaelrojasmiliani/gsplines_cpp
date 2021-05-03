@@ -4,6 +4,7 @@
 #include <gsplines++/Interpolator.hpp>
 #include <gsplines++/PiecewiseFunction.hpp>
 #include <gsplines++/Sobolev.hpp>
+#include <gsplines++/ipopt_solver.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -128,6 +129,8 @@ PYBIND11_MODULE(pygsplines, m) {
                     std::vector<std::pair<std::size_t, double>>>())
       .def("__call__", &SobolevNorm::operator())
       .def("deriv_wrt_interval_len", &SobolevNorm::deriv_wrt_interval_len);
+
+  m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
 }
 
 } // namespace basis
