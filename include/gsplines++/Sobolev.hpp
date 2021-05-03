@@ -37,10 +37,7 @@ public:
   SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
               const basis::Basis &_basis,
               std::vector<std::pair<std::size_t, double>> _weights);
-  virtual ~SobolevNorm() {
-    printf("destrozer\n");
-    fflush(stdout);
-  }
+  virtual ~SobolevNorm() {}
 
   double operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
   void deriv_wrt_interval_len(
