@@ -1,6 +1,6 @@
 # This file tells docker what image must be created
 # in order to be ahble to test this library
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 
 ENV TZ=Europe/Rome
@@ -24,7 +24,7 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    ros-melodic-ifopt
+                    ros-noetic-ifopt
 
 # user handling
 ARG myuser

@@ -8,3 +8,5 @@ gsplines.egg-info/*
 *.stats
 *.o
 build/
+ifopt_notes
+npm-debug.log

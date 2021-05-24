@@ -3,7 +3,7 @@ set guifont=Monospace
 set si 					"Smart indent see help
 set ai 					"Auto indent Copy indent from current line when starting a new line
 set shiftwidth=4 		"Number of spaces to use for each step of (auto)indent
-set softtabstop=4               
+set softtabstop=4
 set tabstop=4   		"Number of spaces that a <Tab> in the file counts for
 set expandtab           "set tab to spaces
 set smarttab     		"When on, a <Tab> in front of a line inserts blanks according to
@@ -51,7 +51,7 @@ let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['
 let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
 let g:ale_cpp_clangtidy_executable='clang-tidy'
 let g:ale_cpp_clangtidy_extra_options=''
-let g:ale_cpp_cc_options='-I ''/opt/ros/melodic/include'' -I ''/usr/include/eigen3'' -I ''/gsplinespp/include'' '
+let g:ale_cpp_cc_options='-I ''/opt/ros/noetic/include'' -I ''/usr/include/eigen3'' -I ''/gsplinespp/include'' '
 let g:ale_sign_error = 'E'
 let g:ale_sign_warning = 'W'
 let g:ale_lint_on_text_changed = 'never'
@@ -71,6 +71,8 @@ Plugin 'vim-fugitive'
 Plugin 'xmledit'
 Plugin 'vimspector'
 let g:vimspector_enable_mappings = 'HUMAN'
+Plugin 'nerdtree'
+Plugin 'nerdtree-git-plugin'
 call vundle#end()
 filetype plugin indent on
 filetype plugin on
@@ -89,7 +91,7 @@ endfunction
 " jamessan's
 set laststatus=2
 set statusline=   " clear the statusline for when vimrc is reloaded
-set statusline+=%1*[\ WS00\ ]%*   
+set statusline+=%1*[\ WS00\ ]%*
 "set statusline+=%{StatuslineGit()}
 set statusline+=%-2.2n                       " buffer number
 set statusline+=%t\                          " tail of file name
@@ -113,7 +115,7 @@ function! MyFormatExpr(start, end)
 "        next char is the first char of the whole match. /zero-width
 "        I.E. This only substitute the space after [.!?]
   silent execute a:start.','.a:end.'g/^\s*$/d'
-"\s      whitespace character: <Space> and <Tab>  
+"\s      whitespace character: <Space> and <Tab>
 endfunction
 
 set formatexpr=MyFormatExpr(v:lnum,v:lnum+v:count-1)

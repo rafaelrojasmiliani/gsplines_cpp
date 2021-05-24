@@ -9,7 +9,7 @@ set(PYTHON_VERSION
     CACHE STRING "Build bindings for Python version")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # include ifopt with custon ROS installation
-set(ifopt_DIR /opt/ros/melodic/share/ifopt/cmake)
+set(ifopt_DIR /opt/ros/noetic/share/ifopt/cmake)
 find_package(GSL REQUIRED)
 find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -20,7 +20,8 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp
   ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp
   ${CMAKE_SOURCE_DIR}/src/ipopt_interface.cpp
-  ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp)
+  ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                       ${ifopt_LIBRARIES})
