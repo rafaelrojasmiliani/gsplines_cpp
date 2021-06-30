@@ -1,4 +1,3 @@
-#include <boost/math/special_functions/binomial.hpp>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 namespace gsplines {
 namespace functions {
@@ -16,6 +15,9 @@ FunctionExpression::FunctionExpression(
     function_array_.push_back(_function_array[i]->clone());
   }
 }
+
+FunctionExpression::FunctionExpression(const FunctionExpression &that)
+    : Function(that){};
 
 FunctionExpression operator+(const Function &_f1, const Function &_f2) {
 
@@ -85,6 +87,7 @@ eval_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
 Eigen::MatrixXd
 eval_mul_functions(std::vector<std::unique_ptr<Function>> &_function_array,
                    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+  // NOTE: the first element of _function_array has larger codomain dimension
 
   Eigen::MatrixXd result(_domain_points.size(),
                          _function_array[0]->get_codom_dim());
@@ -156,7 +159,7 @@ std::unique_ptr<Function> first_deriv_mul_functions(
     elem_array.push_back(_function_array[i]->deriv());
     for (std::size_t k = 0; k < _function_array.size(); k++) {
       if (k != i)
-        elem_array.push_back(_function_array[k]);
+        elem_array.push_back(_function_array[k]->clone());
     }
     result_array.push_back(std::make_unique<FunctionExpression>(
         domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
@@ -188,25 +191,50 @@ std::unique_ptr<Function> first_deriv_compose_functions(
     std::vector<std::unique_ptr<Function>> &_function_array) {
 
   std::vector<std::unique_ptr<Function>> result_array;
+
+  result_array.push_back(_function_array[0]->deriv());
+  for (std::size_t i = 1; i < _function_array.size(); i++) {
+    std::vector<std::unique_ptr<Function>> elem_array;
+    for (std::size_t j = 0; j < i; j++) {
+      elem_array.push_back(_function_array[j]->clone());
+    }
+    std::size_t codom_dim = _function_array[i]->get_codom_dim();
+    std::pair<double, double> domain = _function_array[i]->get_domain();
+    elem_array.push_back(_function_array[i]->deriv());
+    result_array.push_back(std::make_unique<FunctionExpression>(
+        domain, codom_dim, FunctionExpression::Type::COMPOSITION, elem_array));
+  }
   std::size_t codom_dim = _function_array.back()->get_codom_dim();
   std::pair<double, double> domain = _function_array.back()->get_domain();
-
-  for (std::size_t i = _function_array.size() - 1; i >= 0; i--) {
-    result_array.push_back(_function_array[i]->deriv());
-  }
   return std::make_unique<FunctionExpression>(
       domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
       result_array);
 }
+
 std::unique_ptr<Function>
 deriv_compose_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                        std::size_t _deg) {}
+                        std::size_t _deg) {
 
+  std::size_t codom_dim = _function_array[0]->get_codom_dim();
+  std::pair<double, double> domain = _function_array[0]->get_domain();
+  if (_deg == 0) {
+    return std::make_unique<FunctionExpression>(
+        domain, codom_dim, FunctionExpression::Type::COMPOSITION,
+        _function_array);
+  }
+  std::unique_ptr<Function> result =
+      first_deriv_compose_functions(_function_array);
+  for (std::size_t k = 1; k <= _deg; k++)
+    result.reset(result->deriv().get());
+
+  return result;
+}
+
+/*
 std::unique_ptr<Function>
 deriv_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
                        std::size_t _deg);
 
-/*
  */
 } // namespace functions
 } // namespace gsplines

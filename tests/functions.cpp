@@ -1,6 +1,6 @@
 #include <cmath>
 #include <gsplines++/Functions/Functions.hpp>
-#include<iostream>
+#include <iostream>
 using namespace gsplines::functions;
 class Exponential : public gsplines::functions::Function {
 public:
@@ -23,18 +23,18 @@ public:
 };
 
 int main() {
+  /*
+    Exponential s, g;
+    Eigen::VectorXd time_span = Eigen::VectorXd::Random(4);
+    Eigen::MatrixXd res = s(time_span);
 
-  Exponential s, g;
-  Eigen::VectorXd time_span = Eigen::VectorXd::Random(4);
-  Eigen::MatrixXd res = s(time_span);
-  
- SumOfFunctions f = s + g + s +g;
+   SumOfFunctions f = s + g + s +g;
 
-  Eigen::MatrixXd res_2 = f(time_span);
+    Eigen::MatrixXd res_2 = f(time_span);
 
-  std::cout << (4*res - res_2) << std::endl;
+    std::cout << (4*res - res_2) << std::endl;
 
+  */
 
-  
   return 0;
 }
