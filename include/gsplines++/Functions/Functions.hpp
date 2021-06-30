@@ -11,13 +11,32 @@
 
 namespace gsplines {
 namespace functions {
-
-class Function {
+class FunctionBase {
 private:
   const std::size_t codom_dim_;
   const std::pair<double, double> window_;
   const std::pair<double, double> domain_;
   static const double dom_tollerance_;
+
+public:
+  FunctionBase(std::pair<double, double> _domain, std::size_t _codom_dim);
+  FunctionBase(const FunctionBase &that);
+
+  std::pair<double, double> get_domain() const { return domain_; };
+  std::size_t get_codom_dim() const { return codom_dim_; };
+
+  static bool same_domain(const FunctionBase &_f1, const FunctionBase &_f2);
+  static bool same_codomain(const FunctionBase &_f1, const FunctionBase &_f2);
+
+  virtual ~FunctionBase() {}
+
+  bool is_point_in_domain(double _domain_point);
+};
+
+class FunctionsConcat;
+class Function : public FunctionBase {
+private:
+  friend FunctionsConcat;
 
 public:
   Function(std::pair<double, double> _domain, std::size_t _codom_dim);
@@ -31,9 +50,7 @@ public:
     return this->operator()(_domain_points);
   }
 
-  virtual std::unique_ptr<Function> deriv(int _deg) = 0;
-  std::pair<double, double> get_domain() { return domain_; };
-  std::size_t get_codom_dim() { return codom_dim_; };
+  virtual std::unique_ptr<Function> deriv(int _deg = 1) = 0;
 
   static bool same_set(Function &_f1, Function &_f2);
   static bool same_domain(Function &_f1, Function &_f2);
@@ -42,40 +59,8 @@ public:
   virtual ~Function() {}
 };
 
-class SumOfFunctions: public Function {
-  public:
-    SumOfFunctions(std::vector<std::unique_ptr<Function>> &_function_array);
-    SumOfFunctions(const SumOfFunctions &that);
-    SumOfFunctions(SumOfFunctions &&that);
-  std::unique_ptr<Function> clone() const override {return std::make_unique<SumOfFunctions>(*this);}
-  Eigen::MatrixXd
-  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override;
-  std::unique_ptr<Function> deriv(int _deg) override;
-  private:
-    std::vector<std::unique_ptr<Function>> function_array_;
-
-
-};
-SumOfFunctions operator+(const Function &_f1,
-                                    const Function &_f2);
 /*
 std::unique_ptr<Function> operator-(Function &, Function &);
-std::unique_ptr<Function> operator*(Function &, Function &);
-
-class MulScalarFunction : public Function {
-private:
-  std::unique_ptr<Function> vf_;
-  std::unique_ptr<Function> sf_;
-
-public:
-  MulScalarFunction(Function &_sf, Function &_vf);
-  MulScalarFunction(const MulScalarFunction &that);
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) override final;
-  std::unique_ptr<Function> deriv(int _deg) override final;
-  ~MulScalarFunction() {}
-};
-
 
 class CompositionOfFunctions : public Function {
 private:

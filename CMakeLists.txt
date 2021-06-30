@@ -21,7 +21,11 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp
   ${CMAKE_SOURCE_DIR}/src/ipopt_interface.cpp
   ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp)
+  ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsSum.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsMul.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsComp.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsConcat.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                       ${ifopt_LIBRARIES})

@@ -16,7 +16,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o
                     python3-sympy coinor-libipopt-dev sudo valgrind \
                     build-essential pkg-config git \
                     liblapack-dev liblapack3 libopenblas-base libopenblas-dev \
-                    libgfortran-7-dev cmake libgsl-dev gdb python3-tk libeigen3-dev
+                    libgfortran-7-dev cmake libgsl-dev gdb python3-tk libeigen3-dev \
+                    libboost-math-dev
 
 RUN pip3 install setuptools matplotlib Mosek scipy quadpy six cython tk
 
