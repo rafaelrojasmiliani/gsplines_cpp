@@ -16,6 +16,10 @@ FunctionExpression::FunctionExpression(
   }
 }
 
+FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
+                                       std::size_t _codom_dim, Type _type)
+    : Function(_domain, _codom_dim), type_(_type) {}
+
 FunctionExpression::FunctionExpression(const FunctionExpression &that)
     : Function(that){};
 

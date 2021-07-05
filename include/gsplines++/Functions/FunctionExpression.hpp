@@ -37,6 +37,9 @@ public:
                      Type _type,
                      std::vector<std::unique_ptr<Function>> &_function_array);
 
+  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
+                     Type _type);
+
   FunctionExpression(const FunctionExpression &that);
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override {
@@ -90,9 +93,9 @@ std::unique_ptr<Function>
 deriv_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
                        std::size_t _deg);
 
-FunctionExpression operator+(Function &_f1, Function &_f2);
-FunctionExpression operator*(Function &_f1, Function &_f2);
-FunctionExpression compose(Function &_f1, Function &_f2);
+FunctionExpression operator+(const Function &_f1, const Function &_f2);
+FunctionExpression operator*(const Function &_f1, const Function &_f2);
+FunctionExpression compose(const Function &_f1, const Function &_f2);
 } // namespace functions
 } // namespace gsplines
 #endif
