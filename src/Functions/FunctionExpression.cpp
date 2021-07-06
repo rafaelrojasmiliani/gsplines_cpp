@@ -1,4 +1,5 @@
 #include <gsplines++/Functions/FunctionExpression.hpp>
+#include<iostream>
 namespace gsplines {
 namespace functions {
 
@@ -6,102 +7,115 @@ namespace functions {
  *  Function Construction
  * -----*/
 
+std::size_t FunctionExpression::num_call_constructor_ = 0;
+std::size_t FunctionExpression::num_call_simple_constructor_ = 0;
+std::size_t FunctionExpression::num_call_copy_constructor_ = 0;
+std::size_t FunctionExpression::num_call_move_constructor_ = 0;
+
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
     std::vector<std::unique_ptr<Function>> &_function_array)
-    : Function(_domain, _codom_dim), type_(_type), function_array_() {
+    : Function(_domain, _codom_dim), type_(_type), function_array_(), eval_operation_(nullptr), deriv_operation_(nullptr) {
 
-  for (std::size_t i = 0; i < _function_array.size() - 1; i++) {
+  for (std::size_t i = 0; i < _function_array.size() ; i++) {
     function_array_.push_back(_function_array[i]->clone());
   }
+  switch(type_){
+      case SUM:
+          eval_operation_ = eval_sum_functions;
+          deriv_operation_ = deriv_sum_functions;
+          break;
+
+      case MULTIPLICATION:
+          eval_operation_ = eval_mul_functions;
+          deriv_operation_ = deriv_mul_functions;
+          break;
+
+      case COMPOSITION:
+          eval_operation_ = eval_compose_functions;
+          deriv_operation_ = deriv_compose_functions;
+          break;
+
+      case CONCATENATION:
+          eval_operation_ = eval_concat_functions;
+          deriv_operation_ = deriv_concat_functions;
+          break;
+      default:
+            throw std::invalid_argument("Function Expression Type not defined");
+  }
+  num_call_constructor_++;
+}
+
+FunctionExpression::FunctionExpression(
+    std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
+    std::vector<std::unique_ptr<Function>> &&_function_array)
+    : Function(_domain, _codom_dim), type_(_type), eval_operation_(nullptr), deriv_operation_(nullptr), function_array_(std::move(_function_array)) {
+
+  switch(type_){
+      case SUM:
+          eval_operation_ = eval_sum_functions;
+          deriv_operation_ = deriv_sum_functions;
+          break;
+
+      case MULTIPLICATION:
+          eval_operation_ = eval_mul_functions;
+          deriv_operation_ = deriv_mul_functions;
+          break;
+
+      case COMPOSITION:
+          eval_operation_ = eval_compose_functions;
+          deriv_operation_ = deriv_compose_functions;
+          break;
+
+      case CONCATENATION:
+          eval_operation_ = eval_concat_functions;
+          deriv_operation_ = deriv_concat_functions;
+          break;
+      default:
+            throw std::invalid_argument("Function Expression Type not defined");
+  }
+  num_call_simple_constructor_++;
 }
 
 FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
                                        std::size_t _codom_dim, Type _type)
-    : Function(_domain, _codom_dim), type_(_type) {}
+    : Function(_domain, _codom_dim), type_(_type) {
+
+        printf("calling wrong constructor \n-----\n"); fflush(stdout);
+    }
 
 FunctionExpression::FunctionExpression(const FunctionExpression &that)
-    : Function(that){};
+    : Function(that), type_(that.type_), eval_operation_(that.eval_operation_), deriv_operation_(that.deriv_operation_){
 
-FunctionExpression operator+(const Function &_f1, const Function &_f2) {
+        printf("copy  CONSTRUCTOR ----------\n");
+  for (std::size_t i = 0; i < that.function_array_.size(); i++) {
+    function_array_.push_back(that.function_array_[i]->clone());
+   }
+  num_call_copy_constructor_++;
 
-  if (not FunctionBase::same_domain(_f1, _f2)) {
-    throw std::invalid_argument("Functions with different domains");
-  }
-  if (not FunctionBase::same_codomain(_f1, _f2)) {
-    throw std::invalid_argument("Functions with different codomains");
-  }
+    }
 
-  std::vector<std::unique_ptr<Function>> result_array;
-  std::size_t codom_dim = _f1.get_codom_dim();
-  std::pair<double, double> domain = _f1.get_domain();
 
-  result_array.push_back(_f1.clone());
-  result_array.push_back(_f2.clone());
 
-  return FunctionExpression(domain, codom_dim, FunctionExpression::Type::SUM,
-                            result_array);
+FunctionExpression::FunctionExpression(FunctionExpression &&that)
+    : Function(that), type_(that.type_), eval_operation_(that.eval_operation_), deriv_operation_(that.deriv_operation_), function_array_(std::move(that.function_array_)){
+
+        printf("MOOOOOOOOOOOOOOOOOVEEE  CONSTRUCTOR ----------\n");
+        fflush(stdout);
+        num_call_move_constructor_++;
+    }
+
+void FunctionExpression::print_performace(){
+    printf("Num call of the constructor %zu\n", num_call_constructor_);
+    printf("Num call of the COPY constructor %zu\n", num_call_copy_constructor_);
+    printf("Num call of the MOVE constructor %zu\n", num_call_move_constructor_);
+    printf("Num call of the SIMPLE constructor %zu\n", num_call_simple_constructor_);
+
 }
 
-FunctionExpression operator*(const Function &_f1, const Function &_f2) {
-
-  if (not FunctionBase::same_domain(_f1, _f2)) {
-    throw std::invalid_argument("Functions with different domains");
-  }
-
-  if (_f1.get_codom_dim() > 1 and _f2.get_codom_dim() > 1) {
-    throw std::invalid_argument(
-        "At most one function can have vectorial value");
-  }
-
-  std::pair<double, double> domain = _f1.get_domain();
-  std::size_t codom_dim;
-  std::vector<std::unique_ptr<Function>> result_array;
-
-  if (_f1.get_codom_dim() > 1) {
-    codom_dim = _f1.get_codom_dim();
-    result_array.push_back(_f1.clone());
-    result_array.push_back(_f2.clone());
-  } else {
-    codom_dim = _f2.get_codom_dim();
-    result_array.push_back(_f2.clone());
-    result_array.push_back(_f1.clone());
-  }
-
-  return FunctionExpression(domain, codom_dim,
-                            FunctionExpression::Type::MULTIPLICATION,
-                            result_array);
-}
 /* -----
  *  Function Evaluation
  * -----*/
-Eigen::MatrixXd
-eval_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                   const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array[0]->get_codom_dim());
-  result.setZero();
-  for (std::unique_ptr<Function> &f : _function_array) {
-    result += f->value(_domain_points);
-  }
-  return result;
-}
-
-Eigen::MatrixXd
-eval_mul_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                   const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  // NOTE: the first element of _function_array has larger codomain dimension
-
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array[0]->get_codom_dim());
-  result = _function_array[0]->value(_domain_points);
-  for (std::size_t i = 1; i < _function_array.size(); i++) {
-    Eigen::MatrixXd scalar_res = _function_array[i]->value(_domain_points);
-    result = result.array().colwise() * scalar_res.col(0).array();
-  }
-  return result;
-}
 
 Eigen::MatrixXd
 eval_compose_functions(std::vector<std::unique_ptr<Function>> &_function_array,
@@ -136,61 +150,6 @@ eval_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
 /* -----
  *  Function Derivation
  * -----*/
-std::unique_ptr<Function>
-deriv_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                    std::size_t _deg) {
-
-  std::vector<std::unique_ptr<Function>> result_array;
-  for (std::unique_ptr<Function> &f : _function_array) {
-    result_array.push_back(f->deriv(_deg));
-  }
-  std::size_t codom_dim = _function_array[0]->get_codom_dim();
-  std::pair<double, double> domain = _function_array[0]->get_domain();
-  return std::make_unique<FunctionExpression>(
-      domain, codom_dim, FunctionExpression::Type::SUM, result_array);
-}
-
-// https://scholar.rose-hulman.edu/cgi/viewcontent.cgi?article=1352&context=rhumj
-std::unique_ptr<Function> first_deriv_mul_functions(
-    std::vector<std::unique_ptr<Function>> &_function_array) {
-
-  std::vector<std::unique_ptr<Function>> result_array;
-  std::size_t codom_dim = _function_array[0]->get_codom_dim();
-  std::pair<double, double> domain = _function_array[0]->get_domain();
-  for (std::size_t i = 0; i < _function_array.size(); i++) {
-
-    std::vector<std::unique_ptr<Function>> elem_array;
-    elem_array.push_back(_function_array[i]->deriv());
-    for (std::size_t k = 0; k < _function_array.size(); k++) {
-      if (k != i)
-        elem_array.push_back(_function_array[k]->clone());
-    }
-    result_array.push_back(std::make_unique<FunctionExpression>(
-        domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
-        result_array));
-  }
-  return std::make_unique<FunctionExpression>(
-      domain, codom_dim, FunctionExpression::Type::SUM, result_array);
-}
-
-std::unique_ptr<Function>
-deriv_mul_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                    std::size_t _deg) {
-
-  std::size_t codom_dim = _function_array[0]->get_codom_dim();
-  std::pair<double, double> domain = _function_array[0]->get_domain();
-  if (_deg == 0) {
-    return std::make_unique<FunctionExpression>(
-        domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
-        _function_array);
-  }
-  std::unique_ptr<Function> result = first_deriv_mul_functions(_function_array);
-  for (std::size_t k = 1; k <= _deg; k++)
-    result.reset(result->deriv().get());
-
-  return result;
-}
-
 std::unique_ptr<Function> first_deriv_compose_functions(
     std::vector<std::unique_ptr<Function>> &_function_array) {
 
@@ -206,13 +165,13 @@ std::unique_ptr<Function> first_deriv_compose_functions(
     std::pair<double, double> domain = _function_array[i]->get_domain();
     elem_array.push_back(_function_array[i]->deriv());
     result_array.push_back(std::make_unique<FunctionExpression>(
-        domain, codom_dim, FunctionExpression::Type::COMPOSITION, elem_array));
+        domain, codom_dim, FunctionExpression::Type::COMPOSITION, std::move(elem_array)));
   }
   std::size_t codom_dim = _function_array.back()->get_codom_dim();
   std::pair<double, double> domain = _function_array.back()->get_domain();
   return std::make_unique<FunctionExpression>(
       domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
-      result_array);
+      std::move(result_array));
 }
 
 std::unique_ptr<Function>
@@ -234,11 +193,18 @@ deriv_compose_functions(std::vector<std::unique_ptr<Function>> &_function_array,
   return result;
 }
 
-/*
 std::unique_ptr<Function>
 deriv_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
-                       std::size_t _deg);
+                    std::size_t _deg) {
 
- */
+  std::vector<std::unique_ptr<Function>> result_array;
+  for (std::unique_ptr<Function> &f : _function_array) {
+    result_array.push_back(f->deriv(_deg));
+  }
+  std::size_t codom_dim = _function_array[0]->get_codom_dim();
+  std::pair<double, double> domain = _function_array[0]->get_domain();
+  return std::make_unique<FunctionExpression>(
+      domain, codom_dim, FunctionExpression::Type::CONCATENATION, result_array);
+}
 } // namespace functions
 } // namespace gsplines

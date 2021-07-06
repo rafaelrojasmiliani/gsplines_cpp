@@ -1,3 +1,6 @@
+
+#ifndef PYBASIS
+#define PYBASIS 
 #include <eigen3/Eigen/Core>
 #include <gsplines++/Basis.hpp>
 #include <gsplines++/BasisLegendre.hpp>
@@ -52,6 +55,8 @@ public:
   std::unique_ptr<Basis> clone() const override { return nullptr; }
 };
 
+} // namespace basis
+
 class PyInterpolator : public Interpolator {
 public:
   using Interpolator::Interpolator;
@@ -75,7 +80,5 @@ public:
                 std::vector<std::pair<std::size_t, double>> _weights)
       : SobolevNorm(_waypoints, _basis, _weights) {}
 };
-
-
-} // namespace basis
 } // namespace gsplines
+#endif /* ifndef PYBASIS */

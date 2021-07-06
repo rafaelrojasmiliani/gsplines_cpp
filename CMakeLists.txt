@@ -1,6 +1,7 @@
 project(gsplines)
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 # project( gplines++ VERSION 0.0.1 DESCRIPTION "Generalized Splines in c++")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,6 +23,8 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/ipopt_interface.cpp
   ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp
   ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionSum.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionMul.cpp
   ${CMAKE_SOURCE_DIR}/src/Functions/FunctionExpression.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
@@ -35,7 +38,7 @@ target_include_directories(
 set(PYBIND11_PYTHON_VERSION "3.6")
 link_directories(${CMAKE_SOURCE_DIR}/build)
 add_subdirectory(${CMAKE_SOURCE_DIR}/modules/pybind11)
-pybind11_add_module(pygsplines ${CMAKE_SOURCE_DIR}/bindings/pyfunctions.cpp)
+pybind11_add_module(pygsplines ${CMAKE_SOURCE_DIR}/bindings/bindings.cpp)
 target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
                                              /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}

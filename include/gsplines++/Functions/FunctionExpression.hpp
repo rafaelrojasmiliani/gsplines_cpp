@@ -13,24 +13,43 @@
 namespace gsplines {
 namespace functions {
 
+class FunctionExpression;
+
+FunctionExpression operator+(const Function &_f1, const Function &_f2);
+FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2);
+// cause ambiguity FunctionExpression operator+(const Function &_f2, FunctionExpression &&_f1);
+FunctionExpression operator+(const FunctionExpression &_f1, const Function &_f2);
+
+FunctionExpression operator*(const Function &_f1, const Function &_f2);
+FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2);
+FunctionExpression operator*(const Function &_f1, FunctionExpression &&_f2);
+
+
+FunctionExpression compose(const Function &_f1, const Function &_f2);
+
 class FunctionExpression : public Function {
-  friend FunctionExpression operator+(Function &_f1, Function &_f2);
 
 public:
   enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION };
+  std::vector<std::unique_ptr<Function>> function_array_;
 
 private:
-  std::vector<std::unique_ptr<Function>> function_array_;
   typedef Eigen::MatrixXd(Eval_Function_Type)(
       std::vector<std::unique_ptr<Function>> &,
       const Eigen::Ref<const Eigen::VectorXd> &);
   typedef std::unique_ptr<Function>(Deriv_Function_Type)(
-      std::vector<std::unique_ptr<Function>> &);
+      std::vector<std::unique_ptr<Function>> &,
+                    std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
 
   Type type_;
+
+  static std::size_t num_call_constructor_;
+  static std::size_t num_call_copy_constructor_;
+  static std::size_t num_call_simple_constructor_;
+  static std::size_t num_call_move_constructor_;
 
 public:
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
@@ -40,17 +59,25 @@ public:
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
                      Type _type);
 
+  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
+                     Type _type,
+                     std::vector<std::unique_ptr<Function>> &&_function_array);
+
   FunctionExpression(const FunctionExpression &that);
+
+  FunctionExpression(FunctionExpression &&that);
+
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override {
+      printf("we are in operator ()\n"); fflush(stdout);
     return eval_operation_(function_array_, _domain_points);
   }
   std::unique_ptr<Function> deriv(int _deg = 1) override {
-    return deriv_operation_(function_array_);
+    return deriv_operation_(function_array_, _deg);
   }
 
   FunctionExpression derivate(int _deg = 1) {
-    std::unique_ptr<Function> result = deriv_operation_(function_array_);
+    std::unique_ptr<Function> result = deriv_operation_(function_array_, _deg);
     return FunctionExpression(*static_cast<FunctionExpression *>(result.get()));
   }
 
@@ -59,6 +86,26 @@ public:
   }
 
   const Type &get_type() const { return type_; }
+
+  FunctionExpression sum(const FunctionExpression &that) {
+    return *this + that;
+  }
+
+  FunctionExpression mul(const FunctionExpression &that) {
+    return (*this) * (that);
+  }
+
+
+  FunctionExpression copose(const FunctionExpression &that) {
+    return compose(*this,that);
+  }
+
+  void print_performace();
+
+  Type get_type(){return type_;}
+
+  FunctionExpression& operator+=(const Function& that);
+  FunctionExpression& operator+=(const FunctionExpression& that);
 };
 
 Eigen::MatrixXd
@@ -93,9 +140,6 @@ std::unique_ptr<Function>
 deriv_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
                        std::size_t _deg);
 
-FunctionExpression operator+(const Function &_f1, const Function &_f2);
-FunctionExpression operator*(const Function &_f1, const Function &_f2);
-FunctionExpression compose(const Function &_f1, const Function &_f2);
 } // namespace functions
 } // namespace gsplines
 #endif
