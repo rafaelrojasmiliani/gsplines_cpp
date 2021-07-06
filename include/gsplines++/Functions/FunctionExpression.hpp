@@ -17,13 +17,14 @@ class FunctionExpression;
 
 FunctionExpression operator+(const Function &_f1, const Function &_f2);
 FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2);
-// cause ambiguity FunctionExpression operator+(const Function &_f2, FunctionExpression &&_f1);
-FunctionExpression operator+(const FunctionExpression &_f1, const Function &_f2);
+// cause ambiguity FunctionExpression operator+(const Function &_f2,
+// FunctionExpression &&_f1);
+FunctionExpression operator+(const FunctionExpression &_f1,
+                             const Function &_f2);
 
 FunctionExpression operator*(const Function &_f1, const Function &_f2);
 FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2);
 FunctionExpression operator*(const Function &_f1, FunctionExpression &&_f2);
-
 
 FunctionExpression compose(const Function &_f1, const Function &_f2);
 
@@ -38,8 +39,7 @@ private:
       std::vector<std::unique_ptr<Function>> &,
       const Eigen::Ref<const Eigen::VectorXd> &);
   typedef std::unique_ptr<Function>(Deriv_Function_Type)(
-      std::vector<std::unique_ptr<Function>> &,
-                    std::size_t);
+      std::vector<std::unique_ptr<Function>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
@@ -69,7 +69,8 @@ public:
 
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override {
-      printf("we are in operator ()\n"); fflush(stdout);
+    printf("we are in operator ()\n");
+    fflush(stdout);
     return eval_operation_(function_array_, _domain_points);
   }
   std::unique_ptr<Function> deriv(int _deg = 1) override {
@@ -95,22 +96,21 @@ public:
     return (*this) * (that);
   }
 
-
   FunctionExpression copose(const FunctionExpression &that) {
-    return compose(*this,that);
+    return compose(*this, that);
   }
 
   void print_performace();
 
-  Type get_type(){return type_;}
+  Type get_type() { return type_; }
 
-  FunctionExpression& operator+=(const Function& that);
-  FunctionExpression& operator+=(const FunctionExpression& that);
-  FunctionExpression& operator+=(FunctionExpression&& that);
+  FunctionExpression &operator+=(const Function &that);
+  FunctionExpression &operator+=(const FunctionExpression &that);
+  FunctionExpression &operator+=(FunctionExpression &&that);
 
-
-  FunctionExpression& operator*=(const Function& that);
-  FunctionExpression& operator*=(const FunctionExpression& that);
+  FunctionExpression &operator*=(const Function &that);
+  FunctionExpression &operator*=(const FunctionExpression &that);
+  FunctionExpression &operator*=(FunctionExpression &&that);
 };
 
 Eigen::MatrixXd

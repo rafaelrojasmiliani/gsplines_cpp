@@ -12,10 +12,10 @@
 namespace gsplines {
 namespace functions {
 class FunctionBase {
-private:
-  const std::size_t codom_dim_;
-  const std::pair<double, double> window_;
-  const std::pair<double, double> domain_;
+public:
+  std::size_t codom_dim_;
+  std::pair<double, double> window_;
+  std::pair<double, double> domain_;
   static const double dom_tollerance_;
 
 public:

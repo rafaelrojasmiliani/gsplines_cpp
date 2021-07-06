@@ -54,7 +54,13 @@ FunctionExpression::operator+=(const FunctionExpression &that) {
 
     eval_operation_ = eval_sum_functions;
     deriv_operation_ = deriv_sum_functions;
-    function_array_.push_back(that.clone());
+    if (that.get_type() == SUM) {
+      for (const std::unique_ptr<Function> &f : that.function_array_) {
+        function_array_.push_back(f->clone());
+      }
+    } else {
+      function_array_.push_back(that.clone());
+    }
   } else {
     if (that.type_ == SUM) {
       printf("both are sums sum\n");
@@ -97,9 +103,6 @@ FunctionExpression &FunctionExpression::operator+=(FunctionExpression &&that) {
   } else {
     if (that.type_ == SUM) {
       printf("both are sums sum\n");
-      for (const std::unique_ptr<Function> &f : that.function_array_) {
-        function_array_.push_back(f->clone());
-      }
 
       function_array_.reserve(function_array_.size() +
                               that.function_array_.size());
@@ -225,8 +228,9 @@ deriv_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
   }
   std::size_t codom_dim = _function_array[0]->get_codom_dim();
   std::pair<double, double> domain = _function_array[0]->get_domain();
-  return std::make_unique<FunctionExpression>(
-      domain, codom_dim, FunctionExpression::Type::SUM, result_array);
+  return std::make_unique<FunctionExpression>(domain, codom_dim,
+                                              FunctionExpression::Type::SUM,
+                                              std::move(result_array));
 }
 
 } // namespace functions
