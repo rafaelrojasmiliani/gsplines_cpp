@@ -106,6 +106,11 @@ public:
 
   FunctionExpression& operator+=(const Function& that);
   FunctionExpression& operator+=(const FunctionExpression& that);
+  FunctionExpression& operator+=(FunctionExpression&& that);
+
+
+  FunctionExpression& operator*=(const Function& that);
+  FunctionExpression& operator*=(const FunctionExpression& that);
 };
 
 Eigen::MatrixXd

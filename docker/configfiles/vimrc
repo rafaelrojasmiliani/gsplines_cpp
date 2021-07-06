@@ -49,7 +49,7 @@ Plugin 'ale'
 let g:ale_completion_enabled = 0
 let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace'], 'json':['jq'], 'yaml':['prettier']}
 let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
-let g:ale_cpp_clangtidy_executable='clang-tidy'
+let g:ale_c_clangformat_executable='clang-format-10'
 let g:ale_cpp_clangtidy_extra_options=''
 let g:ale_cpp_cc_options='-I ''/opt/ros/noetic/include'' -I ''/usr/include/eigen3'' -I ''/gsplinespp/include'' '
 let g:ale_sign_error = 'E'

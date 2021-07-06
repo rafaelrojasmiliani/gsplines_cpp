@@ -60,6 +60,7 @@ int main() {
     assert((f(time_span) - 11*exp_value).norm()<1.0e-9);
     printf("|||||||||||||||||||||||||");
 
+    f+=(m +s);
     f.print_performace();
 
   return 0;
