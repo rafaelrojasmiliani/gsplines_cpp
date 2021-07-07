@@ -50,6 +50,18 @@ Function &return_second_or_mim_codom_dim(Function &_f1, Function &_f2) {
   return _f1;
 }
 
+void push_back_to_array(std::unique_ptr<Function> &_self_copy, Function &_that,
+                        std::vector<std::unique_ptr<Function>> _fa) {
+
+  if (_self_copy->get_codom_dim() >= _that.get_codom_dim()) {
+    _fa.push_back(std::move(_self_copy));
+    _fa.push_back(_that.clone());
+  } else {
+    _fa.push_back(_that.clone());
+    _fa.push_back(std::move(_self_copy));
+  }
+}
+
 FunctionExpression &FunctionExpression::operator*=(const Function &that) {
 
   compatibility_mul(*this, that);
@@ -249,6 +261,7 @@ FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2) {
   std::vector<std::unique_ptr<Function>> result_array;
 
   if (_f1.get_type() == FunctionExpression::Type::MULTIPLICATION) {
+
     if (_f1.get_codom_dim() > 1) {
       codom_dim = _f1.get_codom_dim();
       result_array.push_back(
@@ -277,8 +290,43 @@ FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2) {
                             FunctionExpression::Type::MULTIPLICATION,
                             std::move(result_array));
 }
-FunctionExpression operator*(const Function &_f1, FunctionExpression &&_f2) {
-  return std::move(_f2) * _f1;
+
+FunctionExpression operator*(const FunctionExpression &_f1,
+                             const Function &_f2) {
+
+  compatibility_mul(_f1, _f2);
+
+  std::pair<double, double> domain = _f1.get_domain();
+  std::size_t codom_dim;
+  std::vector<std::unique_ptr<Function>> result_array;
+
+  if (_f1.get_type() == FunctionExpression::Type::MULTIPLICATION) {
+
+    if (_f1.get_codom_dim() > 1) {
+      codom_dim = _f1.get_codom_dim();
+      result_array.push_back(_f1.clone());
+      result_array.push_back(_f2.clone());
+    } else {
+      codom_dim = _f2.get_codom_dim();
+      result_array.push_back(_f2.clone());
+      result_array.push_back(_f1.clone());
+    }
+  }
+  if (_f1.get_codom_dim() > 1) {
+    codom_dim = _f1.get_codom_dim();
+    result_array.push_back(
+        std::make_unique<FunctionExpression>(std::move(_f1)));
+    result_array.push_back(_f2.clone());
+  } else {
+    codom_dim = _f2.get_codom_dim();
+    result_array.push_back(_f2.clone());
+    result_array.push_back(
+        std::make_unique<FunctionExpression>(std::move(_f1)));
+  }
+
+  return FunctionExpression(domain, codom_dim,
+                            FunctionExpression::Type::MULTIPLICATION,
+                            std::move(result_array));
 }
 /* -----
  *  Function Evaluation
