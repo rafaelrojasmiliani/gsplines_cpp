@@ -296,9 +296,19 @@ FunctionExpression operator*(const FunctionExpression &_f1,
 
   compatibility_mul(_f1, _f2);
 
-  std::pair<double, double> domain = _f1.get_domain();
-  std::size_t codom_dim;
   std::vector<std::unique_ptr<Function>> result_array;
+
+  const Function &f_vector = return_first_or_max_codom_dim(_f1, _f2);
+  const Function &f_scaler = return_second_or_mim_codom_dim(_f1, _f2);
+
+  std::pair<double, double> domain = f_vector.get_domain();
+  std::size_t codom_dim = f_vector.get_codom_dim();
+
+  if (_f1.get_codom_dim() > _f2.get_codom_dim()) {
+    std::unique_ptr<Function> vector_function(_f1.function_array_[0]->clone());
+  } else if (_f1.get_codom_dim() < _f2.get_codom_dim()) {
+    std::unique_ptr<Function> vector_function(_f2.clone());
+  }
 
   if (_f1.get_type() == FunctionExpression::Type::MULTIPLICATION) {
 

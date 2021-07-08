@@ -32,6 +32,10 @@ class FunctionExpression : public Function {
 
 public:
   enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION };
+  // Consider use a deque
+  // https://stackoverflow.com/questions/18811948/vector-vs-deque-operator
+  // What is more critical to this calss? scalar multiplication or
+  // operations that require random access?
   std::vector<std::unique_ptr<Function>> function_array_;
 
 private:
