@@ -36,6 +36,13 @@ public:
   // https://stackoverflow.com/questions/18811948/vector-vs-deque-operator
   // What is more critical to this calss? scalar multiplication or
   // operations that require random access?
+  //
+  // Consider to use a list. NOt that we do not desire a random access. We
+  // deseire an
+  // - Fast ordered access 
+  // - fast concatenation
+  // - Fast insertion at the begining
+  // - Fast  inserion at the end.
   std::vector<std::unique_ptr<Function>> function_array_;
 
 private:

@@ -23,56 +23,56 @@ set nocompatible
 filetype off
 set rtp+=/etc/vim/bundle/Vundle.vim
 call vundle#begin('/etc/vim/bundle/')
-Plugin 'Vundle.vim'
-Plugin 'YouCompleteMe'
-set encoding=utf-8
-let g:ycm_key_list_select_completion = ['<C-n>']
-let g:ycm_key_list_previous_completion = ['<C-p>']
-let g:ycm_python_binary_path='/usr/bin/python3'
-let g:ycm_enable_diagnostic_signs=0
-let g:ycm_enable_diagnostic_highlighting=0
-let g:ycm_global_ycm_extra_conf='/etc/vim/ycm_extra_conf.py'
-let g:ycm_confirm_extra_conf = 1
-let g:SuperTabDefaultCompletionType = '<C-n>'
-Plugin 'vim-latex'
-" ------- tagbar -------
-Plugin 'tagbar'
-map  <F4>          :TagbarToggle<CR>
-"let g:tagbar_ctags_options = ['C:\Users\Administrator\.ctags']
-"let g:tagbar_type_xml = {
-"            \ 'kinds' : ['j:joints', 'l:links', 'p:properties', 'm:macros', 'i:includes', 'n:nodes']
-"            \}
-" ------- bufer exampler -------
-Plugin 'bufexplorer'
-" ------- ale -------
-Plugin 'ale'
-let g:ale_completion_enabled = 0
-let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace'], 'json':['jq'], 'yaml':['prettier']}
-let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
-let g:ale_c_clangformat_executable='clang-format-10'
-let g:ale_cpp_clangtidy_extra_options=''
-let g:ale_cpp_cc_options='-I ''/opt/ros/noetic/include'' -I ''/usr/include/eigen3'' -I ''/gsplinespp/include'' '
-let g:ale_sign_error = 'E'
-let g:ale_sign_warning = 'W'
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_enter = 1
-let g:ale_lint_on_insert_leave = 1
-let g:ale_fix_on_save = 1
-let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
-" ------- vim-substitute -------
-Plugin 'vim-substitute'
-let g:substitute_SingleWordSize=100
-Plugin 'ultisnips'
-let g:UltiSnipsExpandTrigger = "<c-j>"
-let g:UltiSnipsJumpForwardTrigger = "<c-n>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-p>"
-Plugin 'vim-snippets'
-Plugin 'vim-fugitive'
-Plugin 'xmledit'
-Plugin 'vimspector'
-let g:vimspector_enable_mappings = 'HUMAN'
-Plugin 'nerdtree'
-Plugin 'nerdtree-git-plugin'
+    Plugin 'Vundle.vim'
+    Plugin 'YouCompleteMe'
+        set encoding=utf-8
+        let g:ycm_key_list_select_completion = ['<C-n>']
+        let g:ycm_key_list_previous_completion = ['<C-p>']
+        let g:ycm_python_binary_path='/usr/bin/python3'
+        let g:ycm_enable_diagnostic_signs=0
+        let g:ycm_enable_diagnostic_highlighting=0
+        let g:ycm_global_ycm_extra_conf='/etc/vim/ycm_extra_conf.py'
+        let g:ycm_confirm_extra_conf = 1
+        let g:SuperTabDefaultCompletionType = '<C-n>'
+    Plugin 'vim-latex'
+    " ------- tagbar -------
+    Plugin 'tagbar'
+        "let g:tagbar_ctags_options = ['C:\Users\Administrator\.ctags']
+        "let g:tagbar_type_xml = {
+        "            \ 'kinds' : ['j:joints', 'l:links', 'p:properties', 'm:macros', 'i:includes', 'n:nodes']
+        "            \}
+        " ------- bufer exampler -------
+    Plugin 'bufexplorer'
+        " ------- ale -------
+        Plugin 'ale'
+        let g:ale_completion_enabled = 0
+        let g:ale_fixers = {'python': ['autopep8'], 'cpp': ['clang-format'], 'cmake': ['cmakeformat'], 'xml':['xmllint'], 'javascript':['prettier'], '*':['remove_trailing_lines', 'trim_whitespace'], 'json':['jq'], 'yaml':['prettier']}
+        let g:ale_linters = {'python': ['pylint', 'flake8', 'prospector'],'xml':['xmllint'], 'cpp':['clangtidy', 'cc']}
+        let g:ale_c_clangformat_executable='clang-format-10'
+        let g:ale_cpp_clangtidy_extra_options=''
+        let g:ale_cpp_cc_options='-I ''/opt/ros/noetic/include'' -I ''/usr/include/eigen3'' -I ''/gsplinespp/include'' '
+        let g:ale_sign_error = 'E'
+        let g:ale_sign_warning = 'W'
+        let g:ale_lint_on_text_changed = 'never'
+        let g:ale_lint_on_enter = 1
+        let g:ale_lint_on_insert_leave = 1
+        let g:ale_fix_on_save = 1
+        let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
+    " ------- vim-substitute -------
+    Plugin 'vim-substitute'
+        let g:substitute_SingleWordSize=100
+    Plugin 'ultisnips'
+        let g:UltiSnipsExpandTrigger = "<c-j>"
+        let g:UltiSnipsJumpForwardTrigger = "<c-n>"
+        let g:UltiSnipsJumpBackwardTrigger = "<c-p>"
+    Plugin 'vim-snippets'
+    Plugin 'vim-fugitive'
+    Plugin 'xmledit'
+    Plugin 'vimspector'
+        let g:vimspector_enable_mappings = 'HUMAN'
+        map  <F4>          :TagbarToggle<CR>
+    Plugin 'nerdtree'
+    Plugin 'nerdtree-git-plugin'
 call vundle#end()
 filetype plugin indent on
 filetype plugin on
