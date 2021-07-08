@@ -4,14 +4,19 @@
 namespace gsplines {
 namespace functions {
 
-FunctionExpression &FunctionExpression::operator+=(const Function &that) {
+void sum_throw(const Function &_f1, const Function &_f2) {
 
-  if (not FunctionBase::same_domain(*this, that)) {
+  if (not FunctionBase::same_domain(_f1, _f2)) {
     throw std::invalid_argument("Functions with different domains");
   }
-  if (not FunctionBase::same_codomain(*this, that)) {
+  if (not FunctionBase::same_codomain(_f1, _f2)) {
     throw std::invalid_argument("Functions with different codomains");
   }
+}
+
+FunctionExpression &FunctionExpression::operator+=(const Function &that) {
+
+  sum_throw(*this, that);
 
   if (type_ != SUM) {
     type_ = SUM;
@@ -35,15 +40,9 @@ FunctionExpression &
 FunctionExpression::operator+=(const FunctionExpression &that) {
   printf("llllllllllllllllllllllllllllllll\n");
 
-  if (not FunctionBase::same_domain(*this, that)) {
-    throw std::invalid_argument("Functions with different domains");
-  }
-  if (not FunctionBase::same_codomain(*this, that)) {
-    throw std::invalid_argument("Functions with different codomains");
-  }
+  sum_throw(*this, that);
 
   if (type_ != SUM) {
-    printf("this is not a sum\n");
     type_ = SUM;
 
     std::unique_ptr<Function> self_copy = std::make_unique<FunctionExpression>(
@@ -54,22 +53,14 @@ FunctionExpression::operator+=(const FunctionExpression &that) {
 
     eval_operation_ = eval_sum_functions;
     deriv_operation_ = deriv_sum_functions;
-    if (that.get_type() == SUM) {
-      for (const std::unique_ptr<Function> &f : that.function_array_) {
-        function_array_.push_back(f->clone());
-      }
-    } else {
-      function_array_.push_back(that.clone());
+  }
+
+  if (that.get_type() == SUM) {
+    for (const std::unique_ptr<Function> &f : that.function_array_) {
+      function_array_.push_back(f->clone());
     }
   } else {
-    if (that.type_ == SUM) {
-      printf("both are sums sum\n");
-      for (const std::unique_ptr<Function> &f : that.function_array_) {
-        function_array_.push_back(f->clone());
-      }
-    } else {
-      function_array_.push_back(that.clone());
-    }
+    function_array_.push_back(that.clone());
   }
   fflush(stdout);
 
@@ -79,15 +70,9 @@ FunctionExpression::operator+=(const FunctionExpression &that) {
 FunctionExpression &FunctionExpression::operator+=(FunctionExpression &&that) {
   printf("KEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
 
-  if (not FunctionBase::same_domain(*this, that)) {
-    throw std::invalid_argument("Functions with different domains");
-  }
-  if (not FunctionBase::same_codomain(*this, that)) {
-    throw std::invalid_argument("Functions with different codomains");
-  }
+  sum_throw(*this, that);
 
   if (type_ != SUM) {
-    printf("this is not a sum\n");
     type_ = SUM;
 
     std::unique_ptr<Function> self_copy = std::make_unique<FunctionExpression>(
@@ -98,21 +83,16 @@ FunctionExpression &FunctionExpression::operator+=(FunctionExpression &&that) {
 
     eval_operation_ = eval_sum_functions;
     deriv_operation_ = deriv_sum_functions;
+  }
+
+  if (that.type_ == SUM) {
+    printf("both are sums sum\n");
+
+    std::move(std::begin(that.function_array_), std::end(that.function_array_),
+              std::back_inserter(function_array_));
+  } else {
     function_array_.push_back(
         std::make_unique<FunctionExpression>(std::move(that)));
-  } else {
-    if (that.type_ == SUM) {
-      printf("both are sums sum\n");
-
-      function_array_.reserve(function_array_.size() +
-                              that.function_array_.size());
-      std::move(std::begin(that.function_array_),
-                std::end(that.function_array_),
-                std::back_inserter(function_array_));
-    } else {
-      function_array_.push_back(
-          std::make_unique<FunctionExpression>(std::move(that)));
-    }
   }
   fflush(stdout);
 
@@ -130,7 +110,7 @@ FunctionExpression operator+(const FunctionExpression &_f1,
   printf("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n");
   fflush(stdout);
 
-  std::vector<std::unique_ptr<Function>> result_array;
+  std::list<std::unique_ptr<Function>> result_array;
   std::size_t codom_dim = _f1.get_codom_dim();
   std::pair<double, double> domain = _f1.get_domain();
 
@@ -154,7 +134,7 @@ FunctionExpression operator+(const Function &_f1, const Function &_f2) {
     throw std::invalid_argument("Functions with different codomains");
   }
 
-  std::vector<std::unique_ptr<Function>> result_array;
+  std::list<std::unique_ptr<Function>> result_array;
   std::size_t codom_dim = _f1.get_codom_dim();
   std::pair<double, double> domain = _f1.get_domain();
 
@@ -179,7 +159,7 @@ FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2) {
     throw std::invalid_argument("Functions with different codomains");
   }
 
-  std::vector<std::unique_ptr<Function>> result_array;
+  std::list<std::unique_ptr<Function>> result_array;
   std::size_t codom_dim = _f1.get_codom_dim();
   std::pair<double, double> domain = _f1.get_domain();
 
@@ -203,11 +183,11 @@ FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2) {
  *  Function Evaluation
  * -----*/
 Eigen::MatrixXd
-eval_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+eval_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
                    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
 
   Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array[0]->get_codom_dim());
+                         _function_array.front()->get_codom_dim());
   result.setZero();
   for (std::unique_ptr<Function> &f : _function_array) {
     result += f->value(_domain_points);
@@ -219,15 +199,15 @@ eval_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
  *  Function Derivation
  * -----*/
 std::unique_ptr<Function>
-deriv_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+deriv_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
                     std::size_t _deg) {
 
-  std::vector<std::unique_ptr<Function>> result_array;
+  std::list<std::unique_ptr<Function>> result_array;
   for (std::unique_ptr<Function> &f : _function_array) {
     result_array.push_back(f->deriv(_deg));
   }
-  std::size_t codom_dim = _function_array[0]->get_codom_dim();
-  std::pair<double, double> domain = _function_array[0]->get_domain();
+  std::size_t codom_dim = _function_array.front()->get_codom_dim();
+  std::pair<double, double> domain = _function_array.front()->get_domain();
   return std::make_unique<FunctionExpression>(domain, codom_dim,
                                               FunctionExpression::Type::SUM,
                                               std::move(result_array));
