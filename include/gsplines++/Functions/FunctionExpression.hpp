@@ -7,9 +7,9 @@
 #include <eigen3/Eigen/Core>
 #include <functional>
 #include <gsplines++/Functions/Functions.hpp>
+#include <list>
 #include <memory>
 #include <utility>
-#include <vector>
 namespace gsplines {
 namespace functions {
 
@@ -39,18 +39,18 @@ public:
   //
   // Consider to use a list. NOt that we do not desire a random access. We
   // deseire an
-  // - Fast ordered access 
+  // - Fast ordered access
   // - fast concatenation
   // - Fast insertion at the begining
   // - Fast  inserion at the end.
-  std::vector<std::unique_ptr<Function>> function_array_;
+  std::list<std::unique_ptr<Function>> function_array_;
 
 private:
   typedef Eigen::MatrixXd(Eval_Function_Type)(
-      std::vector<std::unique_ptr<Function>> &,
+      std::list<std::unique_ptr<Function>> &,
       const Eigen::Ref<const Eigen::VectorXd> &);
   typedef std::unique_ptr<Function>(Deriv_Function_Type)(
-      std::vector<std::unique_ptr<Function>> &, std::size_t);
+      std::list<std::unique_ptr<Function>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
@@ -65,14 +65,14 @@ private:
 public:
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
                      Type _type,
-                     std::vector<std::unique_ptr<Function>> &_function_array);
+                     std::list<std::unique_ptr<Function>> &_function_array);
 
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
                      Type _type);
 
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
                      Type _type,
-                     std::vector<std::unique_ptr<Function>> &&_function_array);
+                     std::list<std::unique_ptr<Function>> &&_function_array);
 
   FunctionExpression(const FunctionExpression &that);
 
@@ -125,35 +125,35 @@ public:
 };
 
 Eigen::MatrixXd
-eval_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+eval_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
                    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd
-eval_mul_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+eval_mul_functions(std::list<std::unique_ptr<Function>> &_function_array,
                    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd
-eval_compose_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+eval_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
                        const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd
-eval_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+eval_concat_functions(std::list<std::unique_ptr<Function>> &_function_array,
                       const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 std::unique_ptr<Function>
-deriv_sum_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+deriv_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
                     std::size_t _deg);
 
 std::unique_ptr<Function>
-deriv_mul_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+deriv_mul_functions(std::list<std::unique_ptr<Function>> &_function_array,
                     std::size_t _deg);
 
 std::unique_ptr<Function>
-deriv_compose_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+deriv_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
                         std::size_t _deg);
 
 std::unique_ptr<Function>
-deriv_concat_functions(std::vector<std::unique_ptr<Function>> &_function_array,
+deriv_concat_functions(std::list<std::unique_ptr<Function>> &_function_array,
                        std::size_t _deg);
 
 } // namespace functions

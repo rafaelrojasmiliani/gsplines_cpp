@@ -130,6 +130,7 @@ FunctionExpression::operator*=(const FunctionExpression &that) {
   }
   return *this;
 }
+/*
 
 FunctionExpression &FunctionExpression::operator*=(FunctionExpression &&that) {
 
@@ -180,7 +181,8 @@ FunctionExpression operator*(const Function &_f1, const Function &_f2) {
   const Function &f_vector = return_first_or_max_codom_dim(_f1, _f2);
   const Function &f_scalar = return_second_or_mim_codom_dim(_f1, _f2);
 
-  std::vector<std::unique_ptr<Function>> result_array = {f_vector.clone(), f_scalar.clone()};
+  std::vector<std::unique_ptr<Function>> result_array = {f_vector.clone(),
+f_scalar.clone()};
 
   return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
                             FunctionExpression::Type::MULTIPLICATION,
@@ -261,6 +263,7 @@ FunctionExpression operator*(const FunctionExpression &_f1,
                             FunctionExpression::Type::MULTIPLICATION,
                             std::move(result_array));
 }
+*/
 /* -----
  *  Function Evaluation
  * -----*/
