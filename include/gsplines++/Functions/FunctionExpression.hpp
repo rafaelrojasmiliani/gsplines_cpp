@@ -16,6 +16,7 @@ namespace functions {
 class FunctionExpression;
 
 FunctionExpression operator+(const Function &_f1, const Function &_f2);
+FunctionExpression operator-(const Function &_f1, const Function &_f2);
 FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2);
 // cause ambiguity FunctionExpression operator+(const Function &_f2,
 // FunctionExpression &&_f1);

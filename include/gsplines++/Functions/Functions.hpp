@@ -11,6 +11,9 @@
 
 namespace gsplines {
 namespace functions {
+
+class FunctionExpression;
+
 class FunctionBase {
 public:
   std::size_t codom_dim_;
@@ -33,11 +36,8 @@ public:
   bool is_point_in_domain(double _domain_point);
 };
 
-class FunctionsConcat;
 class Function : public FunctionBase {
 private:
-  friend FunctionsConcat;
-
 public:
   Function(std::pair<double, double> _domain, std::size_t _codom_dim);
   Function(const Function &that);
@@ -57,6 +57,7 @@ public:
 
   virtual std::unique_ptr<Function> clone() const = 0;
   virtual ~Function() {}
+  FunctionExpression operator-() const;
 };
 
 /*

@@ -1,4 +1,5 @@
 
+#include <gsplines++/Functions/ElementalFunctions.hpp>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 #include <iostream>
 namespace gsplines {
@@ -213,5 +214,17 @@ deriv_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
                                               std::move(result_array));
 }
 
+FunctionExpression operator-(const Function &_f1, const Function &_f2) {
+
+  std::list<std::unique_ptr<Function>> result_array;
+
+  result_array.push_back(_f1.clone());
+  result_array.push_back(std::make_unique<FunctionExpression>(
+      ConstFunction(_f2.get_domain(), 1, -1.0) * _f2));
+
+  return FunctionExpression(_f1.get_domain(), _f1.get_codom_dim(),
+                            FunctionExpression::Type::SUM,
+                            std::move(result_array));
+}
 } // namespace functions
 } // namespace gsplines

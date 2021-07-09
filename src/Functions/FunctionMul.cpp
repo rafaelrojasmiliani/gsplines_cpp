@@ -1,4 +1,5 @@
 
+#include <gsplines++/Functions/ElementalFunctions.hpp>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 #include <iostream>
 namespace gsplines {
@@ -239,6 +240,11 @@ FunctionExpression operator*(const FunctionExpression &_f1,
                             FunctionExpression::Type::MULTIPLICATION,
                             std::move(result_array));
 }
+
+FunctionExpression Function::operator-() const {
+
+  return ConstFunction(get_domain(), 1, -1.0) * *this;
+}
 /* -----
  *  Function Evaluation
  * -----*/
@@ -324,5 +330,6 @@ deriv_mul_functions(std::list<std::unique_ptr<Function>> &_function_array,
 
   return result;
 }
+
 } // namespace functions
 } // namespace gsplines

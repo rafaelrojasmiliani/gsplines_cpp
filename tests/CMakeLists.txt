@@ -2,9 +2,14 @@ link_directories(${CMAKE_SOURCE_DIR}/build)
 link_libraries(${GSL_LIBRARIES} ${Eigen3_LIBRARIES} gsplines)
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
                     ${Eigen3_LIBRARIES})
-add_executable(test_basislegendre ${CMAKE_SOURCE_DIR}/tests/basis_legendre.cpp)
-add_executable(interpolator ${CMAKE_SOURCE_DIR}/tests/interpolator.cpp)
-add_executable(functions ${CMAKE_SOURCE_DIR}/tests/functions.cpp)
-add_test(test_basislegendre test_basislegendre)
-add_test(interpolator interpolator)
-add_test(functions functions)
+
+file(
+  GLOB_RECURSE test_list
+  RELATIVE ${CMAKE_SOURCE_DIR}
+  "tests/*.cpp")
+
+foreach(file_path ${test_list})
+  string(REPLACE ".cpp" "" new_name ${file_path})
+  add_executable(${new_name} ${file_path})
+  add_test(${new_name} ${new_name})
+endforeach()
