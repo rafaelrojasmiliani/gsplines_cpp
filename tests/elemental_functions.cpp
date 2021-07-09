@@ -14,16 +14,19 @@ int main() {
   FunctionExpression f_d_nom =
       (exp + sin + cos) * (-sin) + (exp + cos - sin) * cos;
 
-  Eigen::VectorXd time_span = Eigen::VectorXd::Random(10000);
+  for (int _ = 0; _ < 100; _++) {
+    Eigen::VectorXd time_span = Eigen::VectorXd::Random(10000);
 
-  assert(((exp(time_span) + sin(time_span) + cos(time_span)) * cos(time_span) -
-          f_nom(time_span))
-             .norm() < 1.0e-9);
+    assert(
+        ((exp(time_span) + sin(time_span) + cos(time_span)) * cos(time_span) -
+         f_nom(time_span))
+            .norm() < 1.0e-9);
 
-  FunctionExpression f_dot = f_nom.derivate();
+    FunctionExpression f_dot = f_nom.derivate();
 
-  assert((f_dot(time_span) - exp(time_span) + cos(time_span) - sin(time_span))
-             .norm() < 1.0e-9);
+    assert((f_dot(time_span) - exp(time_span) + cos(time_span) - sin(time_span))
+               .norm() < 1.0e-9);
+  }
 
   return 0;
 }
