@@ -25,6 +25,7 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp
   ${CMAKE_SOURCE_DIR}/src/Functions/FunctionSum.cpp
   ${CMAKE_SOURCE_DIR}/src/Functions/FunctionMul.cpp
+  ${CMAKE_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp
   ${CMAKE_SOURCE_DIR}/src/Functions/FunctionExpression.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}

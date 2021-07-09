@@ -38,8 +38,12 @@ public:
 
 class Function : public FunctionBase {
 private:
+  const std::string name_;
+
 public:
   Function(std::pair<double, double> _domain, std::size_t _codom_dim);
+  Function(std::pair<double, double> _domain, std::size_t _codom_dim,
+           const std::string &_name);
   Function(const Function &that);
 
   virtual Eigen::MatrixXd
@@ -58,24 +62,14 @@ public:
   virtual std::unique_ptr<Function> clone() const = 0;
   virtual ~Function() {}
   FunctionExpression operator-() const;
+
+  const std::string &get_name() const { return name_; }
+
+  virtual void print(std::size_t _indent = 0) {
+    printf("%*s- %s\n", 4 * (int)_indent, "", get_name().c_str());
+  }
 };
 
-/*
-std::unique_ptr<Function> operator-(Function &, Function &);
-
-class CompositionOfFunctions : public Function {
-private:
-  std::unique_ptr<Function> f1_;
-  std::unique_ptr<Function> f2_;
-
-public:
-  CompositionOfFunctions(Function &_f1, Function &_f2);
-  CompositionOfFunctions(const CompositionOfFunctions &that);
-  Eigen::MatrixXd
-  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override;
-  std::unique_ptr<Function> deriv(int _deg) override;
-};
-*/
 } // namespace functions
 } // namespace gsplines
 #endif

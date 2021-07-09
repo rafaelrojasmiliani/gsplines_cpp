@@ -190,7 +190,7 @@ eval_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
   Eigen::MatrixXd result(_domain_points.size(),
                          _function_array.front()->get_codom_dim());
   result.setZero();
-  for (std::unique_ptr<Function> &f : _function_array) {
+  for (const std::unique_ptr<Function> &f : _function_array) {
     result += f->value(_domain_points);
   }
   return result;

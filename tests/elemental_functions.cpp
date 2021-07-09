@@ -10,21 +10,30 @@ int main() {
   Sin sin(base_domain);
   Cos cos(base_domain);
 
-  FunctionExpression f_nom = (exp + sin + cos) * cos;
-  FunctionExpression f_d_nom =
-      (exp + sin + cos) * (-sin) + (exp + cos - sin) * cos;
+  FunctionExpression f_nom = (exp + sin + cos);
+
+  FunctionExpression f_d_nom = (exp + cos - sin);
 
   for (int _ = 0; _ < 100; _++) {
-    Eigen::VectorXd time_span = Eigen::VectorXd::Random(10000);
+    Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
-    assert(
-        ((exp(time_span) + sin(time_span) + cos(time_span)) * cos(time_span) -
-         f_nom(time_span))
-            .norm() < 1.0e-9);
+    assert((exp(time_span) + sin(time_span) + cos(time_span) - f_nom(time_span))
+               .norm() < 1.0e-9);
 
     FunctionExpression f_dot = f_nom.derivate();
 
-    assert((f_dot(time_span) - exp(time_span) + cos(time_span) - sin(time_span))
+    f_dot.print();
+
+    printf("function name %s\n", f_dot.get_name().c_str());
+
+    std::cout << f_dot(time_span) << "\n";
+    std::cout << exp(time_span) + cos(time_span) - sin(time_span) << "\n"
+              << (f_dot(time_span) - exp(time_span) + cos(time_span) -
+                  sin(time_span))
+                     .norm()
+              << "\n";
+
+    assert((f_dot(time_span) - exp(time_span) - cos(time_span) + sin(time_span))
                .norm() < 1.0e-9);
   }
 

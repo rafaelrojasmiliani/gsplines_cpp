@@ -1,14 +1,15 @@
 #include <gsplines++/Functions/ElementalFunctions.hpp>
+#include <iostream>
 namespace gsplines {
 namespace functions {
 
 ConstFunction::ConstFunction(std::pair<double, double> _domain,
                              Eigen::Ref<Eigen::VectorXd> _values)
-    : Function(_domain, _values.size()), values_(_values) {}
+    : Function(_domain, _values.size(), "ConstFunction"), values_(_values) {}
 
 ConstFunction::ConstFunction(std::pair<double, double> _domain,
                              std::size_t _codom_dim, double _value)
-    : Function(_domain, _codom_dim),
+    : Function(_domain, _codom_dim, "ConstFunction"),
       values_(Eigen::VectorXd::Ones(_codom_dim) * _value) {}
 
 ConstFunction::ConstFunction(const ConstFunction &_that)
@@ -16,12 +17,20 @@ ConstFunction::ConstFunction(const ConstFunction &_that)
 
 Eigen::MatrixXd Exponential::operator()(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  return Eigen::exp(_domain_points.array()).matrix();
+  // std::cout << "Exp \n" << Eigen::exp(_domain_points.array()).matrix() <<
+  // '\n';
+  Eigen::MatrixXd result = Eigen::exp(_domain_points.array()).matrix();
+  // std::cout << "................\n";
+  return result;
 };
 
 Eigen::MatrixXd
 Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  return Eigen::cos(_domain_points.array()).matrix();
+  // std::cout << "Cos \n" << Eigen::cos(_domain_points.array()).matrix() <<
+  // '\n';
+  Eigen::MatrixXd result = Eigen::cos(_domain_points.array()).matrix();
+  // std::cout << "................\n";
+  return result;
 };
 
 std::unique_ptr<Function> Cos::deriv(int _deg) {
@@ -31,7 +40,11 @@ std::unique_ptr<Function> Cos::deriv(int _deg) {
 
 Eigen::MatrixXd
 Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  return Eigen::cos(_domain_points.array()).matrix();
+  // std::cout << "Sin \n" << Eigen::sin(_domain_points.array()).matrix() <<
+  // '\n';
+  Eigen::MatrixXd result = Eigen::sin(_domain_points.array()).matrix();
+  // std::cout << "................\n";
+  return result;
 };
 
 std::unique_ptr<Function> Sin::deriv(int _deg) {

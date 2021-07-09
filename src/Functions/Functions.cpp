@@ -7,6 +7,7 @@ namespace gsplines {
 namespace functions {
 /**  Function Base */
 const double FunctionBase::dom_tollerance_ = 1.0e-5;
+
 FunctionBase::FunctionBase(std::pair<double, double> _domain,
                            std::size_t _codom_dim)
     : codom_dim_(_codom_dim), window_(_domain), domain_(_domain) {}
@@ -33,10 +34,16 @@ bool FunctionBase::is_point_in_domain(double _domain_point) {
   return domain_.first <= _domain_point and _domain_point <= domain_.second;
 }
 /**  Function */
-Function::Function(std::pair<double, double> _domain, std::size_t _codom_dim)
-    : FunctionBase(_domain, _codom_dim) {}
 
-Function::Function(const Function &that) : FunctionBase(that) {}
+Function::Function(std::pair<double, double> _domain, std::size_t _codom_dim)
+    : FunctionBase(_domain, _codom_dim), name_("Function") {}
+
+Function::Function(std::pair<double, double> _domain, std::size_t _codom_dim,
+                   const std::string &_name)
+    : FunctionBase(_domain, _codom_dim), name_(_name) {}
+
+Function::Function(const Function &that)
+    : FunctionBase(that), name_(that.name_) {}
 
 } // namespace functions
 } // namespace gsplines

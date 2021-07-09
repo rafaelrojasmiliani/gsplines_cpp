@@ -123,6 +123,34 @@ public:
   FunctionExpression &operator*=(const Function &that);
   FunctionExpression &operator*=(const FunctionExpression &that);
   FunctionExpression &operator*=(FunctionExpression &&that);
+
+  virtual void print(std::size_t _indent = 0) override {
+
+    printf("%*s- %s  %s\n", 4 * (int)_indent, "", get_name().c_str(),
+           type_to_str().c_str());
+    for (const std::unique_ptr<Function> &f : function_array_) {
+      f->print(_indent + 1);
+    }
+  }
+
+  std::string type_to_str() {
+
+    switch (type_) {
+    case SUM:
+      return "SUM";
+
+    case MULTIPLICATION:
+      return "MULTIPLICATION";
+
+    case COMPOSITION:
+      return "COMPOSITION";
+
+    case CONCATENATION:
+      return "CONCATENATION";
+    default:
+      throw std::invalid_argument("Function Expression Type not defined");
+    }
+  }
 };
 
 Eigen::MatrixXd

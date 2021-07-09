@@ -15,8 +15,8 @@ std::size_t FunctionExpression::num_call_move_constructor_ = 0;
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
     std::list<std::unique_ptr<Function>> &_function_array)
-    : Function(_domain, _codom_dim), type_(_type), function_array_(),
-      eval_operation_(nullptr), deriv_operation_(nullptr) {
+    : Function(_domain, _codom_dim, "FunctionExpression"), type_(_type),
+      function_array_(), eval_operation_(nullptr), deriv_operation_(nullptr) {
 
   for (const std::unique_ptr<Function> &f : function_array_) {
     function_array_.push_back(f->clone());
@@ -51,8 +51,9 @@ FunctionExpression::FunctionExpression(
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
     std::list<std::unique_ptr<Function>> &&_function_array)
-    : Function(_domain, _codom_dim), type_(_type), eval_operation_(nullptr),
-      deriv_operation_(nullptr), function_array_(std::move(_function_array)) {
+    : Function(_domain, _codom_dim, "FunctionExpression"), type_(_type),
+      eval_operation_(nullptr), deriv_operation_(nullptr),
+      function_array_(std::move(_function_array)) {
 
   switch (type_) {
   case SUM:
@@ -78,14 +79,6 @@ FunctionExpression::FunctionExpression(
     throw std::invalid_argument("Function Expression Type not defined");
   }
   num_call_simple_constructor_++;
-}
-
-FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
-                                       std::size_t _codom_dim, Type _type)
-    : Function(_domain, _codom_dim), type_(_type) {
-
-  printf("calling wrong constructor \n-----\n");
-  fflush(stdout);
 }
 
 FunctionExpression::FunctionExpression(const FunctionExpression &that)
