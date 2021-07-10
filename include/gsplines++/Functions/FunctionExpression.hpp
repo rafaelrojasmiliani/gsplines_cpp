@@ -157,6 +157,8 @@ public:
       throw std::invalid_argument("Function Expression Type not defined");
     }
   }
+
+  std::vector<std::pair<double, double>> get_arg_domains() const;
 };
 
 Eigen::MatrixXd

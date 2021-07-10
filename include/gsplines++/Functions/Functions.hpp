@@ -25,7 +25,7 @@ public:
   FunctionBase(std::pair<double, double> _domain, std::size_t _codom_dim);
   FunctionBase(const FunctionBase &that);
 
-  std::pair<double, double> get_domain() const { return domain_; };
+  const std::pair<double, double> &get_domain() const { return domain_; };
   std::size_t get_codom_dim() const { return codom_dim_; };
 
   static bool same_domain(const FunctionBase &_f1, const FunctionBase &_f2);

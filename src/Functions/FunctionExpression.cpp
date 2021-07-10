@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 #include <iostream>
+
 namespace gsplines {
 namespace functions {
 
@@ -110,5 +112,18 @@ void FunctionExpression::print_performace() {
          num_call_simple_constructor_);
 }
 
+std::vector<std::pair<double, double>>
+FunctionExpression::get_arg_domains() const {
+
+  std::vector<std::pair<double, double>> result;
+
+  std::transform(function_array_.begin(), function_array_.end(),
+                 std::back_inserter(result),
+                 [](const std::unique_ptr<Function> &element) {
+                   return element->get_domain();
+                 });
+
+  return result;
+}
 } // namespace functions
 } // namespace gsplines
