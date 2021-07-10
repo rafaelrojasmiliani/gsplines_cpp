@@ -46,6 +46,33 @@ public:
   }
 };
 
+class DomainLinearDilation : public Function {
+private:
+  double dilation_factor_;
+
+public:
+  DomainLinearDilation(std::pair<double, double> _domain,
+                       double _dilation_factor)
+      : Function(_domain, 1, "DomainLinearDilation"),
+        dilation_factor_(_dilation_factor) {}
+
+  DomainLinearDilation(const DomainLinearDilation &that)
+      : Function(that), dilation_factor_(that.dilation_factor_) {}
+
+  Eigen::MatrixXd
+  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override {
+    return dilation_factor_ * _domain_points;
+  };
+
+  std::unique_ptr<Function> clone() const override {
+    return std::make_unique<DomainLinearDilation>(*this);
+  }
+  std::unique_ptr<Function> deriv(int _deg) override {
+    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
+                                           dilation_factor_);
+  }
+};
+
 class Identity : public Function {
 
 public:

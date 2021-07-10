@@ -61,13 +61,17 @@ public:
 
   virtual std::unique_ptr<Function> clone() const = 0;
   virtual ~Function() {}
-  FunctionExpression operator-() const;
+  virtual FunctionExpression operator-() const;
 
   const std::string &get_name() const { return name_; }
 
   virtual void print(std::size_t _indent = 0) {
     printf("%*s- %s\n", 4 * (int)_indent, "", get_name().c_str());
   }
+
+  virtual FunctionExpression compose(const Function &that) const;
+  virtual FunctionExpression compose(const FunctionExpression &that) const;
+  virtual FunctionExpression compose(FunctionExpression &&that) const;
 };
 
 } // namespace functions

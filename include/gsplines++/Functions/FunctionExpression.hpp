@@ -58,6 +58,8 @@ private:
 
   Type type_;
 
+  Eigen::VectorXd domain_break_points_;
+
   static std::size_t num_call_constructor_;
   static std::size_t num_call_copy_constructor_;
   static std::size_t num_call_simple_constructor_;
@@ -108,10 +110,6 @@ public:
     return (*this) * (that);
   }
 
-  FunctionExpression copose(const FunctionExpression &that) {
-    return compose(*this, that);
-  }
-
   void print_performace();
 
   Type get_type() { return type_; }
@@ -123,6 +121,11 @@ public:
   FunctionExpression &operator*=(const Function &that);
   FunctionExpression &operator*=(const FunctionExpression &that);
   FunctionExpression &operator*=(FunctionExpression &&that);
+
+  virtual FunctionExpression compose(const Function &that) const override;
+  virtual FunctionExpression
+  compose(const FunctionExpression &that) const override;
+  virtual FunctionExpression compose(FunctionExpression &&that) const override;
 
   virtual void print(std::size_t _indent = 0) override {
 
