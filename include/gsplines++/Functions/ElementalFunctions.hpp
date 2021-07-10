@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <functional>
-#include <gsplines++/Functions/FunctionExpression.hpp>
+#include <gsplines++/Functions/Function.hpp>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -38,10 +38,10 @@ public:
     return result;
   };
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<ConstFunction>(*this);
   }
-  std::unique_ptr<Function> deriv(int _deg) override {
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
   }
 };
@@ -64,10 +64,10 @@ public:
     return dilation_factor_ * _domain_points;
   };
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<DomainLinearDilation>(*this);
   }
-  std::unique_ptr<Function> deriv(int _deg) override {
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
                                            dilation_factor_);
   }
@@ -86,10 +86,10 @@ public:
     return _domain_points;
   };
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Identity>(*this);
   }
-  std::unique_ptr<Function> deriv(int _deg) override {
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 1.0);
   }
 };
@@ -104,10 +104,10 @@ public:
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override;
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Exponential>(*this);
   }
-  std::unique_ptr<Function> deriv(int _deg) override {
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override {
     return std::make_unique<Exponential>(*this);
   }
 };
@@ -123,10 +123,10 @@ public:
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override;
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Cos>(*this);
   }
-  std::unique_ptr<Function> deriv(int _deg) override;
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override;
 };
 
 class Sin : public Function {
@@ -138,11 +138,11 @@ public:
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override;
 
-  std::unique_ptr<Function> clone() const override {
+  std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Sin>(*this);
   }
 
-  std::unique_ptr<Function> deriv(int _deg) override;
+  std::unique_ptr<FunctionExpression> deriv(int _deg) override;
 };
 } // namespace functions
 } // namespace gsplines

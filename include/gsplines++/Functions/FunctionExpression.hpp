@@ -6,55 +6,52 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <functional>
-#include <gsplines++/Functions/Functions.hpp>
+#include <gsplines++/Functions/FunctionBase.hpp>
 #include <list>
 #include <memory>
 #include <utility>
+#include <vector>
+
 namespace gsplines {
 namespace functions {
 
-class FunctionExpression;
-
-FunctionExpression operator+(const Function &_f1, const Function &_f2);
-FunctionExpression operator-(const Function &_f1, const Function &_f2);
-FunctionExpression operator+(FunctionExpression &&_f1, const Function &_f2);
-// cause ambiguity FunctionExpression operator+(const Function &_f2,
+/*
+FunctionExpression operator+(const FunctionExpression &_f1, const
+FunctionExpression &_f2); FunctionExpression operator-(const FunctionExpression
+&_f1, const FunctionExpression &_f2); FunctionExpression
+operator+(FunctionExpression &&_f1, const FunctionExpression &_f2);
+// cause ambiguity FunctionExpression operator+(const FunctionExpression &_f2,
 // FunctionExpression &&_f1);
 FunctionExpression operator+(const FunctionExpression &_f1,
-                             const Function &_f2);
+                             const FunctionExpression &_f2);
 
-FunctionExpression operator*(const Function &_f1, const Function &_f2);
-FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2);
-FunctionExpression operator*(double, const Function &_f2);
-FunctionExpression operator*(double, const FunctionExpression &_f2);
-FunctionExpression operator*(double, FunctionExpression &&_f2);
-// FunctionExpression operator*(const Function &_f1, FunctionExpression &&_f2);
+FunctionExpression operator*(const FunctionExpression &_f1, const
+FunctionExpression &_f2); FunctionExpression operator*(FunctionExpression &&_f1,
+const FunctionExpression &_f2); FunctionExpression operator*(double, const
+FunctionExpression &_f2); FunctionExpression operator*(double, const
+FunctionExpression &_f2); FunctionExpression operator*(double,
+FunctionExpression &&_f2);
+// FunctionExpression operator*(const FunctionExpression &_f1,
+FunctionExpression &&_f2);
 
-FunctionExpression compose(const Function &_f1, const Function &_f2);
+FunctionExpression compose(const FunctionExpression &_f1, const
+FunctionExpression &_f2);
 
-class FunctionExpression : public Function {
+*/
+
+class FunctionExpression : public FunctionBase {
 
 public:
-  enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION };
-  // Consider use a deque
-  // https://stackoverflow.com/questions/18811948/vector-vs-deque-operator
-  // What is more critical to this calss? scalar multiplication or
-  // operations that require random access?
-  //
-  // Consider to use a list. NOt that we do not desire a random access. We
-  // deseire an
-  // - Fast ordered access
-  // - fast concatenation
-  // - Fast insertion at the begining
-  // - Fast  inserion at the end.
-  std::list<std::unique_ptr<Function>> function_array_;
+  enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION, SINGLE };
+
+  std::list<std::unique_ptr<FunctionExpression>> function_array_;
 
 private:
   typedef Eigen::MatrixXd(Eval_Function_Type)(
-      std::list<std::unique_ptr<Function>> &,
+      std::list<std::unique_ptr<FunctionExpression>> &,
       const Eigen::Ref<const Eigen::VectorXd> &);
-  typedef std::unique_ptr<Function>(Deriv_Function_Type)(
-      std::list<std::unique_ptr<Function>> &, std::size_t);
+  typedef std::unique_ptr<FunctionExpression>(Deriv_Function_Type)(
+      std::list<std::unique_ptr<FunctionExpression>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
@@ -69,129 +66,115 @@ private:
   static std::size_t num_call_move_constructor_;
 
 public:
-  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
-                     Type _type,
-                     std::list<std::unique_ptr<Function>> &_function_array);
+  FunctionExpression(
+      std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
+      std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+      const std::string &_name = "FunctionExpression");
 
-  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
-                     Type _type);
-
-  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
-                     Type _type,
-                     std::list<std::unique_ptr<Function>> &&_function_array);
+  FunctionExpression(
+      std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
+      std::list<std::unique_ptr<FunctionExpression>> &&_function_array,
+      const std::string &_name = "FunctionExpression");
 
   FunctionExpression(const FunctionExpression &that);
 
   FunctionExpression(FunctionExpression &&that);
 
   Eigen::MatrixXd
-  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) override {
+  value(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+    return operator()(_domain_points);
+  }
+
+  virtual Eigen::MatrixXd
+  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
     printf("we are in operator ()\n");
     fflush(stdout);
     return eval_operation_(function_array_, _domain_points);
   }
-  std::unique_ptr<Function> deriv(int _deg = 1) override {
+
+  virtual std::unique_ptr<FunctionExpression> deriv(int _deg = 1) {
     return deriv_operation_(function_array_, _deg);
   }
 
-  FunctionExpression derivate(int _deg = 1) {
-    std::unique_ptr<Function> result = deriv_operation_(function_array_, _deg);
+  virtual FunctionExpression derivate(int _deg = 1) {
+    std::unique_ptr<FunctionExpression> result =
+        deriv_operation_(function_array_, _deg);
     return FunctionExpression(*static_cast<FunctionExpression *>(result.get()));
   }
 
-  std::unique_ptr<Function> clone() const override {
+  virtual std::unique_ptr<FunctionExpression> clone() const {
     return std::make_unique<FunctionExpression>(*this);
   }
 
   const Type &get_type() const { return type_; }
 
-  FunctionExpression sum(const FunctionExpression &that) {
-    return *this + that;
-  }
-
-  FunctionExpression mul(const FunctionExpression &that) {
-    return (*this) * (that);
-  }
-
   void print_performace();
 
-  Type get_type() { return type_; }
+  const Type &get_type() { return type_; }
 
-  FunctionExpression &operator+=(const Function &that);
-  FunctionExpression &operator+=(const FunctionExpression &that);
-  FunctionExpression &operator+=(FunctionExpression &&that);
+  virtual FunctionExpression operator+(const FunctionExpression &that) const;
+  virtual FunctionExpression operator+(FunctionExpression &&that) const;
 
-  FunctionExpression &operator*=(const Function &that);
-  FunctionExpression &operator*=(const FunctionExpression &that);
-  FunctionExpression &operator*=(FunctionExpression &&that);
+  virtual FunctionExpression operator-(const FunctionExpression &that) const;
+  virtual FunctionExpression operator-(FunctionExpression &&that) const;
 
-  virtual FunctionExpression compose(const Function &that) const override;
-  virtual FunctionExpression
-  compose(const FunctionExpression &that) const override;
-  virtual FunctionExpression compose(FunctionExpression &&that) const override;
+  virtual FunctionExpression operator*(const FunctionExpression &that) const;
+  virtual FunctionExpression operator*(FunctionExpression &&that) const;
 
-  virtual void print(std::size_t _indent = 0) override {
+  virtual FunctionExpression compose(const FunctionExpression &that) const;
+  virtual FunctionExpression compose(FunctionExpression &&that) const;
 
-    printf("%*s- %s  %s\n", 4 * (int)_indent, "", get_name().c_str(),
-           type_to_str().c_str());
-    for (const std::unique_ptr<Function> &f : function_array_) {
-      f->print(_indent + 1);
-    }
-  }
+  virtual FunctionExpression concat(const FunctionExpression &that) const;
+  virtual FunctionExpression concat(FunctionExpression &&that) const;
 
-  std::string type_to_str() {
+  virtual void print(std::size_t _indent = 0) const;
 
-    switch (type_) {
-    case SUM:
-      return "SUM";
-
-    case MULTIPLICATION:
-      return "MULTIPLICATION";
-
-    case COMPOSITION:
-      return "COMPOSITION";
-
-    case CONCATENATION:
-      return "CONCATENATION";
-    default:
-      throw std::invalid_argument("Function Expression Type not defined");
-    }
-  }
+  std::string type_to_str() const;
 
   std::vector<std::pair<double, double>> get_arg_domains() const;
+
+  void initialize();
 };
 
-Eigen::MatrixXd
-eval_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                   const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+Eigen::MatrixXd eval_single_functions(
+    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
-Eigen::MatrixXd
-eval_mul_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                   const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+Eigen::MatrixXd eval_sum_functions(
+    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
-Eigen::MatrixXd
-eval_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                       const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+Eigen::MatrixXd eval_mul_functions(
+    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
-Eigen::MatrixXd
-eval_concat_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                      const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+Eigen::MatrixXd eval_compose_functions(
+    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
-std::unique_ptr<Function>
-deriv_sum_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                    std::size_t _deg);
+Eigen::MatrixXd eval_concat_functions(
+    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
-std::unique_ptr<Function>
-deriv_mul_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                    std::size_t _deg);
+std::unique_ptr<FunctionExpression> deriv_single_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
 
-std::unique_ptr<Function>
-deriv_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                        std::size_t _deg);
+std::unique_ptr<FunctionExpression> deriv_sum_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
 
-std::unique_ptr<Function>
-deriv_concat_functions(std::list<std::unique_ptr<Function>> &_function_array,
-                       std::size_t _deg);
+std::unique_ptr<FunctionExpression> deriv_mul_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
+
+std::unique_ptr<FunctionExpression> deriv_compose_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
+
+std::unique_ptr<FunctionExpression> deriv_concat_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
 
 } // namespace functions
 } // namespace gsplines
