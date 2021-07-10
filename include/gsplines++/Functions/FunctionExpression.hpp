@@ -25,6 +25,9 @@ FunctionExpression operator+(const FunctionExpression &_f1,
 
 FunctionExpression operator*(const Function &_f1, const Function &_f2);
 FunctionExpression operator*(FunctionExpression &&_f1, const Function &_f2);
+FunctionExpression operator*(double, const Function &_f2);
+FunctionExpression operator*(double, const FunctionExpression &_f2);
+FunctionExpression operator*(double, FunctionExpression &&_f2);
 // FunctionExpression operator*(const Function &_f1, FunctionExpression &&_f2);
 
 FunctionExpression compose(const Function &_f1, const Function &_f2);

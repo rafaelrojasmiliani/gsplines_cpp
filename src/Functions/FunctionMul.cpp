@@ -247,6 +247,18 @@ FunctionExpression Function::operator-() const {
 
   return ConstFunction(get_domain(), 1, -1.0) * *this;
 }
+
+FunctionExpression operator*(double _value, const Function &_f2) {
+  return ConstFunction(_f2.get_domain(), 1, _value) * _f2;
+}
+FunctionExpression operator*(double _value, const FunctionExpression &_f2) {
+  return ConstFunction(_f2.get_domain(), 1, _value) * _f2;
+}
+FunctionExpression operator*(double _value, FunctionExpression &&_f2) {
+
+  return ConstFunction(_f2.get_domain(), 1, _value) * _f2;
+}
+
 /* -----
  *  Function Evaluation
  * -----*/

@@ -33,6 +33,7 @@ call vundle#begin('/etc/vim/bundle/')
         let g:ycm_enable_diagnostic_highlighting=0
         let g:ycm_global_ycm_extra_conf='/etc/vim/ycm_extra_conf.py'
         let g:ycm_confirm_extra_conf = 1
+        let g:ycm_compilation_database_folder = 'build'
         let g:SuperTabDefaultCompletionType = '<C-n>'
     Plugin 'vim-latex'
     " ------- tagbar -------

@@ -169,15 +169,20 @@ eval_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
 
   Eigen::MatrixXd result(_domain_points.size(),
                          _function_array.back()->get_codom_dim());
-  Eigen::VectorXd domain_ponts = _domain_points;
+
+  Eigen::VectorXd domain_points_copy = _domain_points;
+
   std::list<std::unique_ptr<Function>>::const_iterator it;
+
   std::list<std::unique_ptr<Function>>::const_iterator it_limit =
       std::next(_function_array.end(), -1);
 
   for (it = _function_array.begin(); it != it_limit; it++) {
-    domain_ponts = (*it)->value(domain_ponts);
+    domain_points_copy = (*it)->value(domain_points_copy);
   }
-  result = _function_array.back()->value(_domain_points);
+
+  result = _function_array.back()->value(domain_points_copy);
+
   return result;
 }
 
@@ -240,6 +245,7 @@ std::unique_ptr<Function> first_deriv_compose_functions(
         domain, codom_dim, FunctionExpression::Type::COMPOSITION,
         std::move(elem_array)));
   }
+
   std::size_t codom_dim = _function_array.back()->get_codom_dim();
   std::pair<double, double> domain = _function_array.back()->get_domain();
   return std::make_unique<FunctionExpression>(
@@ -262,7 +268,7 @@ deriv_compose_functions(std::list<std::unique_ptr<Function>> &_function_array,
   std::unique_ptr<Function> result =
       first_deriv_compose_functions(_function_array);
 
-  for (std::size_t k = 1; k <= _deg; k++)
+  for (std::size_t k = 1; k < _deg; k++)
     result = std::move(result->deriv());
 
   return result;
