@@ -94,11 +94,15 @@ public:
 
   const Type &get_type() { return type_; }
 
-  virtual FunctionExpression operator+(const FunctionExpression &that) const;
-  virtual FunctionExpression operator+(FunctionExpression &&that) const;
+  virtual FunctionExpression operator+(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator+(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator+(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator+(FunctionExpression &&that) &&;
 
-  virtual FunctionExpression operator-(const FunctionExpression &that) const;
-  virtual FunctionExpression operator-(FunctionExpression &&that) const;
+  virtual FunctionExpression operator-(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator-(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator-(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator-(FunctionExpression &&that) &&;
   virtual FunctionExpression operator-() const;
 
   virtual FunctionExpression operator*(const FunctionExpression &that) const;

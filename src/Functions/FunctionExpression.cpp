@@ -21,6 +21,8 @@ FunctionExpression::FunctionExpression(
     : FunctionBase(_domain, _codom_dim, _name), type_(_type), function_array_(),
       eval_operation_(nullptr), deriv_operation_(nullptr) {
 
+  assert(not(_type == SINGLE and _name == ""));
+
   for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
     function_array_.push_back(f->clone());
   }
@@ -38,6 +40,7 @@ FunctionExpression::FunctionExpression(
       eval_operation_(nullptr), deriv_operation_(nullptr),
       function_array_(std::move(_function_array)) {
 
+  assert(not(_type == SINGLE and _name == ""));
   initialize();
 
   num_call_simple_constructor_++;
@@ -48,6 +51,7 @@ FunctionExpression::FunctionExpression(const FunctionExpression &that)
       eval_operation_(that.eval_operation_),
       deriv_operation_(that.deriv_operation_) {
 
+  printf("lllllllll\n");
   for (const std::unique_ptr<FunctionExpression> &f : that.function_array_) {
     function_array_.push_back(f->clone());
   }
@@ -132,6 +136,8 @@ std::string FunctionExpression::type_to_str() const {
 
   case CONCATENATION:
     return "CONCATENATION";
+  case SINGLE:
+    return "SINGLE: " + get_name();
   default:
     throw std::invalid_argument(
         "FunctionExpression Expression Type not defined");

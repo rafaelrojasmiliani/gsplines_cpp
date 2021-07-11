@@ -35,8 +35,7 @@ Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
 
 std::unique_ptr<FunctionExpression> Cos::deriv(int _deg) const {
   return std::make_unique<FunctionExpression>(
-      ConstFunction(get_domain(), 1, -1.0) *
-      (FunctionExpression)Sin(get_domain()));
+      ConstFunction(get_domain(), 1, -1.0) * Sin(get_domain()));
 }
 
 Eigen::MatrixXd
