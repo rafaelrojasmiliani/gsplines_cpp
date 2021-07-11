@@ -141,6 +141,7 @@ public:
       const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
 
   std::unique_ptr<FunctionExpression> clone() const override {
+    printf("CLONING SIN\n");
     return std::make_unique<Sin>(*this);
   }
 

@@ -81,7 +81,7 @@ public:
   virtual FunctionExpression derivate(int _deg = 1) const {
     std::unique_ptr<FunctionExpression> result =
         deriv_operation_(function_array_, _deg);
-    return FunctionExpression(*static_cast<FunctionExpression *>(result.get()));
+    return FunctionExpression(std::move(*result));
   }
 
   virtual std::unique_ptr<FunctionExpression> clone() const {
@@ -121,6 +121,8 @@ public:
   std::vector<std::pair<double, double>> get_arg_domains() const;
 
   void initialize();
+
+  virtual ~FunctionExpression() {}
 };
 
 FunctionExpression operator*(double, const FunctionExpression &);

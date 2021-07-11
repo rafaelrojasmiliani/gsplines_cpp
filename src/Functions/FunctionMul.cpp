@@ -49,6 +49,7 @@ return_second_or_mim_codom_dim(const FunctionExpression &_f1,
 FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) const {
 
+  printf("HEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -88,6 +89,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) const {
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) const {
 
+  printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -103,8 +105,12 @@ FunctionExpression::operator*(FunctionExpression &&_that) const {
               std::end(_that.function_array_),
               std::back_inserter(result_array));
   } else {
-    result_array.push_back(
-        std::make_unique<FunctionExpression>(std::move(_that)));
+    if (_that.get_type() == SINGLE) {
+      result_array.push_back(_that.clone());
+    } else {
+      result_array.push_back(
+          std::make_unique<FunctionExpression>(std::move(_that)));
+    }
   }
 
   if (get_codom_dim() >= _that.get_codom_dim()) {
@@ -128,6 +134,9 @@ FunctionExpression::operator*(FunctionExpression &&_that) const {
       result_array.push_back(this->clone());
     }
   }
+
+  result_array.front()->value(Eigen::VectorXd());
+  result_array.back()->value(Eigen::VectorXd());
 
   return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
                             FunctionExpression::Type::MULTIPLICATION,

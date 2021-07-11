@@ -9,7 +9,8 @@ const double FunctionBase::dom_tollerance_ = 1.0e-5;
 
 FunctionBase::FunctionBase(std::pair<double, double> _domain,
                            std::size_t _codom_dim, const std::string &_name)
-    : codom_dim_(_codom_dim), window_(_domain), domain_(_domain) {}
+    : codom_dim_(_codom_dim), window_(_domain), domain_(_domain), name_(_name) {
+}
 
 FunctionBase::FunctionBase(const FunctionBase &that)
     : codom_dim_(that.codom_dim_), window_(that.window_), domain_(that.domain_),

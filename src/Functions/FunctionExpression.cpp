@@ -21,12 +21,11 @@ FunctionExpression::FunctionExpression(
     : FunctionBase(_domain, _codom_dim, _name), type_(_type), function_array_(),
       eval_operation_(nullptr), deriv_operation_(nullptr) {
 
-  assert(not(_type == SINGLE and _name == ""));
-
   for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
     function_array_.push_back(f->clone());
   }
 
+  assert(not(get_type() == SINGLE and get_name() == ""));
   initialize();
 
   num_call_constructor_++;
@@ -40,7 +39,7 @@ FunctionExpression::FunctionExpression(
       eval_operation_(nullptr), deriv_operation_(nullptr),
       function_array_(std::move(_function_array)) {
 
-  assert(not(_type == SINGLE and _name == ""));
+  assert(not(get_type() == SINGLE and get_name() == ""));
   initialize();
 
   num_call_simple_constructor_++;
@@ -51,6 +50,7 @@ FunctionExpression::FunctionExpression(const FunctionExpression &that)
       eval_operation_(that.eval_operation_),
       deriv_operation_(that.deriv_operation_) {
 
+  assert(not(get_type() == SINGLE and get_name() == ""));
   printf("lllllllll\n");
   for (const std::unique_ptr<FunctionExpression> &f : that.function_array_) {
     function_array_.push_back(f->clone());

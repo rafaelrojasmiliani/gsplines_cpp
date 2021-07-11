@@ -32,7 +32,10 @@ FunctionExpression::operator+(const FunctionExpression &_that) const & {
                    });
   } else {
     printf("this not sum, other const& \n");
+    printf("this name %s, that name %s\n", get_name().c_str(),
+           _that.get_name().c_str());
     result_array.push_back(this->clone());
+    printf("cloned name %s \n", result_array.front()->get_name().c_str());
   }
 
   if (_that.get_type() == SUM) {
@@ -73,8 +76,13 @@ FunctionExpression::operator+(FunctionExpression &&_that) const & {
     std::move(_that.function_array_.begin(), _that.function_array_.end(),
               std::back_inserter(result_array));
   } else {
-    result_array.push_front(
-        std::make_unique<FunctionExpression>(std::move(_that)));
+    if (_that.get_type() == SINGLE) {
+      result_array.push_front(
+          std::make_unique<FunctionExpression>(_that.clone()));
+    } else {
+      result_array.push_front(
+          std::make_unique<FunctionExpression>(std::move(_that)));
+    }
   }
   return FunctionExpression(get_domain(), get_codom_dim(),
                             FunctionExpression::Type::SUM,
@@ -102,8 +110,12 @@ FunctionExpression::operator+(const FunctionExpression &_that) && {
   printf("---------+++++++++++\n");
   std::list<std::unique_ptr<FunctionExpression>> result_array;
 
-  result_array.push_back(
-      std::make_unique<FunctionExpression>(std::move(*this)));
+  if (get_type() == SINGLE) {
+    result_array.push_back(this->clone());
+  } else {
+    result_array.push_back(
+        std::make_unique<FunctionExpression>(std::move(*this)));
+  }
   if (_that.get_type() == FunctionExpression::SUM) {
     std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                    std::back_inserter(result_array),
@@ -126,16 +138,25 @@ FunctionExpression::operator+(FunctionExpression &&_that) && {
     if (_that.get_type() == FunctionExpression::SUM) {
       std::move(_that.function_array_.begin(), _that.function_array_.end(),
                 std::back_inserter(function_array_));
-    } else
-      function_array_.push_back(
-          std::make_unique<FunctionExpression>(std::move(_that)));
+    } else {
+      if (_that.get_type() == SINGLE) {
+        function_array_.push_back(_that.clone());
+      } else {
+        function_array_.push_back(
+            std::make_unique<FunctionExpression>(std::move(_that)));
+      }
+    }
 
     return std::move(*this);
   }
   std::list<std::unique_ptr<FunctionExpression>> result_array;
 
-  result_array.push_back(
-      std::make_unique<FunctionExpression>(std::move(*this)));
+  if (get_type() == SINGLE) {
+    result_array.push_back(this->clone());
+  } else {
+    result_array.push_back(
+        std::make_unique<FunctionExpression>(std::move(*this)));
+  }
   if (_that.get_type() == FunctionExpression::SUM) {
     std::move(_that.function_array_.begin(), _that.function_array_.end(),
               std::back_inserter(function_array_));
@@ -273,7 +294,9 @@ std::unique_ptr<FunctionExpression> deriv_sum_functions(
     std::size_t _deg) {
   std::list<std::unique_ptr<FunctionExpression>> result_array;
   for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
+    printf("func name = %s \n", f->get_name().c_str());
     result_array.push_back(f->deriv(_deg));
+    printf("func name = %s \n", result_array.back()->get_name().c_str());
   }
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::pair<double, double> domain = _function_array.front()->get_domain();
