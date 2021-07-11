@@ -76,6 +76,5 @@ public:
       : SobolevNorm(_waypoints, _basis, _weights) {}
 };
 
-
 } // namespace basis
 } // namespace gsplines

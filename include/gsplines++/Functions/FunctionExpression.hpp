@@ -16,24 +16,6 @@ namespace gsplines {
 namespace functions {
 
 /*
-FunctionExpression operator+(const FunctionExpression &_f1, const
-FunctionExpression &_f2); FunctionExpression operator-(const FunctionExpression
-&_f1, const FunctionExpression &_f2); FunctionExpression
-operator+(FunctionExpression &&_f1, const FunctionExpression &_f2);
-// cause ambiguity FunctionExpression operator+(const FunctionExpression &_f2,
-// FunctionExpression &&_f1);
-FunctionExpression operator+(const FunctionExpression &_f1,
-                             const FunctionExpression &_f2);
-
-FunctionExpression operator*(const FunctionExpression &_f1, const
-FunctionExpression &_f2); FunctionExpression operator*(FunctionExpression &&_f1,
-const FunctionExpression &_f2); FunctionExpression operator*(double, const
-FunctionExpression &_f2); FunctionExpression operator*(double, const
-FunctionExpression &_f2); FunctionExpression operator*(double,
-FunctionExpression &&_f2);
-// FunctionExpression operator*(const FunctionExpression &_f1,
-FunctionExpression &&_f2);
-
 FunctionExpression compose(const FunctionExpression &_f1, const
 FunctionExpression &_f2);
 
@@ -48,10 +30,10 @@ public:
 
 private:
   typedef Eigen::MatrixXd(Eval_Function_Type)(
-      std::list<std::unique_ptr<FunctionExpression>> &,
+      const std::list<std::unique_ptr<FunctionExpression>> &,
       const Eigen::Ref<const Eigen::VectorXd> &);
   typedef std::unique_ptr<FunctionExpression>(Deriv_Function_Type)(
-      std::list<std::unique_ptr<FunctionExpression>> &, std::size_t);
+      const std::list<std::unique_ptr<FunctionExpression>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
@@ -68,7 +50,7 @@ private:
 public:
   FunctionExpression(
       std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
-      std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+      const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
       const std::string &_name = "FunctionExpression");
 
   FunctionExpression(
@@ -81,22 +63,22 @@ public:
   FunctionExpression(FunctionExpression &&that);
 
   Eigen::MatrixXd
-  value(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+  value(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
     return operator()(_domain_points);
   }
 
   virtual Eigen::MatrixXd
-  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+  operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
     printf("we are in operator ()\n");
     fflush(stdout);
     return eval_operation_(function_array_, _domain_points);
   }
 
-  virtual std::unique_ptr<FunctionExpression> deriv(int _deg = 1) {
+  virtual std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const {
     return deriv_operation_(function_array_, _deg);
   }
 
-  virtual FunctionExpression derivate(int _deg = 1) {
+  virtual FunctionExpression derivate(int _deg = 1) const {
     std::unique_ptr<FunctionExpression> result =
         deriv_operation_(function_array_, _deg);
     return FunctionExpression(*static_cast<FunctionExpression *>(result.get()));
@@ -117,6 +99,7 @@ public:
 
   virtual FunctionExpression operator-(const FunctionExpression &that) const;
   virtual FunctionExpression operator-(FunctionExpression &&that) const;
+  virtual FunctionExpression operator-() const;
 
   virtual FunctionExpression operator*(const FunctionExpression &that) const;
   virtual FunctionExpression operator*(FunctionExpression &&that) const;
@@ -136,24 +119,27 @@ public:
   void initialize();
 };
 
+FunctionExpression operator*(double, const FunctionExpression &);
+FunctionExpression operator*(double, FunctionExpression &&);
+
 Eigen::MatrixXd eval_single_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd eval_sum_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd eval_mul_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd eval_compose_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd eval_concat_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 std::unique_ptr<FunctionExpression> deriv_single_functions(

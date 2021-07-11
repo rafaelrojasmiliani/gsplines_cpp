@@ -29,8 +29,9 @@ bool FunctionBase::same_codomain(const FunctionBase &_f1,
   return _f1.get_codom_dim() == _f2.get_codom_dim();
 }
 
-bool FunctionBase::is_point_in_domain(double _domain_point) {
-  return domain_.first <= _domain_point and _domain_point <= domain_.second;
+bool FunctionBase::is_point_in_domain(double _domain_point) const {
+  return domain_.first - dom_tollerance_ <= _domain_point and
+         _domain_point <= domain_.second + dom_tollerance_;
 }
 
 void FunctionBase::print(std::size_t _indent) const {

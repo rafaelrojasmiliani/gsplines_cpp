@@ -1,9 +1,9 @@
 
+#include <gsplines++/Functions/ElementalFunctions.hpp>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 #include <iostream>
 namespace gsplines {
 namespace functions {
-
 void compatibility_mul(const FunctionExpression &_f1,
                        const FunctionExpression &_f2) {
 
@@ -97,28 +97,36 @@ FunctionExpression::operator*(FunctionExpression &&_that) const {
 
   std::list<std::unique_ptr<FunctionExpression>> result_array;
 
-  if()
+  if (_that.get_type() == FunctionExpression::Type::MULTIPLICATION) {
 
-  if (f_vector.get_type() == MULTIPLICATION) {
-    std::transform(f_vector.function_array_.begin(),
-                   f_vector.function_array_.end(),
-                   std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
-                     return element->clone();
-                   });
+    std::move(std::begin(_that.function_array_),
+              std::end(_that.function_array_),
+              std::back_inserter(result_array));
   } else {
-    result_array.push_back(f_vector.clone());
+    result_array.push_back(
+        std::make_unique<FunctionExpression>(std::move(_that)));
   }
 
-  if (f_scalar.get_type() == MULTIPLICATION) {
-    std::transform(f_scalar.function_array_.begin(),
-                   f_scalar.function_array_.end(),
-                   std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
-                     return element->clone();
-                   });
+  if (get_codom_dim() >= _that.get_codom_dim()) {
+    if (get_type() == MULTIPLICATION) {
+      std::transform(function_array_.begin(), function_array_.end(),
+                     std::front_inserter(result_array),
+                     [](const std::unique_ptr<FunctionExpression> &element) {
+                       return element->clone();
+                     });
+    } else {
+      result_array.push_front(this->clone());
+    }
   } else {
-    result_array.push_back(f_scalar.clone());
+    if (get_type() == MULTIPLICATION) {
+      std::transform(function_array_.begin(), function_array_.end(),
+                     std::back_inserter(result_array),
+                     [](const std::unique_ptr<FunctionExpression> &element) {
+                       return element->clone();
+                     });
+    } else {
+      result_array.push_back(this->clone());
+    }
   }
 
   return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
@@ -126,12 +134,25 @@ FunctionExpression::operator*(FunctionExpression &&_that) const {
                             std::move(result_array));
 }
 
+FunctionExpression FunctionExpression::operator-() const {
+
+  return ConstFunction(get_domain(), 1, -1.0) * (*this);
+}
+FunctionExpression operator*(double _value, const FunctionExpression &_that) {
+
+  return ConstFunction(_that.get_domain(), 1, _value) * _that;
+}
+FunctionExpression operator*(double _value, FunctionExpression &&_that) {
+
+  return ConstFunction(_that.get_domain(), 1, _value) * std::move(_that);
+}
+
 /* -----
  *  FunctionExpression Evaluation
  * -----*/
 
 Eigen::MatrixXd eval_mul_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
   // NOTE: the first element of _function_array has larger codomain dimension
 
@@ -140,7 +161,7 @@ Eigen::MatrixXd eval_mul_functions(
 
   result = _function_array.front()->value(_domain_points);
 
-  std::list<std::unique_ptr<FunctionExpression>>::iterator it;
+  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
   for (it = std::next(_function_array.begin(), 1); it != _function_array.end();
        it++) {
     result =
@@ -149,17 +170,18 @@ Eigen::MatrixXd eval_mul_functions(
   return result;
 }
 
-// https://scholar.rose-hulman.edu/cgi/viewcontent.cgi?article=1352&context=rhumj
+// http://
+// scholar.rose-hulman.edu/cgi/viewcontent.cgi?article=1352&context=rhumj
+
 std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array) {
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array) {
 
   std::list<std::unique_ptr<FunctionExpression>> result_array;
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::pair<double, double> domain = _function_array.front()->get_domain();
-
-  std::list<std::unique_ptr<FunctionExpression>>::iterator it_1 =
+  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it_1 =
       _function_array.begin();
-  std::list<std::unique_ptr<FunctionExpression>>::iterator it_2;
+  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it_2;
 
   std::list<std::unique_ptr<FunctionExpression>> elem_array_1;
 
@@ -195,9 +217,8 @@ std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
                                               FunctionExpression::Type::SUM,
                                               std::move(result_array));
 }
-
 std::unique_ptr<FunctionExpression> deriv_mul_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     std::size_t _deg) {
 
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
@@ -217,6 +238,5 @@ std::unique_ptr<FunctionExpression> deriv_mul_functions(
 
   return result;
 }
-
 } // namespace functions
 } // namespace gsplines

@@ -16,7 +16,7 @@ ConstFunction::ConstFunction(const ConstFunction &_that)
     : Function(_that), values_(_that.values_) {}
 
 Eigen::MatrixXd Exponential::operator()(
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
   // std::cout << "Exp \n" << Eigen::exp(_domain_points.array()).matrix() <<
   // '\n';
   Eigen::MatrixXd result = Eigen::exp(_domain_points.array()).matrix();
@@ -25,7 +25,7 @@ Eigen::MatrixXd Exponential::operator()(
 };
 
 Eigen::MatrixXd
-Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
   // std::cout << "Cos \n" << Eigen::cos(_domain_points.array()).matrix() <<
   // '\n';
   Eigen::MatrixXd result = Eigen::cos(_domain_points.array()).matrix();
@@ -33,13 +33,14 @@ Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
   return result;
 };
 
-std::unique_ptr<Function> Cos::deriv(int _deg) {
+std::unique_ptr<FunctionExpression> Cos::deriv(int _deg) const {
   return std::make_unique<FunctionExpression>(
-      ConstFunction(get_domain(), 1, -1.0) * Sin(get_domain()));
+      ConstFunction(get_domain(), 1, -1.0) *
+      (FunctionExpression)Sin(get_domain()));
 }
 
 Eigen::MatrixXd
-Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
   // std::cout << "Sin \n" << Eigen::sin(_domain_points.array()).matrix() <<
   // '\n';
   Eigen::MatrixXd result = Eigen::sin(_domain_points.array()).matrix();
@@ -47,7 +48,7 @@ Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
   return result;
 };
 
-std::unique_ptr<Function> Sin::deriv(int _deg) {
+std::unique_ptr<FunctionExpression> Sin::deriv(int _deg) const {
   return std::make_unique<Cos>(get_domain());
 }
 } // namespace functions

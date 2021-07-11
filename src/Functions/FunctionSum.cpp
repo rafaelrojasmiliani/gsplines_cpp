@@ -136,7 +136,7 @@ FunctionExpression::operator-(FunctionExpression &&_that) const {
  *  FunctionExpression Evaluation
  * -----*/
 Eigen::MatrixXd eval_sum_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
 
   Eigen::MatrixXd result(_domain_points.size(),
@@ -152,11 +152,11 @@ Eigen::MatrixXd eval_sum_functions(
  *  FunctionExpression Derivation
  * -----*/
 std::unique_ptr<FunctionExpression> deriv_sum_functions(
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     std::size_t _deg) {
 
   std::list<std::unique_ptr<FunctionExpression>> result_array;
-  for (std::unique_ptr<FunctionExpression> &f : _function_array) {
+  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
     result_array.push_back(f->deriv(_deg));
   }
   std::size_t codom_dim = _function_array.front()->get_codom_dim();

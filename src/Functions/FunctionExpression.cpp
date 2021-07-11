@@ -16,7 +16,7 @@ std::size_t FunctionExpression::num_call_move_constructor_ = 0;
 
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
-    std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const std::string &_name)
     : FunctionBase(_domain, _codom_dim, _name), type_(_type), function_array_(),
       eval_operation_(nullptr), deriv_operation_(nullptr) {
