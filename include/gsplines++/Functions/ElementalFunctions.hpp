@@ -43,6 +43,11 @@ public:
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<ConstFunction>(*this);
   }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<ConstFunction>(std::move(*this));
+  }
+
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
   }
@@ -69,6 +74,11 @@ public:
   virtual std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<DomainLinearDilation>(*this);
   }
+
+  virtual std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<DomainLinearDilation>(std::move(*this));
+  }
+
   virtual std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
                                            dilation_factor_);
@@ -91,6 +101,11 @@ public:
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Identity>(*this);
   }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<Identity>(std::move(*this));
+  }
+
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 1.0);
   }
@@ -109,6 +124,11 @@ public:
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Exponential>(*this);
   }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<Exponential>(std::move(*this));
+  }
+
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
     return std::make_unique<Exponential>(*this);
   }
@@ -128,6 +148,11 @@ public:
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Cos>(*this);
   }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<Cos>(std::move(*this));
+  }
+
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override;
 };
 
@@ -143,6 +168,11 @@ public:
   std::unique_ptr<FunctionExpression> clone() const override {
     printf("CLONING SIN\n");
     return std::make_unique<Sin>(*this);
+  }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    printf("CLONING SIN\n");
+    return std::make_unique<Sin>(std::move(*this));
   }
 
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override;

@@ -27,7 +27,12 @@ public:
   deriv(int _deg = 1) const override = 0;
 
   virtual std::unique_ptr<FunctionExpression> clone() const override = 0;
+
+  virtual std::unique_ptr<FunctionExpression> move_clone() override = 0;
+
   virtual ~Function() {}
+
+  FunctionExpression derivate(int _deg = 1) const final;
 };
 
 } // namespace functions

@@ -117,6 +117,11 @@ void FunctionExpression::initialize() {
     deriv_operation_ = deriv_single_functions;
     break;
 
+  case UNIQUE:
+    eval_operation_ = eval_unique_functions;
+    deriv_operation_ = deriv_unique_functions;
+    break;
+
   default:
     throw std::invalid_argument("Function Expression Type not defined");
   }
@@ -138,6 +143,8 @@ std::string FunctionExpression::type_to_str() const {
     return "CONCATENATION";
   case SINGLE:
     return "SINGLE: " + get_name();
+  case UNIQUE:
+    return "UNIQUE: " + get_name();
   default:
     throw std::invalid_argument(
         "FunctionExpression Expression Type not defined");
@@ -163,6 +170,18 @@ Eigen::MatrixXd eval_single_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
   throw std::invalid_argument("Single functions can't implement this method");
+}
+
+std::unique_ptr<FunctionExpression> deriv_unique_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg) {
+  return _function_array.front()->deriv(_deg);
+}
+
+Eigen::MatrixXd eval_unique_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+  return _function_array.front()->value(_domain_points);
 }
 
 } // namespace functions

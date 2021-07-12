@@ -17,7 +17,7 @@ void concat_throw(const FunctionExpression &_f1,
 }
 
 FunctionExpression
-FunctionExpression::concat(const FunctionExpression &_that) const {
+FunctionExpression::concat(const FunctionExpression &_that) const & {
 
   concat_throw(*this, _that);
 
@@ -48,7 +48,7 @@ FunctionExpression::concat(const FunctionExpression &_that) const {
 }
 
 FunctionExpression
-FunctionExpression::concat(FunctionExpression &&_that) const {
+FunctionExpression::concat(FunctionExpression &&_that) const & {
 
   concat_throw(*this, _that);
 
@@ -69,17 +69,73 @@ FunctionExpression::concat(FunctionExpression &&_that) const {
     std::move(_that.function_array_.begin(), _that.function_array_.end(),
               std::back_inserter(result_array));
   } else {
-    result_array.push_back(
-        std::make_unique<FunctionExpression>(std::move(_that)));
+    result_array.push_back(_that.move_clone());
   }
   return FunctionExpression(
       {get_domain().first, _that.get_domain().second}, get_codom_dim(),
       FunctionExpression::Type::CONCATENATION, std::move(result_array));
 }
 
-/* -----
- *  FunctionExpression Evaluation
- * -----*/
+FunctionExpression
+FunctionExpression::concat(const FunctionExpression &_that) && {
+
+  concat_throw(*this, _that);
+
+  std::list<std::unique_ptr<FunctionExpression>> result_array;
+
+  std::list<std::unique_ptr<FunctionExpression>> &target_array =
+      (get_type() == CONCATENATION) ? function_array_ : result_array;
+
+  if (_that.get_type() == CONCATENATION) {
+
+    std::transform(_that.function_array_.begin(), _that.function_array_.end(),
+                   std::back_inserter(target_array),
+                   [](const std::unique_ptr<FunctionExpression> &element) {
+                     return element->clone();
+                   });
+  } else {
+    target_array.push_back(_that.clone());
+  }
+
+  if (get_type() == CONCATENATION)
+    return std::move(*this);
+
+  result_array.push_front(this->move_clone());
+
+  return FunctionExpression(
+      {get_domain().first, _that.get_domain().second}, get_codom_dim(),
+      FunctionExpression::Type::CONCATENATION, std::move(target_array));
+}
+
+FunctionExpression FunctionExpression::concat(FunctionExpression &&_that) && {
+
+  concat_throw(*this, _that);
+
+  std::list<std::unique_ptr<FunctionExpression>> result_array;
+
+  std::list<std::unique_ptr<FunctionExpression>> &target_array =
+      (get_type() == CONCATENATION) ? function_array_ : result_array;
+
+  if (_that.get_type() == CONCATENATION) {
+
+    std::move(_that.function_array_.begin(), _that.function_array_.end(),
+              std::back_inserter(target_array));
+  } else {
+    target_array.push_back(_that.move_clone());
+  }
+
+  if (get_type() == CONCATENATION)
+    return std::move(*this);
+
+  result_array.push_front(this->move_clone());
+  return FunctionExpression(
+      {get_domain().first, _that.get_domain().second}, get_codom_dim(),
+      FunctionExpression::Type::CONCATENATION, std::move(target_array));
+}
+
+//  -----------------------------
+//  FunctionExpression Evaluation
+//  -----------------------------
 
 std::list<std::unique_ptr<FunctionExpression>>::const_iterator
 get_interval_function(

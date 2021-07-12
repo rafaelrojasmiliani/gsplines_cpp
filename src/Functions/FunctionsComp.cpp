@@ -18,7 +18,7 @@ void comp_throw(const FunctionExpression &_f1, const FunctionExpression &_f2) {
 }
 
 FunctionExpression
-FunctionExpression::compose(const FunctionExpression &_that) const {
+FunctionExpression::compose(const FunctionExpression &_that) const & {
 
   comp_throw(*this, _that);
 
@@ -50,7 +50,7 @@ FunctionExpression::compose(const FunctionExpression &_that) const {
 }
 
 FunctionExpression
-FunctionExpression::compose(FunctionExpression &&_that) const {
+FunctionExpression::compose(FunctionExpression &&_that) const & {
 
   comp_throw(*this, _that);
 
@@ -70,8 +70,80 @@ FunctionExpression::compose(FunctionExpression &&_that) const {
     std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
               std::front_inserter(result_array));
   } else {
-    result_array.push_front(
-        std::make_unique<FunctionExpression>(std::move(_that)));
+    result_array.push_front(_that.move_clone());
+  }
+
+  return FunctionExpression(_that.get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::COMPOSITION,
+                            std::move(result_array));
+}
+
+FunctionExpression
+FunctionExpression::compose(const FunctionExpression &_that) && {
+
+  comp_throw(*this, _that);
+
+  if (get_type() == COMPOSITION) {
+    if (_that.get_type() == COMPOSITION) {
+      std::transform(_that.function_array_.rbegin(),
+                     _that.function_array_.rend(),
+                     std::front_inserter(function_array_),
+                     [](const std::unique_ptr<FunctionExpression> &element) {
+                       return element->clone();
+                     });
+
+    } else {
+      function_array_.push_front(this->clone());
+    }
+    return std::move(*this);
+  }
+
+  std::list<std::unique_ptr<FunctionExpression>> result_array;
+
+  result_array.push_back(this->move_clone());
+
+  if (_that.get_type() == COMPOSITION) {
+
+    std::transform(_that.function_array_.rbegin(), _that.function_array_.rend(),
+                   std::front_inserter(result_array),
+                   [](const std::unique_ptr<FunctionExpression> &element) {
+                     return element->clone();
+                   });
+  } else {
+    result_array.push_front(_that.clone());
+  }
+
+  return FunctionExpression(_that.get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::COMPOSITION,
+                            std::move(result_array));
+}
+
+FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
+
+  comp_throw(*this, _that);
+
+  if (get_type() == COMPOSITION) {
+    if (_that.get_type() == COMPOSITION) {
+      std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
+                std::front_inserter(function_array_));
+
+    } else {
+      function_array_.push_front(_that.move_clone());
+    }
+    return std::move(*this);
+  }
+
+  std::list<std::unique_ptr<FunctionExpression>> result_array;
+
+  result_array.push_back(this->move_clone());
+
+  if (_that.get_type() == COMPOSITION) {
+
+    std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
+              std::front_inserter(result_array));
+
+  } else {
+    result_array.push_front(_that.move_clone());
   }
 
   return FunctionExpression(_that.get_domain(), get_codom_dim(),
@@ -188,7 +260,7 @@ std::unique_ptr<FunctionExpression> deriv_compose_functions(
       first_deriv_compose_functions(_function_array);
 
   for (std::size_t k = 1; k < _deg; k++)
-    result = std::move(result->deriv());
+    result = result->deriv()->move_clone();
 
   return result;
 }

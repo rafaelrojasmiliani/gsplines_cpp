@@ -24,7 +24,14 @@ FunctionExpression &_f2);
 class FunctionExpression : public FunctionBase {
 
 public:
-  enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION, SINGLE };
+  enum Type {
+    SUM = 0,
+    MULTIPLICATION,
+    COMPOSITION,
+    CONCATENATION,
+    SINGLE,
+    UNIQUE
+  };
 
   std::list<std::unique_ptr<FunctionExpression>> function_array_;
 
@@ -88,6 +95,10 @@ public:
     return std::make_unique<FunctionExpression>(*this);
   }
 
+  virtual std::unique_ptr<FunctionExpression> move_clone() {
+    return std::make_unique<FunctionExpression>(std::move(*this));
+  }
+
   const Type &get_type() const { return type_; }
 
   void print_performace();
@@ -103,16 +114,25 @@ public:
   virtual FunctionExpression operator-(FunctionExpression &&that) const &;
   virtual FunctionExpression operator-(const FunctionExpression &that) &&;
   virtual FunctionExpression operator-(FunctionExpression &&that) &&;
-  virtual FunctionExpression operator-() const;
+  virtual FunctionExpression operator-() const &;
+  virtual FunctionExpression operator-() &&;
 
-  virtual FunctionExpression operator*(const FunctionExpression &that) const;
-  virtual FunctionExpression operator*(FunctionExpression &&that) const;
+  virtual FunctionExpression operator*(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator*(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator*(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator*(FunctionExpression &&that) &&;
 
-  virtual FunctionExpression compose(const FunctionExpression &that) const;
-  virtual FunctionExpression compose(FunctionExpression &&that) const;
+  virtual FunctionExpression compose(const FunctionExpression &that) const &;
+  virtual FunctionExpression compose(FunctionExpression &&that) const &;
 
-  virtual FunctionExpression concat(const FunctionExpression &that) const;
-  virtual FunctionExpression concat(FunctionExpression &&that) const;
+  virtual FunctionExpression compose(const FunctionExpression &that) &&;
+  virtual FunctionExpression compose(FunctionExpression &&that) &&;
+
+  virtual FunctionExpression concat(const FunctionExpression &that) const &;
+  virtual FunctionExpression concat(FunctionExpression &&that) const &;
+
+  virtual FunctionExpression concat(const FunctionExpression &that) &&;
+  virtual FunctionExpression concat(FunctionExpression &&that) &&;
 
   virtual void print(std::size_t _indent = 0) const;
 
@@ -127,6 +147,10 @@ public:
 
 FunctionExpression operator*(double, const FunctionExpression &);
 FunctionExpression operator*(double, FunctionExpression &&);
+
+Eigen::MatrixXd eval_unique_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 Eigen::MatrixXd eval_single_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
@@ -149,6 +173,10 @@ Eigen::MatrixXd eval_concat_functions(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points);
 
 std::unique_ptr<FunctionExpression> deriv_single_functions(
+    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    std::size_t _deg);
+
+std::unique_ptr<FunctionExpression> deriv_unique_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     std::size_t _deg);
 
