@@ -35,7 +35,9 @@ int main() {
   {
     FunctionExpression f_nom = (exp * sin);
 
+    printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
     FunctionExpression f_d_nom = (exp * cos) + (exp * sin);
+    printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
 
     for (int _ = 0; _ < 100; _++) {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
@@ -46,7 +48,16 @@ int main() {
 
       FunctionExpression f_dot = f_nom.derivate();
 
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      f_d_nom.print();
       f_dot.print();
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evalueation of f_dot\n\n");
+      std::cout << f_dot(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evaluation of f_d_nom \n\n");
+      std::cout << f_d_nom(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
       std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
       assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
       printf("------------ assertion paased\n\n");
@@ -70,6 +81,16 @@ int main() {
 
       f_dot.print();
 
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      f_d_nom.print();
+      f_dot.print();
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evalueation of f_dot\n\n");
+      std::cout << f_dot(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evaluation of f_d_nom \n\n");
+      std::cout << f_d_nom(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
       std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
       fflush(stdout);
       assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
@@ -94,8 +115,16 @@ int main() {
 
       FunctionExpression f_dot = f_nom.derivate();
 
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      f_d_nom.print();
       f_dot.print();
-
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evalueation of f_dot\n\n");
+      std::cout << f_dot(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
+      printf("Evaluation of f_d_nom \n\n");
+      std::cout << f_d_nom(time_span) << "<< \n";
+      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
       std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
       fflush(stdout);
       assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);

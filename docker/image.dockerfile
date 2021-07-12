@@ -25,7 +25,7 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
-                    ros-noetic-ifopt
+                    ros-noetic-ifopt exuberant-ctags
 
 # user handling
 ARG myuser
@@ -43,3 +43,6 @@ COPY vim_installation.bash /
 RUN cd / && bash vim_installation.bash
 COPY configfiles/vimrc /etc/vim/
 COPY configfiles/ycm_extra_conf.py /etc/vim/
+RUN chmod 777 /etc/vim/
+RUN chmod 777 /etc/vim/vimrc
+RUN chmod 777 /etc/vim/bundle

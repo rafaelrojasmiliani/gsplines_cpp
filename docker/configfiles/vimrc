@@ -74,6 +74,7 @@ call vundle#begin('/etc/vim/bundle/')
         map  <F4>          :TagbarToggle<CR>
     Plugin 'nerdtree'
     Plugin 'nerdtree-git-plugin'
+    Plugin 'vim-interestingwords'
 call vundle#end()
 filetype plugin indent on
 filetype plugin on

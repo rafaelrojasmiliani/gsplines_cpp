@@ -3,7 +3,7 @@
 
 install_deps(){
     apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  build-essential cmake python3-dev mono-complete golang nodejs default-jdk npm clang-tidy-9 clang-format-10 apt-transport-https ca-certificates gnupg software-properties-common wget g++-8 golang clang jsonlint jq 
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  build-essential cmake python3-dev mono-complete golang nodejs default-jdk npm clang-tidy-9 clang-format-10 apt-transport-https ca-certificates gnupg software-properties-common wget g++-8 golang clang jsonlint jq
 
     pip3 install cmakelang autopep8 pylint flake8 yamllint yamlfix yamlfmt
 
@@ -36,6 +36,7 @@ install_vim_plugins(){
     git clone https://github.com/Xuyuanp/nerdtree-git-plugin.git /etc/vim/nerdtree-git-plugin
     cd /etc/vim/bundle/YouCompleteMe && git submodule update --init --recursive && python3 install.py --clang-completer --ts-completer --java-completer --cs-completer
     cd /etc/vim/bundle/vimspector && python3 install_gadget.py --enable-c --enable-cpp #--enable-python
+    got clone https://github.com/lfv89/vim-interestingwords.git /etv/vim/vim-interestingwords
 }
 
 main(){

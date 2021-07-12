@@ -130,9 +130,6 @@ FunctionExpression::operator*(FunctionExpression &&_that) const & {
     }
   }
 
-  result_array.front()->value(Eigen::VectorXd());
-  result_array.back()->value(Eigen::VectorXd());
-
   return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
                             FunctionExpression::Type::MULTIPLICATION,
                             std::move(result_array));
@@ -141,7 +138,6 @@ FunctionExpression::operator*(FunctionExpression &&_that) const & {
 FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) && {
 
-  printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -165,7 +161,12 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
 
     } else {
       std::list<std::unique_ptr<FunctionExpression>> result_array;
+
+      std::pair<double, double> domain = get_domain();
+      std::size_t codom_dim = get_codom_dim();
+
       result_array.push_back(this->move_clone());
+
       if (_that.get_type() == MULTIPLICATION) {
         std::transform(_that.function_array_.begin(),
                        _that.function_array_.end(),
@@ -220,7 +221,6 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) && {
 
-  printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -243,7 +243,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) && {
       result_array.push_back(this->move_clone());
       if (_that.get_type() == MULTIPLICATION) {
         std::move(_that.function_array_.begin(), _that.function_array_.end(),
-                  std::back_inserter(function_array_));
+                  std::back_inserter(result_array));
       } else {
         result_array.push_back(_that.move_clone());
       }
