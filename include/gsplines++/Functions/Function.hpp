@@ -32,7 +32,7 @@ public:
 
   virtual ~Function() {}
 
-  FunctionExpression derivate(int _deg = 1) const final;
+  FunctionExpression derivate(int _deg = 1) const override;
 };
 
 } // namespace functions

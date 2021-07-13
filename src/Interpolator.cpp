@@ -154,7 +154,8 @@ PiecewiseFunction Interpolator::interpolate(
   const Eigen::VectorXd &vector_resut =
       solve_interpolation(_interval_lengths, _waypoints);
 
-  return PiecewiseFunction(codom_dim_, num_intervals_, *basis_, vector_resut,
+  return PiecewiseFunction({0.0, _interval_lengths.sum()}, codom_dim_,
+                           num_intervals_, *basis_, vector_resut,
                            _interval_lengths);
 }
 

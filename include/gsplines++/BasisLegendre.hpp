@@ -17,7 +17,7 @@ public:
   BasisLegendre(const BasisLegendre &that);
   virtual ~BasisLegendre();
   void eval_on_window(double _s, double _tau,
-                      Eigen::Ref<Eigen::VectorXd> _buff) override;
+                      Eigen::Ref<Eigen::VectorXd> _buff) const override;
   void eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
                                  Eigen::Ref<Eigen::VectorXd> _buff) override;
 

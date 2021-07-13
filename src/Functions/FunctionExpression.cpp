@@ -192,7 +192,10 @@ std::unique_ptr<FunctionExpression> deriv_unique_functions(
 Eigen::MatrixXd eval_unique_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  return _function_array.front()->value(_domain_points);
+  printf("EVAL UNIQUE !°°° .............. \n\n");
+  Eigen::MatrixXd result = _function_array.front()->value(_domain_points);
+  std::cout << "in eval uniqune ..... \n" << result << "----\n";
+  return result;
 }
 
 } // namespace functions

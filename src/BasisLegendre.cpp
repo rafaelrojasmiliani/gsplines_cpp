@@ -71,7 +71,7 @@ void BasisLegendre::eval_derivative_wrt_tau_on_window(
 }
 
 void BasisLegendre::eval_on_window(double _s, double _tau,
-                                   Eigen::Ref<Eigen::VectorXd> _buff) {
+                                   Eigen::Ref<Eigen::VectorXd> _buff) const {
   _buff(0) = 1.0;
   _buff(1) = _s;
   for (int i = 1; i < get_dim() - 1; i++) {

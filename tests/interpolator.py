@@ -18,7 +18,7 @@ except ImportError:
     from pygsplines import PyInterpolator as Interpolator
 
 
-def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
+def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title=''):
     dim = _q.get_codom_dim()
     fig, ax = plt.subplots(_up_to_deriv + 1, dim)
     if dim == 1:
@@ -37,8 +37,11 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
                 ax[i, j].set_title('coordinate {:d}'.format(j + 1), fontsize=8)
 
             if hasattr(_q, 'get_domain_breakpoints'):
-                for ti in _q.get_domain_breakpoints():
+                t_bp = _q.get_domain_breakpoints()
+                for ti in t_bp:
                     ax[i, j].axvline(ti, alpha=0.1, color='red')
+                if _wp is not None and i == 0:
+                    ax[i, j].plot(t_bp, _wp[:, j], 'b*')
 
     plt.subplots_adjust(
         left=0.025,
@@ -57,10 +60,11 @@ class MyTest(unittest.TestCase):
         np.random.seed()
 
     @debug_on()
-    def test(self):
-        basis = BasisLegendre(4)
-        dim = 3  # np.random.randint(1, 10)
-        intervals = np.random.randint(1, 6)
+    def compute_gspline_test(self):
+        """ Test the computation of an interpolating gpline """
+        basis = BasisLegendre(6)
+        dim = 6  # np.random.randint(1, 10)
+        intervals = np.random.randint(3, 6)
         waypoints = np.random.rand(intervals+1, dim)
         interval_lengths = 1.0 + np.random.rand(intervals) * 2.0
         inter = Interpolator(dim, intervals, basis)
@@ -68,29 +72,30 @@ class MyTest(unittest.TestCase):
 #        inter.print_interpolating_matrix()
 #        inter.print_interpolating_vector()
 
-        show_piecewisefunction(res, 5, 0.001)
+        show_piecewisefunction(res, 5, 0.10, waypoints)
+
+#    @debug_on()
+#    def interpolation_test_computation_time(self):
+#        """ copmutes the time it takes to interpolate """
+#        basis = BasisLegendre(6)
+#        dim = 7
+#        intervals = 10
+#        waypoints = np.random.rand(intervals+1, dim)
+#        intervals_length = np.array(intervals*[1])
+#
+#        iters = 100
+#        tmean = 0
+#        for _ in range(iters):
+#            time_0 = time.time()
+#            inter = Interpolator(dim, intervals, basis)
+#            _ = inter.interpolate(intervals_length, waypoints)
+#            time_1 = time.time()
+#            tmean += (time_1 - time_0)
+#
+#        print('mean time = ', tmean/iters)
 
     @debug_on()
-    def test_interpolation_time(self):
-        basis = BasisLegendre(6)
-        dim = 7
-        intervals = 10
-        waypoints = np.random.rand(intervals+1, dim)
-        intervals_length = np.array(intervals*[1])
-
-        iters = 100
-        tmean = 0
-        for _ in range(iters):
-            time_0 = time.time()
-            inter = Interpolator(dim, intervals, basis)
-            _ = inter.interpolate(intervals_length, waypoints)
-            time_1 = time.time()
-            tmean += (time_1 - time_0)
-
-        print('mean time = ', tmean/iters)
-
-    @debug_on()
-    def test_derivative_y(self):
+    def derivative_y(self):
         ''' Compare the numerical derivate of y w.r.t tau with the nominal one
         '''
         for i in range(40):
@@ -149,6 +154,10 @@ class MyTest(unittest.TestCase):
                 value of dydtau test = {:10.7e}
                 value of dydtau nom = {:10.7e}
                 '''.format(e, ep, dydtauiTest[eidx], dydtauNom[eidx])
+
+    def test(self):
+
+        self.compute_gspline_test()
 
 
 if __name__ == '__main__':

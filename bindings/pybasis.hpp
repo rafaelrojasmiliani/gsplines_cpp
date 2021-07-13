@@ -1,6 +1,6 @@
 
 #ifndef PYBASIS
-#define PYBASIS 
+#define PYBASIS
 #include <eigen3/Eigen/Core>
 #include <gsplines++/Basis.hpp>
 #include <gsplines++/BasisLegendre.hpp>
@@ -23,7 +23,7 @@ public:
   /* Inherit the constructors */
   using Basis::Basis;
   void eval_on_window(double _s, double _tau,
-                      Eigen::Ref<Eigen::VectorXd> _buff) override {
+                      Eigen::Ref<Eigen::VectorXd> _buff) const override {
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_on_window, _s, _tau, _buff);
   }
   void eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
