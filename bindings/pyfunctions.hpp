@@ -2,6 +2,7 @@
 #ifndef PYFUNCTION
 #define PYFUNCTION
 #include <eigen3/Eigen/Core>
+#include <gsplines++/Functions/ElementalFunctions.hpp>
 #include <gsplines++/Functions/Function.hpp>
 #include <gsplines++/Functions/FunctionExpression.hpp>
 #include <pybind11/eigen.h>

@@ -15,6 +15,7 @@ int main() {
   FunctionExpression f_dot_nom =
       -2 * sin.compose(DomainLinearDilation({-1, 1}, 2));
 
+  f.print();
   assert((f(time_span) - Eigen::cos(2 * time_span.array()).matrix()).norm() <
          1.0e-9);
 

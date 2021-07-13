@@ -21,9 +21,20 @@ FunctionExpression::FunctionExpression(
     : FunctionBase(_domain, _codom_dim, _name), type_(_type), function_array_(),
       eval_operation_(nullptr), deriv_operation_(nullptr) {
 
-  for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
+  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
     function_array_.push_back(f->clone());
   }
+
+  assert(not(get_type() == SINGLE and get_name() == ""));
+  initialize();
+
+  num_call_constructor_++;
+}
+
+FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
+                                       std::size_t _codom_dim)
+    : FunctionBase(_domain, _codom_dim, "DUMMY"), type_(SINGLE),
+      function_array_(), eval_operation_(nullptr), deriv_operation_(nullptr) {
 
   assert(not(get_type() == SINGLE and get_name() == ""));
   initialize();

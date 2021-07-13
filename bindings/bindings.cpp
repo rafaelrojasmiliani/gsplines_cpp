@@ -68,47 +68,84 @@ PYBIND11_MODULE(pygsplines, m) {
   m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
 
   // Function Expression
-  /*
   py::class_<gsplines::functions::FunctionExpression>(m, "FunctionExpression")
-      .def(py::init<
-           std::pair<double, double>, std::size_t,
-           gsplines::functions::FunctionExpression::Type,
-           std::list<std::unique_ptr<gsplines::functions::FunctionExpression>>
-               &,
-           const std::string &>());
-*/
-  /*
-        .def(py::init(
-            [](std::pair<double, double> a, std::size_t b,
-               gsplines::functions::FunctionExpression::Type c,
-               std::list<std::unique_ptr<gsplines::functions::FunctionExpression>>
-                   &d,
-               const std::string &e) {
-              return std::make_unique<gsplines::functions::FunctionExpression>(
-                  a, b, c, d, e);
-            }));
-        .def("get_codom_dim",
-             &gsplines::functions::FunctionExpression::get_codom_dim)
-        .def("is_point_in_domain",
-             &gsplines::functions::FunctionExpression::is_point_in_domain)
-        .def("get_domain", &gsplines::functions::FunctionExpression::get_domain)
-        .def("deriv", &gsplines::functions::FunctionExpression::derivate)
-        .def(
-            "__sum__",
-            [](const gsplines::functions::FunctionExpression &_lhs,
-               const gsplines::functions::FunctionExpression &_rhs) {
-              return _lhs + _rhs;
-            },
-            py::is_operator())
-        .def(
-            "__mul__",
-            [](const gsplines::functions::FunctionExpression &_lhs,
-               const gsplines::functions::FunctionExpression &_rhs) {
-              return _lhs * _rhs;
-            },
-            py::is_operator())
-        .def("__call__",
-     &gsplines::functions::FunctionExpression::operator());*/
+      .def(py::init<std::pair<double, double>, std::size_t>())
+      .def("get_codom_dim",
+           &gsplines::functions::FunctionExpression::get_codom_dim)
+      .def("is_point_in_domain",
+           &gsplines::functions::FunctionExpression::is_point_in_domain)
+      .def("get_domain", &gsplines::functions::FunctionExpression::get_domain)
+      .def("deriv", &gsplines::functions::FunctionExpression::derivate,
+           py::arg("_deg") = 1)
+      .def("print", &gsplines::functions::FunctionExpression::print,
+           py::arg("_indent") = 0)
+      .def("concat",
+           [](const gsplines::functions::FunctionExpression &_self,
+              const gsplines::functions::FunctionExpression &_that) {
+             return _self.concat(_that);
+           })
+      .def("compose",
+           [](const gsplines::functions::FunctionExpression &_self,
+              const gsplines::functions::FunctionExpression &_that) {
+             return _self.compose(_that);
+           })
+      .def(
+          "__add__",
+          [](const gsplines::functions::FunctionExpression &_lhs,
+             const gsplines::functions::FunctionExpression &_rhs) {
+            return _lhs + _rhs;
+          },
+          py::is_operator())
+      .def(
+          "__sub__",
+          [](const gsplines::functions::FunctionExpression &_lhs,
+             const gsplines::functions::FunctionExpression &_rhs) {
+            return _lhs - _rhs;
+          },
+          py::is_operator())
+      .def(
+          "__mul__",
+          [](const gsplines::functions::FunctionExpression &_lhs,
+             const gsplines::functions::FunctionExpression &_rhs) {
+            return _lhs * _rhs;
+          },
+          py::is_operator())
+      .def(
+          "__neg__",
+          [](const gsplines::functions::FunctionExpression &_this) {
+            return -_this;
+          },
+          py::is_operator())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+
+  py::class_<gsplines::functions::Exponential,
+             gsplines::functions::FunctionExpression>(m, "Exponential")
+      .def(py::init<std::pair<double, double>>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+  py::class_<gsplines::functions::ConstFunction,
+             gsplines::functions::FunctionExpression>(m, "ConstFunction")
+      .def(py::init<std::pair<double, double>, std::size_t, double>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+
+  py::class_<gsplines::functions::Cos, gsplines::functions::FunctionExpression>(
+      m, "Cos")
+      .def(py::init<std::pair<double, double>>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+
+  py::class_<gsplines::functions::DomainLinearDilation,
+             gsplines::functions::FunctionExpression>(m, "DomainLinearDilation")
+      .def(py::init<std::pair<double, double>, double>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+
+  py::class_<gsplines::functions::Identity,
+             gsplines::functions::DomainLinearDilation>(m, "Identity")
+      .def(py::init<std::pair<double, double>>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+
+  py::class_<gsplines::functions::Sin, gsplines::functions::FunctionExpression>(
+      m, "Sin")
+      .def(py::init<std::pair<double, double>>())
+      .def("__call__", &gsplines::functions::FunctionExpression::operator());
   // Operations
   // m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
 }

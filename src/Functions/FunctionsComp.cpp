@@ -41,7 +41,7 @@ FunctionExpression::compose(const FunctionExpression &_that) const & {
                      return element->clone();
                    });
   } else {
-    result_array.push_front(this->clone());
+    result_array.push_front(_that.clone());
   }
 
   return FunctionExpression(_that.get_domain(), get_codom_dim(),
@@ -93,7 +93,7 @@ FunctionExpression::compose(const FunctionExpression &_that) && {
                      });
 
     } else {
-      function_array_.push_front(this->clone());
+      function_array_.push_front(_that.clone());
     }
     return std::move(*this);
   }
@@ -137,6 +137,9 @@ FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
 
   result_array.push_back(this->move_clone());
 
+  std::pair<double, double> domain = _that.get_domain();
+  std::size_t codom_dim = get_codom_dim();
+
   if (_that.get_type() == COMPOSITION) {
 
     std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
@@ -146,7 +149,7 @@ FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
     result_array.push_front(_that.move_clone());
   }
 
-  return FunctionExpression(_that.get_domain(), get_codom_dim(),
+  return FunctionExpression(domain, codom_dim,
                             FunctionExpression::Type::COMPOSITION,
                             std::move(result_array));
 }

@@ -60,6 +60,8 @@ public:
       const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
       const std::string &_name = "FunctionExpression");
 
+  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim);
+
   FunctionExpression(
       std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
       std::list<std::unique_ptr<FunctionExpression>> &&_function_array,
