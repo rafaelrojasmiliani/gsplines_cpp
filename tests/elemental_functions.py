@@ -12,6 +12,8 @@ import functools
 
 import sympy as sp
 
+np.random.seed()
+
 try:
     from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction
 except ImportError:
@@ -138,11 +140,18 @@ class MyTest(unittest.TestCase):
         self.time_spam = np.reshape(np.arange(-1, 1, 0.2), (-1, 1))
 
     @debug_on()
-    def error_test(self, _f1, _f2):
+    def error_test(self, _f_nom, _f_test):
         """ calls np.linalg.norm """
-        assert(np.linalg.norm(
-            _f1(self.time_spam) -
-            _f2(self.time_spam)) < 1.0e-9)
+        nom_val = _f_nom(self.time_spam)
+        nom_val_max = np.abs(np.max(nom_val))
+        if nom_val_max > 1.0e-9:
+            assert(np.linalg.norm(
+                _f_test(self.time_spam) -
+                nom_val)/nom_val_max < 1.0e-9)
+        else:
+            assert(np.linalg.norm(
+                _f_test(self.time_spam) -
+                nom_val) < 1.0e-9)
 
     @debug_on()
     def add_test(self):
