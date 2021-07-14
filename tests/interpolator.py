@@ -98,7 +98,7 @@ class MyTest(unittest.TestCase):
     def derivative_y(self):
         ''' Compare the numerical derivate of y w.r.t tau with the nominal one
         '''
-        for i in range(40):
+        for _ in range(40):
             print('--- begin --')
             b_dim = 2*np.random.randint(1, 10)
             basis = BasisLegendre(b_dim)
