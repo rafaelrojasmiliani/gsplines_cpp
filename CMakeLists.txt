@@ -17,33 +17,33 @@ find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
   gsplines SHARED
-  ${CMAKE_SOURCE_DIR}/src/BasisLegendre.cpp
-  ${CMAKE_SOURCE_DIR}/src/Interpolator.cpp
-  ${CMAKE_SOURCE_DIR}/src/PiecewiseFunction.cpp
-  ${CMAKE_SOURCE_DIR}/src/Sobolev.cpp
-  ${CMAKE_SOURCE_DIR}/src/ipopt_interface.cpp
-  ${CMAKE_SOURCE_DIR}/src/ipopt_solver.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionSum.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionMul.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsComp.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionsConcat.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/Functions.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionExpression.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/FunctionBase.cpp
-  ${CMAKE_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp)
+  ${PROJECT_SOURCE_DIR}/src/BasisLegendre.cpp
+  ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
+  ${PROJECT_SOURCE_DIR}/src/PiecewiseFunction.cpp
+  ${PROJECT_SOURCE_DIR}/src/Sobolev.cpp
+  ${PROJECT_SOURCE_DIR}/src/ipopt_interface.cpp
+  ${PROJECT_SOURCE_DIR}/src/ipopt_solver.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionSum.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionMul.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsComp.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsConcat.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/Functions.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionExpression.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionBase.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp)
 
 target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                       ${ifopt_LIBRARIES})
 target_include_directories(
   gsplines
-  PUBLIC ${CMAKE_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS} ${Eigen3_INCLUDE_DIRS}
-         ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
+  PUBLIC ${PROJECT_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
+         ${Eigen3_INCLUDE_DIRS} ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
 # set_target_properties(gsplines PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib)
 
 set(PYBIND11_PYTHON_VERSION "3.6")
-link_directories(${CMAKE_SOURCE_DIR}/build)
-add_subdirectory(${CMAKE_SOURCE_DIR}/modules/pybind11)
-pybind11_add_module(pygsplines ${CMAKE_SOURCE_DIR}/bindings/bindings.cpp)
+link_directories(${PROJECT_SOURCE_DIR}/build)
+add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
+pybind11_add_module(pygsplines ${PROJECT_SOURCE_DIR}/bindings/bindings.cpp)
 target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
                                              /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
