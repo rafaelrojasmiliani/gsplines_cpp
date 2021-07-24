@@ -52,6 +52,21 @@ PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
   }
 }
 
+PiecewiseFunction::PiecewiseFunction(PiecewiseFunction &&that)
+    : Function(std::move(that)),
+      number_of_intervals_(that.number_of_intervals_),
+      basis_(that.basis_->move_clone()),
+      coefficients_(std::move(that.coefficients_)),
+      domain_break_points_(std::move(that.domain_break_points_)),
+      domain_interval_lengths_(std::move(that.domain_interval_lengths_)) {
+
+  if (coefficients_.size() !=
+      number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
+    printf("Error: The number of coefficients is incorrect\n");
+    fflush(stdout);
+  }
+}
+
 PiecewiseFunction::PiecewiseFunction(
     std::pair<double, double> _domain, std::size_t _codom_dim,
     std::size_t _n_intervals, const basis::Basis &_basis,

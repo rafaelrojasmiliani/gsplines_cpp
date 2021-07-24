@@ -35,7 +35,7 @@ public:
                     const std::string &_name = "PieceWiseFunction");
 
   PiecewiseFunction(const PiecewiseFunction &that);
-  // PiecewiseFunction(PiecewiseFunction &&that);
+  PiecewiseFunction(PiecewiseFunction &&that);
 
   std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override;
 
