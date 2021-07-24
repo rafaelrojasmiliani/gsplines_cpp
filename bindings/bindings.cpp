@@ -1,6 +1,7 @@
 
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
+#include <gsplines++/Collocation/GaussLobattoPointsWeights.hpp>
 
 PYBIND11_MODULE(pygsplines, m) {
   py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")
@@ -146,6 +147,10 @@ PYBIND11_MODULE(pygsplines, m) {
            &gsplines::SobolevNorm::deriv_wrt_interval_len);
 
   m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
+
+  m.def("legendre_gauss_lobatto_points_weights",
+        &gsplines::collocation::legendre_gauss_lobatto_points_and_weights);
+  m.def("q_and_evaluation", &gsplines::collocation::q_and_evaluation);
   // Operations
   // m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
 }

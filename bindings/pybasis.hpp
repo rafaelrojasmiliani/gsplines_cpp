@@ -26,15 +26,16 @@ public:
                       Eigen::Ref<Eigen::VectorXd> _buff) const override {
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_on_window, _s, _tau, _buff);
   }
-  void eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
-                                 Eigen::Ref<Eigen::VectorXd> _buff) override {
+  void
+  eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
+                            Eigen::Ref<Eigen::VectorXd> _buff) const override {
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_derivative_on_window, _s, _tau,
                            _deg, _buff);
   }
 
   void eval_derivative_wrt_tau_on_window(
       double _s, double _tau, unsigned int _deg,
-      Eigen::Ref<Eigen::VectorXd> _buff) override {
+      Eigen::Ref<Eigen::VectorXd> _buff) const override {
 
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_derivative_wrt_tau_on_window, _s,
                            _tau, _deg, _buff);
@@ -53,6 +54,7 @@ public:
                            _tau, _deg, _mat);
   }
   std::unique_ptr<Basis> clone() const override { return nullptr; }
+  std::unique_ptr<Basis> move_clone() override { return nullptr; }
 };
 
 } // namespace basis

@@ -28,12 +28,19 @@ BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
 BasisLegendre::BasisLegendre(const BasisLegendre &that)
     : Basis(that),
       derivative_matrices_buffer_(that.derivative_matrices_buffer_) {}
+
+BasisLegendre::BasisLegendre(BasisLegendre &&that)
+    : Basis(std::move(that)),
+      derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)) {
+}
+
 BasisLegendre::~BasisLegendre() {}
 
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
-    Eigen::Ref<Eigen::VectorXd> _buff) {
-  Eigen::VectorXd buff_next(get_dim());
+    Eigen::Ref<Eigen::VectorXd> _buff) const {
+
+  static Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
   double mutiplier = 1.0;
@@ -64,7 +71,7 @@ void BasisLegendre::eval_derivative_on_window(
 
 void BasisLegendre::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
-    Eigen::Ref<Eigen::VectorXd> _buff) {
+    Eigen::Ref<Eigen::VectorXd> _buff) const {
 
   eval_derivative_on_window(_s, _tau, _deg, _buff);
   _buff *= -0.5 * _deg * (2.0 / _tau);
@@ -125,5 +132,33 @@ void BasisLegendre::add_derivative_matrix_deriv_wrt_tau(
   if (_deg < get_dim() + 1)
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
 }
+
+Eigen::MatrixXd BasisLegendre::derivative_matrix(std::size_t _dim) {
+
+  Eigen::MatrixXd result(Eigen::MatrixXd::Zero(_dim, _dim));
+
+  double firstTerm, secondTerm, thirdTerm, fourthTerm;
+
+  for (int i = 1; i < _dim; i++) {       // for on i
+    for (int j = 0; j < _dim - 1; j++) { // for on j
+      if (i == j + 1) {
+        result(i, j) = ((double)i) / alpha(i - 1);
+      } else if (i > j + 1) {
+        firstTerm = 0.0;
+        secondTerm = (j >= 1) ? alpha(j - 1) * result(i - 1, j - 1) : 0.0;
+        thirdTerm = (i >= 1) ? gamma(j + 1) * result(i - 1, j + 1) : 0.0;
+        fourthTerm = (i >= 2) ? gamma(i - 1) * result(i - 2, j) : 0.0;
+
+        result(i, j) = 1.0 / alpha(i - 1) *
+                       (firstTerm + secondTerm + thirdTerm - fourthTerm);
+      } else {
+        result(i, j) = 0.0;
+      }
+    } // for on j
+  }   // for on i
+
+  return result;
+}
+
 } // namespace basis
 } // namespace gsplines
