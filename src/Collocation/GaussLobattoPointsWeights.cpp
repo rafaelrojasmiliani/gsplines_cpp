@@ -95,7 +95,7 @@ legendre_gauss_lobatto_points_and_weights(std::size_t _n) {
 
         double delta = -q / q_prime;
         points(uicj) += delta;
-        if (std::fabs(delta) < 0.00001 * std::fabs(points(uicj)))
+        if (std::fabs(delta) < 1.0e-7 * std::fabs(points(uicj)))
           break;
       }
 
