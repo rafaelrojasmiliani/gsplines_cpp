@@ -43,8 +43,8 @@ public:
 
   std::unique_ptr<FunctionExpression> move_clone() override;
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::size_t get_intervals_num() { return number_of_intervals_; }
   double get_exec_time() {

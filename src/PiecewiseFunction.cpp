@@ -90,10 +90,10 @@ PiecewiseFunction::PiecewiseFunction(
 
 PiecewiseFunction::~PiecewiseFunction() {}
 
-Eigen::MatrixXd PiecewiseFunction::operator()(
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
+void PiecewiseFunction::value(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
 
-  Eigen::MatrixXd result(_domain_points.size(), get_codom_dim());
   std::size_t result_cols(_domain_points.size());
   std::size_t current_interval = 0;
   double s, tau;
@@ -108,11 +108,10 @@ Eigen::MatrixXd PiecewiseFunction::operator()(
     tau = domain_interval_lengths_(current_interval);
     basis_->eval_on_window(s, tau, basis_buffer);
     for (j = 0; j < get_codom_dim(); j++) {
-      result(i, j) =
+      _result(i, j) =
           coefficient_segment(current_interval, j).adjoint() * basis_buffer;
     }
   }
-  return result;
 }
 
 std::size_t PiecewiseFunction::get_interval(double _domain_point) const {

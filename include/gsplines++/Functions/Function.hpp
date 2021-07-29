@@ -20,11 +20,11 @@ public:
            const std::string &_name);
   Function(const Function &that);
 
-  virtual Eigen::MatrixXd operator()(const Eigen::Ref<const Eigen::VectorXd>
-                                         _domain_points) const override = 0;
-
   virtual std::unique_ptr<FunctionExpression>
   deriv(int _deg = 1) const override = 0;
+
+  virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                     Eigen::Ref<Eigen::MatrixXd> _result) const override = 0;
 
   virtual std::unique_ptr<FunctionExpression> clone() const override = 0;
 

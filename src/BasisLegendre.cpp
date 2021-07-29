@@ -6,7 +6,9 @@ namespace gsplines {
 namespace basis {
 
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
-BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
+
+BasisLegendre::BasisLegendre(std::size_t _dim)
+    : Basis(_dim), buff_next(get_dim()) {
   gsplines_legendre_dmat(_dim, derivative_matrix_);
 
   Eigen::MatrixXd dmat(derivative_matrix_);
@@ -26,11 +28,11 @@ BasisLegendre::BasisLegendre(std::size_t _dim) : Basis(_dim) {
 }
 
 BasisLegendre::BasisLegendre(const BasisLegendre &that)
-    : Basis(that),
+    : Basis(that), buff_next(that.get_dim()),
       derivative_matrices_buffer_(that.derivative_matrices_buffer_) {}
 
 BasisLegendre::BasisLegendre(BasisLegendre &&that)
-    : Basis(std::move(that)),
+    : Basis(std::move(that)), buff_next(that.get_dim()),
       derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)) {
 }
 
@@ -40,7 +42,6 @@ void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd> _buff) const {
 
-  static Eigen::VectorXd buff_next(get_dim());
   double term = 0;
   double aux = 0;
   double mutiplier = 1.0;

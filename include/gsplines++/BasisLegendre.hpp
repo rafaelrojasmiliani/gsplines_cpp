@@ -11,6 +11,7 @@ class BasisLegendre : public Basis {
 private:
   BasisLegendre &operator=(const BasisLegendre &);
   std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
+  mutable Eigen::VectorXd buff_next;
 
 public:
   BasisLegendre(std::size_t _dim);

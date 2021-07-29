@@ -28,16 +28,13 @@ public:
 
   ConstFunction(const ConstFunction &_that);
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override {
-    Eigen::MatrixXd result(_domain_points.size(), get_codom_dim());
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override {
 
-    result = Eigen::MatrixXd::Ones(_domain_points.size(), get_codom_dim())
-                 .array()
-                 .rowwise() *
-             values_.transpose().array();
-
-    return result;
+    _result = Eigen::MatrixXd::Ones(_domain_points.size(), get_codom_dim())
+                  .array()
+                  .rowwise() *
+              values_.transpose().array();
   };
 
   std::unique_ptr<FunctionExpression> clone() const override {
@@ -48,7 +45,7 @@ public:
     return std::make_unique<ConstFunction>(std::move(*this));
   }
 
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
+  std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override {
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
   }
 };
@@ -66,9 +63,9 @@ public:
   DomainLinearDilation(const DomainLinearDilation &that)
       : Function(that), dilation_factor_(that.dilation_factor_) {}
 
-  virtual Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override {
-    return dilation_factor_ * _domain_points;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override {
+    _result.noalias() = dilation_factor_ * _domain_points;
   };
 
   virtual std::unique_ptr<FunctionExpression> clone() const override {
@@ -93,9 +90,9 @@ public:
 
   Identity(const Identity &that) : DomainLinearDilation(that) {}
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override {
-    return _domain_points;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override {
+    _result = _domain_points;
   };
 
   std::unique_ptr<FunctionExpression> clone() const override {
@@ -118,8 +115,8 @@ public:
 
   Exponential(const Exponential &that) : Function(that) {}
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Exponential>(*this);
@@ -142,8 +139,8 @@ public:
 
   Cos(const Cos &that) : Function(that) {}
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<Cos>(*this);
@@ -162,8 +159,8 @@ public:
 
   Sin(const Sin &that) : Function(that) {}
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::unique_ptr<FunctionExpression> clone() const override {
     printf("CLONING SIN\n");
@@ -198,8 +195,8 @@ public:
       : Function(std::move(that)),
         coefficients_(std::move(that.coefficients_)) {}
 
-  Eigen::MatrixXd operator()(
-      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::unique_ptr<FunctionExpression> clone() const override {
     return std::make_unique<CanonicPolynomial>(*this);

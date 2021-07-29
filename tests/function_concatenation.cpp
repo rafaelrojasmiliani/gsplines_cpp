@@ -18,9 +18,8 @@ int main() {
   assert((f(time_span) - Eigen::cos(4 * time_span.array()).matrix()).norm() <
          1.0e-9);
 
-  assert((f.derivate().value(time_span) -
-          Eigen::cos(4 * time_span.array()).matrix())
-             .norm() < 1.0e-9);
+  assert((f.derivate().value(time_span) - f_dot_nom(time_span)).norm() <
+         1.0e-9);
 
   /*
   FunctionExpression g =

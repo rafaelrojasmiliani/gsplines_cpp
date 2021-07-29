@@ -15,22 +15,20 @@ ConstFunction::ConstFunction(std::pair<double, double> _domain,
 ConstFunction::ConstFunction(const ConstFunction &_that)
     : Function(_that), values_(_that.values_) {}
 
-Eigen::MatrixXd Exponential::operator()(
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
+void Exponential::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                        Eigen::Ref<Eigen::MatrixXd> _result) const {
   // std::cout << "Exp \n" << Eigen::exp(_domain_points.array()).matrix() <<
   // '\n';
-  Eigen::MatrixXd result = Eigen::exp(_domain_points.array()).matrix();
+  _result = Eigen::exp(_domain_points.array()).matrix();
   // std::cout << "................\n";
-  return result;
 };
 
-Eigen::MatrixXd
-Cos::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
+void Cos::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                Eigen::Ref<Eigen::MatrixXd> _result) const {
   // std::cout << "Cos \n" << Eigen::cos(_domain_points.array()).matrix() <<
   // '\n';
-  Eigen::MatrixXd result = Eigen::cos(_domain_points.array()).matrix();
+  _result = Eigen::cos(_domain_points.array()).matrix();
   // std::cout << "................\n";
-  return result;
 };
 
 std::unique_ptr<FunctionExpression> Cos::deriv(int _deg) const {
@@ -39,29 +37,27 @@ std::unique_ptr<FunctionExpression> Cos::deriv(int _deg) const {
       ConstFunction(get_domain(), 1, -1.0) * Sin(get_domain()));
 }
 
-Eigen::MatrixXd
-Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
+void Sin::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                Eigen::Ref<Eigen::MatrixXd> _result) const {
   // std::cout << "Sin \n" << Eigen::sin(_domain_points.array()).matrix() <<
   // '\n';
-  Eigen::MatrixXd result = Eigen::sin(_domain_points.array()).matrix();
+  _result = Eigen::sin(_domain_points.array()).matrix();
   // std::cout << "................\n";
-  return result;
 };
 
 std::unique_ptr<FunctionExpression> Sin::deriv(int _deg) const {
   return std::make_unique<Cos>(get_domain());
 }
 
-Eigen::MatrixXd CanonicPolynomial::operator()(
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
-  Eigen::MatrixXd result(_domain_points);
+void CanonicPolynomial::value(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
 
-  result.setConstant(coefficients_.tail(0)(0));
+  _result.setConstant(coefficients_.tail(0)(0));
   for (std::size_t uici = 1; uici < coefficients_.size(); uici++) {
-    result.array() =
-        result.array() * _domain_points.array() + coefficients_.tail(uici)(0);
+    _result.array() *= _domain_points.array();
+    _result.array() += coefficients_.tail(uici)(0);
   }
-  return result;
 }
 
 std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
