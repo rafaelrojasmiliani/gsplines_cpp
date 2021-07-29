@@ -177,9 +177,10 @@ std::unique_ptr<FunctionExpression> deriv_single_functions(
   throw std::invalid_argument("Single functions can't implement this method");
 }
 
-Eigen::MatrixXd eval_single_functions(
+void eval_single_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
   throw std::invalid_argument("Single functions can't implement this method");
 }
 
@@ -189,13 +190,14 @@ std::unique_ptr<FunctionExpression> deriv_unique_functions(
   return _function_array.front()->deriv(_deg);
 }
 
-Eigen::MatrixXd eval_unique_functions(
+void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
   printf("EVAL UNIQUE !°°° .............. \n\n");
-  Eigen::MatrixXd result = _function_array.front()->value(_domain_points);
-  std::cout << "in eval uniqune ..... \n" << result << "----\n";
-  return result;
+
+  _function_array.front()->value(_domain_points, _result);
+  std::cout << "in eval uniqune ..... \n" << _result << "----\n";
 }
 
 } // namespace functions
