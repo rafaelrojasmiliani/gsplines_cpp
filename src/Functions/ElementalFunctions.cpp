@@ -51,5 +51,27 @@ Sin::operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
 std::unique_ptr<FunctionExpression> Sin::deriv(int _deg) const {
   return std::make_unique<Cos>(get_domain());
 }
+
+Eigen::MatrixXd CanonicPolynomial::operator()(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
+  Eigen::MatrixXd result(_domain_points);
+
+  result.setConstant(coefficients_.tail(0)(0));
+  for (std::size_t uici = 1; uici < coefficients_.size(); uici++) {
+    result.array() =
+        result.array() * _domain_points.array() + coefficients_.tail(uici)(0);
+  }
+  return result;
+}
+
+std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
+
+  Eigen::VectorXd result(coefficients_);
+  for (std::size_t uici = 0; uici < coefficients_.size(); uici++) {
+    result(uici) *= (double)uici;
+  }
+  return std::make_unique<CanonicPolynomial>(get_domain(), std::move(result));
+}
+
 } // namespace functions
 } // namespace gsplines

@@ -140,7 +140,7 @@ class Cos : public Function {
 public:
   Cos(std::pair<double, double> _domain) : Function(_domain, 1, "Cos") {}
 
-  Cos(const Exponential &that) : Function(that) {}
+  Cos(const Cos &that) : Function(that) {}
 
   Eigen::MatrixXd operator()(
       const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
@@ -160,7 +160,7 @@ class Sin : public Function {
 public:
   Sin(std::pair<double, double> _domain) : Function(_domain, 1, "Sin") {}
 
-  Sin(const Exponential &that) : Function(that) {}
+  Sin(const Sin &that) : Function(that) {}
 
   Eigen::MatrixXd operator()(
       const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
@@ -173,6 +173,40 @@ public:
   std::unique_ptr<FunctionExpression> move_clone() override {
     printf("CLONING SIN\n");
     return std::make_unique<Sin>(std::move(*this));
+  }
+
+  std::unique_ptr<FunctionExpression> deriv(int _deg) const override;
+};
+
+class CanonicPolynomial : public Function {
+protected:
+  Eigen::VectorXd coefficients_;
+
+public:
+  CanonicPolynomial(std::pair<double, double> _domain,
+                    const Eigen::VectorXd &_coefficients)
+      : Function(_domain, 1, "CanonicPolynomial"),
+        coefficients_(_coefficients) {}
+
+  CanonicPolynomial(std::pair<double, double> _domain,
+                    Eigen::VectorXd &&_coefficients)
+      : Function(_domain, 1, "CanonicPolynomial"),
+        coefficients_(std::move(_coefficients)) {}
+
+  CanonicPolynomial(const CanonicPolynomial &that) : Function(that) {}
+  CanonicPolynomial(CanonicPolynomial &&that)
+      : Function(std::move(that)),
+        coefficients_(std::move(that.coefficients_)) {}
+
+  Eigen::MatrixXd operator()(
+      const Eigen::Ref<const Eigen::VectorXd> _domain_points) const override;
+
+  std::unique_ptr<FunctionExpression> clone() const override {
+    return std::make_unique<CanonicPolynomial>(*this);
+  }
+
+  std::unique_ptr<FunctionExpression> move_clone() override {
+    return std::make_unique<CanonicPolynomial>(std::move(*this));
   }
 
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override;

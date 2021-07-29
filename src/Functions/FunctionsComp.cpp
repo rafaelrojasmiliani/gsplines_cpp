@@ -157,14 +157,13 @@ FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
 /* -----
  *  Evaluation method
  * -----*/
-Eigen::MatrixXd eval_compose_functions(
+void eval_compose_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array.back()->get_codom_dim());
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
 
   Eigen::VectorXd domain_points_copy = _domain_points;
+  Eigen::VectorXd temp(_domain_points.size(), 1);
 
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
 
@@ -172,12 +171,11 @@ Eigen::MatrixXd eval_compose_functions(
       std::next(_function_array.end(), -1);
 
   for (it = _function_array.begin(); it != it_limit; it++) {
-    domain_points_copy = (*it)->value(domain_points_copy);
+    (*it)->value(domain_points_copy, temp);
+    domain_points_copy = temp;
   }
 
-  result = _function_array.back()->value(domain_points_copy);
-
-  return result;
+  _function_array.back()->value(domain_points_copy, _result);
 }
 
 /* -----

@@ -168,14 +168,14 @@ std::unique_ptr<FunctionExpression> deriv_concat_functions(
       FunctionExpression::Type::CONCATENATION, result_array);
 }
 
-Eigen::MatrixXd eval_concat_functions(
+void eval_concat_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array.front()->get_codom_dim());
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
 
   Eigen::VectorXd vector_one(1);
+
+  Eigen::MatrixXd temp(1, _function_array.front()->get_codom_dim());
 
   for (std::size_t i = 0; i < _domain_points.size(); i++) {
 
@@ -183,7 +183,8 @@ Eigen::MatrixXd eval_concat_functions(
         get_interval_function(_domain_points[i], _function_array);
 
     if (f != _function_array.end()) {
-      result.row(i) = (*f)->value(_domain_points.segment(i, 1));
+      (*f)->value(_domain_points.segment(i, 1), temp);
+      _result.row(i) = temp.row(0);
     } else if (_domain_points[i] <
                _function_array.front()->get_domain().first) {
       _function_array.front()->value(Eigen::VectorXd::Constant(
@@ -194,8 +195,6 @@ Eigen::MatrixXd eval_concat_functions(
           1, _function_array.back()->get_domain().second));
     }
   }
-
-  return result;
 }
 } // namespace functions
 } // namespace gsplines

@@ -304,23 +304,22 @@ FunctionExpression operator*(double _value, FunctionExpression &&_that) {
  *  FunctionExpression Evaluation
  * -----*/
 
-Eigen::MatrixXd eval_mul_functions(
+void eval_mul_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
   // NOTE: the first element of _function_array has larger codomain dimension
 
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array.front()->get_codom_dim());
+  Eigen::MatrixXd temp(_domain_points.size(), 1);
 
-  result = _function_array.front()->value(_domain_points);
+  _function_array.front()->value(_domain_points, _result);
 
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
   for (it = std::next(_function_array.begin(), 1); it != _function_array.end();
        it++) {
-    result =
-        result.array().colwise() * (*it)->value(_domain_points).col(0).array();
+    (*it)->value(_domain_points, temp);
+    _result.array().colwise() *= temp.col(0).array();
   }
-  return result;
 }
 
 // http://

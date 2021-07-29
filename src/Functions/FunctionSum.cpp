@@ -262,18 +262,19 @@ FunctionExpression::operator-(FunctionExpression &&_that) && {
 /* -----
  *  FunctionExpression Evaluation
  * -----*/
-Eigen::MatrixXd eval_sum_functions(
+void eval_sum_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points) {
-  Eigen::MatrixXd result(_domain_points.size(),
-                         _function_array.front()->get_codom_dim());
-  result.setZero();
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
+  Eigen::MatrixXd temp(_domain_points.size(),
+                       _function_array.front()->get_codom_dim());
+  _result.setZero();
   for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
-    result += f->value(_domain_points);
-    std::cout << "result \n " << result << "\n ---\n";
+    f->value(_domain_points, temp);
+    _result += temp;
+    std::cout << "result \n " << _result << "\n ---\n";
     printf("kkk\n");
   }
-  return result;
 }
 
 /* -----

@@ -36,9 +36,10 @@ public:
   std::list<std::unique_ptr<FunctionExpression>> function_array_;
 
 private:
-  typedef Eigen::MatrixXd(Eval_Function_Type)(
+  typedef void(Eval_Function_Type)(
       const std::list<std::unique_ptr<FunctionExpression>> &,
-      const Eigen::Ref<const Eigen::VectorXd> &);
+      const Eigen::Ref<const Eigen::VectorXd> &,
+      Eigen::Ref<Eigen::MatrixXd> _result);
   typedef std::unique_ptr<FunctionExpression>(Deriv_Function_Type)(
       const std::list<std::unique_ptr<FunctionExpression>> &, std::size_t);
 
@@ -76,11 +77,17 @@ public:
     return operator()(_domain_points);
   }
 
-  virtual Eigen::MatrixXd
+  virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                     Eigen::Ref<Eigen::MatrixXd> _result) const {
+
+    eval_operation_(function_array_, _domain_points, _result);
+  };
+
+  Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
-    printf("we are in operator ()\n");
-    fflush(stdout);
-    return eval_operation_(function_array_, _domain_points);
+    Eigen::MatrixXd result(_domain_points.size(), get_codom_dim());
+    value(_domain_points, result);
+    return std::move(result);
   }
 
   virtual std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const {
@@ -150,29 +157,35 @@ public:
 FunctionExpression operator*(double, const FunctionExpression &);
 FunctionExpression operator*(double, FunctionExpression &&);
 
-Eigen::MatrixXd eval_unique_functions(
+void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
-Eigen::MatrixXd eval_single_functions(
+void eval_single_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
-Eigen::MatrixXd eval_sum_functions(
+void eval_sum_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
-Eigen::MatrixXd eval_mul_functions(
+void eval_mul_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
-Eigen::MatrixXd eval_compose_functions(
+void eval_compose_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
-Eigen::MatrixXd eval_concat_functions(
+void eval_concat_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points);
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
 
 std::unique_ptr<FunctionExpression> deriv_single_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
