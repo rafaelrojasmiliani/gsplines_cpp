@@ -17,32 +17,22 @@ ConstFunction::ConstFunction(const ConstFunction &_that)
 
 void Exponential::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                         Eigen::Ref<Eigen::MatrixXd> _result) const {
-  // std::cout << "Exp \n" << Eigen::exp(_domain_points.array()).matrix() <<
-  // '\n';
   _result = Eigen::exp(_domain_points.array()).matrix();
-  // std::cout << "................\n";
 };
 
 void Cos::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                 Eigen::Ref<Eigen::MatrixXd> _result) const {
-  // std::cout << "Cos \n" << Eigen::cos(_domain_points.array()).matrix() <<
-  // '\n';
   _result = Eigen::cos(_domain_points.array()).matrix();
-  // std::cout << "................\n";
 };
 
 std::unique_ptr<FunctionExpression> Cos::deriv(int _deg) const {
-  printf("DERIVATING COS\n\n");
   return std::make_unique<FunctionExpression>(
       ConstFunction(get_domain(), 1, -1.0) * Sin(get_domain()));
 }
 
 void Sin::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                 Eigen::Ref<Eigen::MatrixXd> _result) const {
-  // std::cout << "Sin \n" << Eigen::sin(_domain_points.array()).matrix() <<
-  // '\n';
   _result = Eigen::sin(_domain_points.array()).matrix();
-  // std::cout << "................\n";
 };
 
 std::unique_ptr<FunctionExpression> Sin::deriv(int _deg) const {
@@ -55,8 +45,6 @@ void CanonicPolynomial::value(
 
   _result.setConstant(coefficients_[coefficients_.size() - 1]);
   for (int uici = coefficients_.size() - 2; uici >= 0; uici--) {
-    printf(" --- xxxxx ---- %d \n", uici);
-    fflush(stdout);
     _result.array() *= _domain_points.array();
     _result.array() += coefficients_[uici];
   }
@@ -81,12 +69,6 @@ std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
                                              result(0));
     }
   }
-  printf("--------------------------\n");
-  printf("--------------------------\n");
-  printf("vsize %zu result size %zu\n", vsize, result.size());
-  printf("--------------------------\n");
-  printf("--------------------------\n");
-  fflush(stdout);
   return std::make_unique<CanonicPolynomial>(get_domain(),
                                              std::move(result.head(vsize)));
 } // namespace functions
