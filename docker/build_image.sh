@@ -12,4 +12,3 @@ docker build -t "gsplinespp" \
       -f ./image.dockerfile .
 
 exit 0
-

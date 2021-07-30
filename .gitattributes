@@ -1,0 +1,2 @@
+*.bash text eol=lf
+docker/configfiles/* text eol=lf

@@ -1,2 +1,0 @@
-*.bash text eol=lf
-docker/configfiles/vimrc text eol=lf
