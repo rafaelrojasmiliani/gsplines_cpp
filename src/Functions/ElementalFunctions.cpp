@@ -68,15 +68,28 @@ std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
 
   std::size_t vsize = result.size();
 
+  if ((int)vsize - _deg <= 0) {
+    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
+  }
   for (std::size_t k = 1; k <= _deg; k++) {
     for (std::size_t uici = 0; uici < vsize - 1; uici++) {
-      result(uici) *= ((double)uici + 1.0) * result(uici + 1);
+      result(uici) = ((double)uici + 1.0) * result(uici + 1);
     }
     vsize--;
+    if (vsize == 0) {
+      return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
+                                             result(0));
+    }
   }
+  printf("--------------------------\n");
+  printf("--------------------------\n");
+  printf("vsize %zu result size %zu\n", vsize, result.size());
+  printf("--------------------------\n");
+  printf("--------------------------\n");
+  fflush(stdout);
   return std::make_unique<CanonicPolynomial>(get_domain(),
                                              std::move(result.head(vsize)));
-}
+} // namespace functions
 
 } // namespace functions
 } // namespace gsplines

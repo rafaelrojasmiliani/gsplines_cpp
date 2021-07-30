@@ -224,13 +224,22 @@ class MyTest(unittest.TestCase):
             pol_nom = Polynomial(coeff)
             pol_test = CanonicPolynomial((-1, 1), coeff)
 
+            assert np.linalg.norm(pol_nom(self.time_spam) -
+                                  pol_test(self.time_spam)) < 1.0e-9
             self.error_test(pol_nom, pol_test)
+            print("\n----ok\n")
 
             for _ in range(6):
                 deg = np.random.randint(0, 10)
+                print(" COMPUTE DERIV ", deg)
                 pol_d_nom = pol_nom.deriv(deg)
+                print(" ***COMPUTE DERIV ", deg)
                 pol_d_test = pol_test.deriv(deg)
+                print(" +++COMPUTE DERIV ", deg)
+                assert np.linalg.norm(pol_d_nom(self.time_spam) -
+                                      pol_d_test(self.time_spam)) < 1.0e-9
                 self.error_test(pol_d_nom, pol_d_test)
+                print("\n+++ok\n")
 
     @ debug_on()
     def test(self):
