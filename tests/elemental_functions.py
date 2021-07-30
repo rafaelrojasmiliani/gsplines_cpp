@@ -5,22 +5,23 @@ import pathlib
 import sys
 import unittest
 import numpy as np
-from .tools import debug_on
 import matplotlib.pyplot as plt
 import time
 import functools
 
+from numpy.polynomial.polynomial import Polynomial
 import sympy as sp
+from .tools import debug_on
 
 np.random.seed()
 
 try:
-    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction
+    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction
+    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
 
 
 def sp_identity(_var):
@@ -216,6 +217,21 @@ class MyTest(unittest.TestCase):
 
             self.error_test(f_d_nom_eval, f_d_test)
 
+    @debug_on()
+    def polynomial_test(self):
+        for _ in range(100):
+            coeff = np.random.rand(2+np.random.randint(1, 5))
+            pol_nom = Polynomial(coeff)
+            pol_test = CanonicPolynomial((-1, 1), coeff)
+
+            self.error_test(pol_nom, pol_test)
+
+            for _ in range(6):
+                deg = np.random.randint(0, 10)
+                pol_d_nom = pol_nom.deriv(deg)
+                pol_d_test = pol_test.deriv(deg)
+                self.error_test(pol_d_nom, pol_d_test)
+
     @ debug_on()
     def test(self):
         """ runs all tests"""
@@ -224,6 +240,7 @@ class MyTest(unittest.TestCase):
         self.subs_test()
         self.comp_test()
         self.deriv_test()
+        self.polynomial_test()
 
 
 if __name__ == '__main__':

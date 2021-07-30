@@ -53,20 +53,29 @@ void CanonicPolynomial::value(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) const {
 
-  _result.setConstant(coefficients_.tail(1)(0));
+  _result.setConstant(coefficients_[coefficients_.size() - 1]);
   for (int uici = coefficients_.size() - 2; uici >= 0; uici--) {
+    printf(" --- xxxxx ---- %d \n", uici);
+    fflush(stdout);
     _result.array() *= _domain_points.array();
-    _result.array() += coefficients_.tail(uici)(0);
+    _result.array() += coefficients_[uici];
   }
 }
 
 std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
 
-  Eigen::VectorXd result(coefficients_.size() - 1);
-  for (std::size_t uici = 0; uici < coefficients_.size() - 1; uici++) {
-    result(uici) *= ((double)uici + 1.0) * coefficients_(uici + 1);
+  Eigen::VectorXd result(coefficients_);
+
+  std::size_t vsize = result.size();
+
+  for (std::size_t k = 1; k <= _deg; k++) {
+    for (std::size_t uici = 0; uici < vsize - 1; uici++) {
+      result(uici) *= ((double)uici + 1.0) * result(uici + 1);
+    }
+    vsize--;
   }
-  return std::make_unique<CanonicPolynomial>(get_domain(), std::move(result));
+  return std::make_unique<CanonicPolynomial>(get_domain(),
+                                             std::move(result.head(vsize)));
 }
 
 } // namespace functions

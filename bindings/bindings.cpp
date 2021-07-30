@@ -114,6 +114,13 @@ PYBIND11_MODULE(pygsplines, m) {
            &gsplines::PiecewiseFunction::get_domain_breakpoints)
       .def("get_coeff", &gsplines::PiecewiseFunction::get_coeff);
 
+  py::class_<gsplines::functions::CanonicPolynomial,
+             gsplines::functions::FunctionExpression>(m, "CanonicPolynomial")
+      .def(py::init<std::pair<double, double>,
+                    const Eigen::Ref<const Eigen::VectorXd>>());
+  /* Interpolator
+   * */
+
   py::class_<gsplines::Interpolator>(m, "Interpolator")
       .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>());
 
