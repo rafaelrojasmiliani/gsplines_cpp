@@ -162,8 +162,8 @@ void eval_compose_functions(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
 
-  Eigen::VectorXd domain_points_copy = _domain_points;
-  Eigen::VectorXd temp(_domain_points.size(), 1);
+  Eigen::VectorXd domain_points_copy(_domain_points);
+  Eigen::VectorXd temp(_domain_points.size());
 
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
 

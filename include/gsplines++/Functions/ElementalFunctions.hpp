@@ -190,7 +190,9 @@ public:
       : Function(_domain, 1, "CanonicPolynomial"),
         coefficients_(std::move(_coefficients)) {}
 
-  CanonicPolynomial(const CanonicPolynomial &that) : Function(that) {}
+  CanonicPolynomial(const CanonicPolynomial &that)
+      : Function(that), coefficients_(that.coefficients_) {}
+
   CanonicPolynomial(CanonicPolynomial &&that)
       : Function(std::move(that)),
         coefficients_(std::move(that.coefficients_)) {}
