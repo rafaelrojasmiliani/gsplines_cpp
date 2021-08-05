@@ -5,7 +5,7 @@
 namespace gsplines {
 namespace functions {
 /**  Function Base */
-const double FunctionBase::dom_tollerance_ = 1.0e-5;
+const double FunctionBase::dom_tollerance_ = 1.0e-9;
 
 FunctionBase::FunctionBase(std::pair<double, double> _domain,
                            std::size_t _codom_dim, const std::string &_name)
@@ -31,8 +31,7 @@ bool FunctionBase::same_codomain(const FunctionBase &_f1,
 }
 
 bool FunctionBase::is_point_in_domain(double _domain_point) const {
-  return domain_.first - dom_tollerance_ <= _domain_point and
-         _domain_point <= domain_.second + dom_tollerance_;
+  return domain_.first <= _domain_point and _domain_point < domain_.second;
 }
 
 void FunctionBase::print(std::size_t _indent) const {
