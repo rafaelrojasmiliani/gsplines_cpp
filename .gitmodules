@@ -1,6 +1,3 @@
 [submodule "modules/pybind11"]
 	path = modules/pybind11
 	url = https://github.com/pybind/pybind11.git
-[submodule "modules/gsplines_cpp"]
-	path = modules/gsplines_cpp
-	url = https://github.com/rafaelrojasmiliani/gsplines_cpp.git
