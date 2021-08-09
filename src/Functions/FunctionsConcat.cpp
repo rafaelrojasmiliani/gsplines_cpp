@@ -184,16 +184,20 @@ void eval_concat_functions(
 
     if (f != _function_array.end()) {
       (*f)->value(_domain_points.segment(i, 1), temp);
-      _result.row(i) = temp.row(0);
     } else if (_domain_points[i] <
                _function_array.front()->get_domain().first) {
-      _function_array.front()->value(Eigen::VectorXd::Constant(
-          1, _function_array.front()->get_domain().first));
+      _function_array.front()->value(
+          Eigen::VectorXd::Constant(
+              1, _function_array.front()->get_domain().first),
+          temp);
     } else {
 
-      _function_array.front()->value(Eigen::VectorXd::Constant(
-          1, _function_array.back()->get_domain().second));
+      _function_array.front()->value(
+          Eigen::VectorXd::Constant(
+              1, _function_array.back()->get_domain().second),
+          temp);
     }
+    _result.row(i) = temp.row(0);
   }
 }
 } // namespace functions
