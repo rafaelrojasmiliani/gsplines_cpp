@@ -41,13 +41,20 @@ target_include_directories(
          ${Eigen3_INCLUDE_DIRS} ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
 # set_target_properties(gsplines PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib)
 
-set(PYBIND11_PYTHON_VERSION "3.6")
 link_directories(${PROJECT_SOURCE_DIR}/build)
-add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
+
+if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+    set(PYBIND11_PYTHON_VERSION "3.6")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
+endif ()
+
 pybind11_add_module(pygsplines ${PROJECT_SOURCE_DIR}/bindings/bindings.cpp)
 target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
                                              /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                                         ${ifopt_LIBRARIES} gsplines)
+
+if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_subdirectory(tests)
+endif ()
