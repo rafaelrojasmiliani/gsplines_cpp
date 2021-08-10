@@ -62,7 +62,7 @@ FunctionExpression::FunctionExpression(const FunctionExpression &that)
       deriv_operation_(that.deriv_operation_) {
 
   assert(not(get_type() == SINGLE and get_name() == ""));
-  printf("lllllllll\n");
+  // printf("lllllllll\n");
   for (const std::unique_ptr<FunctionExpression> &f : that.function_array_) {
     function_array_.push_back(f->clone());
   }
@@ -164,7 +164,8 @@ std::string FunctionExpression::type_to_str() const {
 
 void FunctionExpression::print(std::size_t _indent) const {
 
-  printf("%*s- %s  %s\n", 4 * (int)_indent, "", get_name().c_str(),
+  FunctionBase::print(_indent);
+  printf("%*s   %s  %s\n", 4 * (int)_indent, "", "Expression type",
          type_to_str().c_str());
   for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
     f->print(_indent + 1);
@@ -194,10 +195,10 @@ void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
-  printf("EVAL UNIQUE !°°° .............. \n\n");
+  // printf("EVAL UNIQUE !°°° .............. \n\n");
 
   _function_array.front()->value(_domain_points, _result);
-  std::cout << "in eval uniqune ..... \n" << _result << "----\n";
+  // std::cout << "in eval uniqune ..... \n" << _result << "----\n";
 }
 
 } // namespace functions

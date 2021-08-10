@@ -10,11 +10,16 @@ const double FunctionBase::dom_tollerance_ = 1.0e-5;
 FunctionBase::FunctionBase(std::pair<double, double> _domain,
                            std::size_t _codom_dim, const std::string &_name)
     : codom_dim_(_codom_dim), window_(_domain), domain_(_domain), name_(_name) {
+
+  assert(_domain.first <= _domain.second);
 }
 
 FunctionBase::FunctionBase(const FunctionBase &that)
     : codom_dim_(that.codom_dim_), window_(that.window_), domain_(that.domain_),
-      name_(that.name_) {}
+      name_(that.name_) {
+
+  assert(domain_.first <= domain_.second);
+}
 
 bool FunctionBase::same_domain(const FunctionBase &_f1,
                                const FunctionBase &_f2) {
@@ -36,7 +41,9 @@ bool FunctionBase::is_point_in_domain(double _domain_point) const {
 }
 
 void FunctionBase::print(std::size_t _indent) const {
-  printf("%*s- %s\n", 4 * (int)_indent, "", name_.c_str());
+  printf("%*s- %s domain = [ %+11.3lf, %+11.3lf] codomain dim = %zu\n",
+         4 * (int)_indent, "", name_.c_str(), domain_.first, domain_.second,
+         codom_dim_);
 }
 
 } // namespace functions

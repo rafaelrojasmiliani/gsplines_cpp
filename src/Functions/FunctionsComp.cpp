@@ -130,6 +130,7 @@ FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
     } else {
       function_array_.push_front(_that.move_clone());
     }
+    set_domain(_that.get_domain().first, _that.get_domain().second);
     return std::move(*this);
   }
 

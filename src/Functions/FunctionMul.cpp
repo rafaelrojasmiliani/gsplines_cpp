@@ -49,7 +49,7 @@ return_second_or_mim_codom_dim(const FunctionExpression &_f1,
 FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) const & {
 
-  printf("HEEEEEEEEEEE ---- \n ");
+  // printf("HEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -89,7 +89,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) const & {
 
-  printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
+  // printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
