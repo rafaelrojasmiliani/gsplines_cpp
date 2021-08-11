@@ -361,6 +361,9 @@ std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
 
     elem_array.push_back((*it_1)->deriv());
 
+    // printf("multiplication derivative domain = [%+11.3lf %+11.3lf]\n",
+    //       domain.first, domain.second);
+    // fflush(stdout);
     result_array.push_back(std::make_unique<FunctionExpression>(
         domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
         std::move(elem_array)));

@@ -146,9 +146,9 @@ get_interval_function(
       std::find_if(
           _function_array.begin(), _function_array.end(),
           [&_domain_point](const std::unique_ptr<FunctionExpression> &element) {
-            printf("function is %s\n", element->get_name().c_str());
-            printf("domain is %lf, %lf\n", element->get_domain().first,
-                   element->get_domain().second);
+            // printf("function is %s\n", element->get_name().c_str());
+            // printf("domain is %lf, %lf\n", element->get_domain().first,
+            //       element->get_domain().second);
             return element->is_point_in_domain(_domain_point);
           });
 
@@ -187,24 +187,28 @@ void eval_concat_functions(
     std::list<std::unique_ptr<FunctionExpression>>::const_iterator f =
         get_interval_function(_domain_points[i], _function_array);
     std::size_t idx = std::distance(_function_array.begin(), f);
-    printf("++ ----- ++\n");
+    /*printf("++ ----- ++\n");
     printf("++  idx = %zu ++\n", idx);
-    printf("++ ----- ++\n");
+    printf("++ ----- ++\n");*/
 
     if (f != _function_array.end()) {
       (*f)->value(_domain_points.segment(i, 1), temp);
-    } else if (_domain_points[i] <
+    } else if (_domain_points[i] <=
                _function_array.front()->get_domain().first) {
       _function_array.front()->value(
           Eigen::VectorXd::Constant(
               1, _function_array.front()->get_domain().first),
           temp);
-    } else {
+    } else if (_domain_points[i] >=
+               _function_array.back()->get_domain().second) {
 
-      _function_array.front()->value(
+      _function_array.back()->value(
           Eigen::VectorXd::Constant(
               1, _function_array.back()->get_domain().second),
           temp);
+    } else {
+      throw std::invalid_argument(
+          "The functions is not defined for this value");
     }
     _result.row(i) = temp.row(0);
   }
