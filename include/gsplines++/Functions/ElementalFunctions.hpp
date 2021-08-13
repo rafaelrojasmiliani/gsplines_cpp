@@ -46,6 +46,9 @@ public:
   }
 
   std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override {
+    if (_deg == 0) {
+      return std::make_unique<ConstFunction>(*this);
+    }
     return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
   }
 };
@@ -104,7 +107,12 @@ public:
   }
 
   std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
-    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 1.0);
+    if (_deg == 0)
+      return std::make_unique<Identity>(*this);
+    if (_deg == 1)
+      return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
+                                             1.0);
+    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
   }
 };
 

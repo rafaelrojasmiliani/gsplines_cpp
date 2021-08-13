@@ -159,15 +159,22 @@ std::unique_ptr<FunctionExpression> deriv_concat_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     std::size_t _deg) {
 
+  printf("---------- deriv concat function ---------------\n");
+
   std::list<std::unique_ptr<FunctionExpression>> result_array;
 
   for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
     result_array.push_back(f->deriv(_deg));
+    printf("    domain %lf, %lf\n", f->get_domain().first,
+           f->get_domain().second);
+    printf("    -- domain %lf, %lf\n", result_array.back()->get_domain().first,
+           result_array.back()->get_domain().second);
   }
 
   std::pair<double, double> domain{_function_array.front()->get_domain().first,
                                    _function_array.back()->get_domain().second};
 
+  printf("domain %lf, %lf\n", domain.first, domain.second);
   return std::make_unique<FunctionExpression>(
       domain, _function_array.front()->get_codom_dim(),
       FunctionExpression::Type::CONCATENATION, result_array);
