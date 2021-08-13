@@ -43,8 +43,9 @@ int main() {
       gsplines::functions::Identity({0, ti}).concat(pol_t);
   Identity id = Identity({0, ti});
 
-  Eigen::VectorXd interval_1 = Eigen::VectorXd::LinSpaced(10, 0, ti);
-  Eigen::VectorXd interval_2 = Eigen::VectorXd::LinSpaced(10, ti, ti + Ts);
+  Eigen::VectorXd interval_1 = Eigen::VectorXd::LinSpaced(10, 0, ti - 1.0e-5);
+  Eigen::VectorXd interval_2 =
+      Eigen::VectorXd::LinSpaced(10, ti, ti + Ts - 1.0e-5);
 
   Eigen::MatrixXd tau_val_test = tau(interval_2);
   Eigen::MatrixXd tau_val_nom = ((interval_2.array() - ti).matrix() / Ts);
