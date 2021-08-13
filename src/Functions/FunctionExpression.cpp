@@ -165,7 +165,7 @@ std::string FunctionExpression::type_to_str() const {
 void FunctionExpression::print(std::size_t _indent) const {
 
   FunctionBase::print(_indent);
-  printf("%*s   %s  %s\n", 4 * (int)_indent, "", "Expression type",
+  printf("%*s %s  %s\n", 4 * (int)_indent, "", "Expression type",
          type_to_str().c_str());
   for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
     f->print(_indent + 1);
