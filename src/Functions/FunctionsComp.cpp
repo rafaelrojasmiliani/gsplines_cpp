@@ -1,6 +1,7 @@
 
 
 #include <gsplines++/Functions/FunctionExpression.hpp>
+#include <iostream>
 namespace gsplines {
 namespace functions {
 
@@ -130,6 +131,7 @@ FunctionExpression FunctionExpression::compose(FunctionExpression &&_that) && {
     } else {
       function_array_.push_front(_that.move_clone());
     }
+    set_domain(_that.get_domain().first, _that.get_domain().second);
     return std::move(*this);
   }
 
@@ -167,12 +169,17 @@ void eval_compose_functions(
 
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
 
+  // std::cout << "++ Function Composition t0 \n" << _domain_points <<
+  // "\n----\n";
+  // std::cout << _m_test << "\n----\n";
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it_limit =
       std::next(_function_array.end(), -1);
 
   for (it = _function_array.begin(); it != it_limit; it++) {
     (*it)->value(domain_points_copy, temp);
     domain_points_copy = temp;
+    // std::cout << "++ Function Composition actual t \n"
+    //          << domain_points_copy << "\n----\n";
   }
 
   _function_array.back()->value(domain_points_copy, _result);
@@ -187,6 +194,8 @@ std::unique_ptr<FunctionExpression> first_deriv_compose_functions(
   std::list<std::unique_ptr<FunctionExpression>> result_array;
 
   result_array.push_back(_function_array.front()->deriv());
+
+  std::pair<double, double> domain = _function_array.front()->get_domain();
 
   std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
   //
@@ -230,7 +239,6 @@ std::unique_ptr<FunctionExpression> first_deriv_compose_functions(
 
     elem_array.push_back((*it)->deriv());
 
-    std::pair<double, double> domain = (*it)->get_domain();
     std::size_t codom_dim = (*it)->get_codom_dim();
 
     result_array.push_front(std::make_unique<FunctionExpression>(
@@ -239,7 +247,9 @@ std::unique_ptr<FunctionExpression> first_deriv_compose_functions(
   }
 
   std::size_t codom_dim = _function_array.back()->get_codom_dim();
-  std::pair<double, double> domain = _function_array.back()->get_domain();
+  printf("multiplication derivative domain = [%+11.3lf %+11.3lf]\n",
+         domain.first, domain.second);
+  fflush(stdout);
   return std::make_unique<FunctionExpression>(
       domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
       std::move(result_array));
@@ -249,9 +259,9 @@ std::unique_ptr<FunctionExpression> deriv_compose_functions(
     const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
     std::size_t _deg) {
 
-  std::size_t codom_dim = _function_array.back()->get_codom_dim();
-  std::pair<double, double> domain = _function_array.back()->get_domain();
   if (_deg == 0) {
+    std::size_t codom_dim = _function_array.back()->get_codom_dim();
+    std::pair<double, double> domain = _function_array.front()->get_domain();
     return std::make_unique<FunctionExpression>(
         domain, codom_dim, FunctionExpression::Type::COMPOSITION,
         _function_array);

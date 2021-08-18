@@ -49,7 +49,7 @@ return_second_or_mim_codom_dim(const FunctionExpression &_f1,
 FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) const & {
 
-  printf("HEEEEEEEEEEE ---- \n ");
+  // printf("HEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -89,7 +89,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) const & {
 
-  printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
+  // printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -361,6 +361,9 @@ std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
 
     elem_array.push_back((*it_1)->deriv());
 
+    // printf("multiplication derivative domain = [%+11.3lf %+11.3lf]\n",
+    //       domain.first, domain.second);
+    // fflush(stdout);
     result_array.push_back(std::make_unique<FunctionExpression>(
         domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
         std::move(elem_array)));

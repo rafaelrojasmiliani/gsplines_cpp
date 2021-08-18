@@ -52,6 +52,8 @@ void CanonicPolynomial::value(
 
 std::unique_ptr<FunctionExpression> CanonicPolynomial::deriv(int _deg) const {
 
+  if (_deg == 0)
+    return std::make_unique<CanonicPolynomial>(*this);
   Eigen::VectorXd result(coefficients_);
 
   std::size_t vsize = result.size();

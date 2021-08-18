@@ -38,6 +38,12 @@ public:
   virtual void print(std::size_t _indent = 0) const;
 
   const std::string &get_name() const { return name_; }
+
+protected:
+  void set_domain(double _t0, double _t1) {
+    domain_.first = _t0;
+    domain_.second = _t1;
+  }
 };
 
 } // namespace functions
