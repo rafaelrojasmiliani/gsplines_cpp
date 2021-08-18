@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include <gsplines++/Interpolator.hpp>
-#include <gsplines++/PiecewiseFunction.hpp>
-#include <gsplines++/ipopt_interface.hpp>
+#include <gsplines/Interpolator.hpp>
+#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/ipopt_interface.hpp>
 #include <ifopt/ipopt_solver.h>
 #include <ifopt/problem.h>
 

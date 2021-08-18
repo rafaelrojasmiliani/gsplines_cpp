@@ -1,4 +1,4 @@
-#include <gsplines++/ipopt_interface.hpp>
+#include <gsplines/ipopt_interface.hpp>
 
 namespace gsplines_opt {
 

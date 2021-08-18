@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <functional>
-#include <gsplines++/Functions/Function.hpp>
+#include <gsplines/Functions/Function.hpp>
 #include <iostream>
 #include <list>
 #include <memory>

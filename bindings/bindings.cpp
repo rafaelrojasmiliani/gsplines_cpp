@@ -1,7 +1,7 @@
 
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
-#include <gsplines++/Collocation/GaussLobattoPointsWeights.hpp>
+#include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 
 PYBIND11_MODULE(pygsplines, m) {
   py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")

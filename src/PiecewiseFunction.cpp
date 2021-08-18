@@ -1,4 +1,4 @@
-#include <gsplines++/PiecewiseFunction.hpp>
+#include <gsplines/PiecewiseFunction.hpp>
 #include <iostream>
 
 namespace gsplines {

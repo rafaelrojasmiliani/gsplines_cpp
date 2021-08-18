@@ -1,4 +1,4 @@
-#include <gsplines++/Functions/ElementalFunctions.hpp>
+#include <gsplines/Functions/ElementalFunctions.hpp>
 #include <iostream>
 namespace gsplines {
 namespace functions {

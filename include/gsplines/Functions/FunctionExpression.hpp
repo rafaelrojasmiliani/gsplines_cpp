@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <functional>
-#include <gsplines++/Functions/FunctionBase.hpp>
+#include <gsplines/Functions/FunctionBase.hpp>
 #include <list>
 #include <memory>
 #include <utility>

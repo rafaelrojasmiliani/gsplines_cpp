@@ -1,7 +1,7 @@
 
 
 #include <cmath>
-#include <gsplines++/Collocation/GaussLobattoPointsWeights.hpp>
+#include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <tuple>
 #include <vector>
 

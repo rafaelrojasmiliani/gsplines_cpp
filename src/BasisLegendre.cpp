@@ -1,4 +1,4 @@
-#include <gsplines++/BasisLegendre.hpp>
+#include <gsplines/BasisLegendre.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {

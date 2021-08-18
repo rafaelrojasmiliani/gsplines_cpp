@@ -2,7 +2,7 @@
 #ifndef FUNCTIONSMUL_H
 #define FUNCTIONSMUL_H
 
-#include<gsplines++/Functions/Functions.hpp>
+#include<gsplines/Functions/Functions.hpp>
 
 namespace gsplines {
 namespace functions {

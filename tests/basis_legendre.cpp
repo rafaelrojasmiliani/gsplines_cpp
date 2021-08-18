@@ -1,7 +1,7 @@
 
 
 #include <eigen3/Eigen/Core>
-#include <gsplines++/BasisLegendre.hpp>
+#include <gsplines/BasisLegendre.hpp>
 int main() {
 
   gsplines::basis::BasisLegendre basis(6);

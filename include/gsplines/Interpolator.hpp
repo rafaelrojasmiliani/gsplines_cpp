@@ -1,8 +1,8 @@
 #ifndef INTERPOLATOR_H
 #define INTERPOLATOR_H
 #include <eigen3/Eigen/SparseCore>
-#include <gsplines++/Basis.hpp>
-#include <gsplines++/PiecewiseFunction.hpp>
+#include <gsplines/Basis.hpp>
+#include <gsplines/PiecewiseFunction.hpp>
 
 namespace gsplines {
 class Interpolator {

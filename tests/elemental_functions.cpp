@@ -1,6 +1,6 @@
 
 #include <cmath>
-#include <gsplines++/Functions/ElementalFunctions.hpp>
+#include <gsplines/Functions/ElementalFunctions.hpp>
 #include <iostream>
 using namespace gsplines::functions;
 

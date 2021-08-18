@@ -1,7 +1,7 @@
 #ifndef FUNCTIONCOMP_H
 #define FUNCTIONCOMP_H
 
-#include<gsplines++/Functions/Functions.hpp>
+#include<gsplines/Functions/Functions.hpp>
 
 namespace gsplines {
 namespace functions {

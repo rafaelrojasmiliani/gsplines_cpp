@@ -4,7 +4,7 @@
 #define IPOPT_INTERFACE_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
-#include <gsplines++/Sobolev.hpp>
+#include <gsplines/Sobolev.hpp>
 #include <ifopt/constraint_set.h>
 #include <ifopt/cost_term.h>
 #include <ifopt/variable_set.h>

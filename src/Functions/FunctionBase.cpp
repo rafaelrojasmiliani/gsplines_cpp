@@ -1,5 +1,5 @@
 #include <cmath>
-#include <gsplines++/Functions/FunctionBase.hpp>
+#include <gsplines/Functions/FunctionBase.hpp>
 #include <stdexcept>
 
 namespace gsplines {

@@ -1,5 +1,5 @@
 #include <eigen3/Eigen/SparseLU>
-#include <gsplines++/Interpolator.hpp>
+#include <gsplines/Interpolator.hpp>
 #include <iostream>
 
 namespace gsplines {

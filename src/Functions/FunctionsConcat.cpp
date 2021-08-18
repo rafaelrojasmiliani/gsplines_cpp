@@ -1,6 +1,6 @@
 
 #include <algorithm>
-#include <gsplines++/Functions/FunctionExpression.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
 namespace gsplines {
 namespace functions {
 

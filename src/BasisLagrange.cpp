@@ -1,4 +1,4 @@
-#include <gsplines++/BasisLagrange.hpp>
+#include <gsplines/BasisLagrange.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {

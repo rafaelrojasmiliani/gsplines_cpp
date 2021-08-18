@@ -1,7 +1,7 @@
 #ifndef FUNCTIONSCONCAT_H
 #define FUNCTIONSCONCAT_H
 
-#include <gsplines++/Functions/Functions.hpp>
+#include <gsplines/Functions/Functions.hpp>
 namespace gsplines {
 namespace functions {
 class FunctionsConcat : public Function {

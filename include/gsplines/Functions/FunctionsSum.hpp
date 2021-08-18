@@ -1,7 +1,7 @@
 #ifndef FUNCTIONSSUM_H
 #define FUNCTIONSSUM_H
 
-#include <gsplines++/Functions/Functions.hpp>
+#include <gsplines/Functions/Functions.hpp>
 
 namespace gsplines {
 namespace functions {

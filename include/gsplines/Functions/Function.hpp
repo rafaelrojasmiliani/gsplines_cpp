@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <eigen3/Eigen/Core>
-#include <gsplines++/Functions/FunctionExpression.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
 #include <memory>
 #include <utility>
 #include <vector>

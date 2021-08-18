@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <gsplines++/Functions/Functions.hpp>
+#include <gsplines/Functions/Functions.hpp>
 
 namespace gsplines {
 namespace functions {

@@ -1,9 +1,9 @@
 #ifndef IPOPT_SOLVER_H
 #define IPOPT_SOLVER_H
 
-#include <gsplines++/Interpolator.hpp>
-#include <gsplines++/PiecewiseFunction.hpp>
-#include <gsplines++/ipopt_interface.hpp>
+#include <gsplines/Interpolator.hpp>
+#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/ipopt_interface.hpp>
 
 namespace gsplines_opt {
 

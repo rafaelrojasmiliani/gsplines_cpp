@@ -1,6 +1,6 @@
 #include <eigen3/Eigen/Core>
-#include <gsplines++/Functions/ElementalFunctions.hpp>
-#include <gsplines++/Functions/FunctionExpression.hpp>
+#include <gsplines/Functions/ElementalFunctions.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>

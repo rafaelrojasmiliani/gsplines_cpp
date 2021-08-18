@@ -2,8 +2,8 @@
 #define PIECEWISE_FUNCTION_H
 
 #include <eigen3/Eigen/Core>
-#include <gsplines++/Basis.hpp>
-#include <gsplines++/Functions/Function.hpp>
+#include <gsplines/Basis.hpp>
+#include <gsplines/Functions/Function.hpp>
 
 namespace gsplines {
 class SobolevNorm;

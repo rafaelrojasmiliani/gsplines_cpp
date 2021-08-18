@@ -1,4 +1,4 @@
-#include <gsplines++/Basis.hpp>
+#include <gsplines/Basis.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {

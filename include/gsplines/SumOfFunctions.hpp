@@ -1,6 +1,6 @@
 #ifndef SUMOFFUNCTIONS_H
 #define SUMOFFUNCTIONS_H
-#include <gsplines++/Functions/Functions.hpp>
+#include <gsplines/Functions/Functions.hpp>
 namespace gsplines {
 namespace functions {
 class SumOfFunctions : public Function {

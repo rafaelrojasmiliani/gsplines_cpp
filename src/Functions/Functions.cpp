@@ -1,6 +1,6 @@
 
 #include <cmath>
-#include <gsplines++/Functions/Function.hpp>
+#include <gsplines/Functions/Function.hpp>
 #include <stdexcept>
 
 namespace gsplines {
