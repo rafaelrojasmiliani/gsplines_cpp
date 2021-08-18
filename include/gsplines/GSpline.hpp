@@ -29,10 +29,10 @@ private:
 
 public:
   GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
-                    std::size_t _n_intervals, const basis::Basis &_basis,
-                    const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-                    const Eigen::Ref<const Eigen::VectorXd> _tauv,
-                    const std::string &_name = "PieceWiseFunction");
+          std::size_t _n_intervals, const basis::Basis &_basis,
+          const Eigen::Ref<const Eigen::VectorXd> _coefficents,
+          const Eigen::Ref<const Eigen::VectorXd> _tauv,
+          const std::string &_name = "PieceWiseFunction");
 
   GSpline(const GSpline &that);
   GSpline(GSpline &&that);
@@ -55,7 +55,15 @@ public:
   }
 
   virtual ~GSpline();
-  Eigen::VectorXd get_coeff();
+  const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
+
+  const Eigen::VectorXd &get_interval_lengths() const {
+    return domain_interval_lengths_;
+  }
+
+  const basis::Basis &get_basis() const { return *basis_; }
+
+  std::size_t get_number_of_intervals() const { return number_of_intervals_; }
 };
 
 const Eigen::Ref<const Eigen::VectorXd>

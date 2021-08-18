@@ -5,7 +5,7 @@
 
 PYBIND11_MODULE(pygsplines, m) {
   py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")
-      .def(py::init<std::size_t>())
+      .def(py::init<std::size_t, const std::string &>())
       .def("get_dim", &gsplines::basis::Basis::get_dim)
       .def("eval_on_window", &gsplines::basis::Basis::eval_on_window)
       .def("eval_derivative_on_window",
@@ -102,17 +102,16 @@ PYBIND11_MODULE(pygsplines, m) {
       .def(py::init<std::pair<double, double>>())
       .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::GSpline,
-             gsplines::functions::FunctionExpression>(m, "GSpline")
+  py::class_<gsplines::GSpline, gsplines::functions::FunctionExpression>(
+      m, "GSpline")
       .def(py::init<std::pair<double, double>, std::size_t, std::size_t,
                     gsplines::basis::Basis &,
                     const Eigen::Ref<const Eigen::VectorXd>,
                     const Eigen::Ref<const Eigen::VectorXd>>())
       .def("__call__", &gsplines::GSpline::operator())
       .def("get_exec_time", &gsplines::GSpline::get_exec_time)
-      .def("get_domain_breakpoints",
-           &gsplines::GSpline::get_domain_breakpoints)
-      .def("get_coeff", &gsplines::GSpline::get_coeff);
+      .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
+      .def("get_coefficients", &gsplines::GSpline::get_coefficients);
 
   py::class_<gsplines::functions::CanonicPolynomial,
              gsplines::functions::FunctionExpression>(m, "CanonicPolynomial")

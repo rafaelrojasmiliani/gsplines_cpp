@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace gsplines {
@@ -11,18 +12,22 @@ class Basis {
 private:
   size_t dim_;
   Basis &operator=(const Basis &);
+  const std::string name_;
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
 
 public:
-  Basis(std::size_t _dim) : dim_(_dim), derivative_matrix_(dim_, dim_) {}
+  Basis(std::size_t _dim, const std::string &_name)
+      : dim_(_dim), derivative_matrix_(dim_, dim_), name_(_name) {}
   Basis(const Basis &that)
-      : dim_(that.get_dim()), derivative_matrix_(that.derivative_matrix_) {}
+      : dim_(that.get_dim()), derivative_matrix_(that.derivative_matrix_),
+        name_(that.name_) {}
 
   Basis(Basis &&that)
       : dim_(that.get_dim()),
-        derivative_matrix_(std::move(that.derivative_matrix_)) {}
+        derivative_matrix_(std::move(that.derivative_matrix_)),
+        name_(that.name_) {}
 
   virtual ~Basis() {}
   std::size_t get_dim() const { return dim_; }
@@ -48,7 +53,11 @@ public:
 
   virtual std::unique_ptr<Basis> clone() const = 0;
   virtual std::unique_ptr<Basis> move_clone() = 0;
+
+  const std::string &get_name() const { return name_; };
 };
+
+std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);
 } // namespace basis
 } // namespace gsplines
 

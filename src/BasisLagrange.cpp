@@ -8,7 +8,9 @@ namespace basis {
 void gsplines_lagrange_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 
 BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
-    : Basis(_domain_points.size()), domain_points_(_domain_points) {
+    : Basis(_domain_points.size(),
+            "lagrange_" + std::to_string(_domain_points.size())),
+      domain_points_(_domain_points) {
   /*
     derivative_matrix(get_dim(), derivative_matrix_);
 

@@ -8,7 +8,7 @@ namespace basis {
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 
 BasisLegendre::BasisLegendre(std::size_t _dim)
-    : Basis(_dim), buff_next(get_dim()) {
+    : Basis(_dim, "legendre_" + std::to_string(_dim)), buff_next(get_dim()) {
   gsplines_legendre_dmat(_dim, derivative_matrix_);
 
   Eigen::MatrixXd dmat(derivative_matrix_);

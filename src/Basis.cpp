@@ -1,20 +1,20 @@
 #include <gsplines/Basis.hpp>
+#include <gsplines/BasisLagrange.hpp>
+#include <gsplines/BasisLegendre.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {
 
 namespace basis {
-/** Returns
- * \int_-1^1 D*D^T d t
- * */
-void Basis::init_sobolev_ip_matrix(std::vector<double> _weights) {
 
-  sobolev_ip_matrix_ = _weights[0] * Eigen::MatrixXd::Identity(dim_, dim_);
-  Eigen::MatrixXd mat(derivative_matrix_);
-  for (unsigned int i = 1; i < _weights.size(); i++) {
-    sobolev_ip_matrix_ += _weights[i] * mat * mat.transpose();
-    mat *= mat;
-  }
+std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name) {
+  std::string::size_type pos = _basis_name.find("_");
+  if (_basis_name.find("legendre") != std::string::npos)
+    return std::make_unique<BasisLegendre>(
+        std::stoul(_basis_name.substr(pos + 1)));
+
+  throw std::invalid_argument("The basis" + _basis_name + " is unknwon");
+  return nullptr;
 }
 } // namespace basis
 } // namespace gsplines

@@ -39,6 +39,8 @@ public:
 
   const std::string &get_name() const { return name_; }
 
+  double get_domain_length() const { return domain_.second - domain_.first; }
+
 protected:
   void set_domain(double _t0, double _t1) {
     domain_.first = _t0;

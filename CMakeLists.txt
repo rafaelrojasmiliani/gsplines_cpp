@@ -18,6 +18,7 @@ find_package(Eigen3 REQUIRED)
 add_library(
   gsplines SHARED
   ${PROJECT_SOURCE_DIR}/src/BasisLegendre.cpp
+  ${PROJECT_SOURCE_DIR}/src/Basis.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
   ${PROJECT_SOURCE_DIR}/src/Sobolev.cpp
@@ -43,10 +44,10 @@ target_include_directories(
 
 link_directories(${PROJECT_SOURCE_DIR}/build)
 
-if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
-    set(PYBIND11_PYTHON_VERSION "3.6")
-    add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
-endif ()
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+  set(PYBIND11_PYTHON_VERSION "3.6")
+  add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
+endif()
 
 pybind11_add_module(pygsplines ${PROJECT_SOURCE_DIR}/bindings/bindings.cpp)
 target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
@@ -54,7 +55,7 @@ target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                                         ${ifopt_LIBRARIES} gsplines)
 
-if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
-enable_testing()
-add_subdirectory(tests)
-endif ()
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+  enable_testing()
+  add_subdirectory(tests)
+endif()
