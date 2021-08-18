@@ -102,17 +102,17 @@ PYBIND11_MODULE(pygsplines, m) {
       .def(py::init<std::pair<double, double>>())
       .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::PiecewiseFunction,
-             gsplines::functions::FunctionExpression>(m, "PiecewiseFunction")
+  py::class_<gsplines::GSpline,
+             gsplines::functions::FunctionExpression>(m, "GSpline")
       .def(py::init<std::pair<double, double>, std::size_t, std::size_t,
                     gsplines::basis::Basis &,
                     const Eigen::Ref<const Eigen::VectorXd>,
                     const Eigen::Ref<const Eigen::VectorXd>>())
-      .def("__call__", &gsplines::PiecewiseFunction::operator())
-      .def("get_exec_time", &gsplines::PiecewiseFunction::get_exec_time)
+      .def("__call__", &gsplines::GSpline::operator())
+      .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints",
-           &gsplines::PiecewiseFunction::get_domain_breakpoints)
-      .def("get_coeff", &gsplines::PiecewiseFunction::get_coeff);
+           &gsplines::GSpline::get_domain_breakpoints)
+      .def("get_coeff", &gsplines::GSpline::get_coeff);
 
   py::class_<gsplines::functions::CanonicPolynomial,
              gsplines::functions::FunctionExpression>(m, "CanonicPolynomial")

@@ -7,11 +7,11 @@
 
 namespace gsplines {
 class SobolevNorm;
-class PiecewiseFunction : public functions::Function {
+class GSpline : public functions::Function {
   friend SobolevNorm;
 
 private:
-  PiecewiseFunction &operator=(const PiecewiseFunction &);
+  GSpline &operator=(const GSpline &);
   const std::size_t number_of_intervals_;
   std::unique_ptr<basis::Basis> basis_;
   Eigen::VectorXd coefficients_;
@@ -28,14 +28,14 @@ private:
   std::size_t get_interval(double _domain_point) const;
 
 public:
-  PiecewiseFunction(std::pair<double, double> _domain, std::size_t _codom_dim,
+  GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
                     std::size_t _n_intervals, const basis::Basis &_basis,
                     const Eigen::Ref<const Eigen::VectorXd> _coefficents,
                     const Eigen::Ref<const Eigen::VectorXd> _tauv,
                     const std::string &_name = "PieceWiseFunction");
 
-  PiecewiseFunction(const PiecewiseFunction &that);
-  PiecewiseFunction(PiecewiseFunction &&that);
+  GSpline(const GSpline &that);
+  GSpline(GSpline &&that);
 
   std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override;
 
@@ -54,7 +54,7 @@ public:
     return domain_break_points_;
   }
 
-  virtual ~PiecewiseFunction();
+  virtual ~GSpline();
   Eigen::VectorXd get_coeff();
 };
 

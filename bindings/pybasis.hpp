@@ -5,7 +5,7 @@
 #include <gsplines/Basis.hpp>
 #include <gsplines/BasisLegendre.hpp>
 #include <gsplines/Interpolator.hpp>
-#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/GSpline.hpp>
 #include <gsplines/Sobolev.hpp>
 #include <gsplines/ipopt_solver.hpp>
 #include <pybind11/eigen.h>
@@ -63,7 +63,7 @@ class PyInterpolator : public Interpolator {
 public:
   using Interpolator::Interpolator;
 
-  PiecewiseFunction
+  GSpline
   py_interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
                  const py::EigenDRef<const Eigen::MatrixXd> _waypoints) {
     return interpolate(_interval_lengths, _waypoints);

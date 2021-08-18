@@ -1,18 +1,18 @@
-#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/GSpline.hpp>
 #include <iostream>
 
 namespace gsplines {
 
 std::unique_ptr<functions::FunctionExpression>
-PiecewiseFunction::clone() const {
-  return std::make_unique<PiecewiseFunction>(*this);
+GSpline::clone() const {
+  return std::make_unique<GSpline>(*this);
 }
 
-std::unique_ptr<functions::FunctionExpression> PiecewiseFunction::move_clone() {
-  return std::make_unique<PiecewiseFunction>(std::move(*this));
+std::unique_ptr<functions::FunctionExpression> GSpline::move_clone() {
+  return std::make_unique<GSpline>(std::move(*this));
 }
 std::unique_ptr<functions::FunctionExpression>
-PiecewiseFunction::deriv(int _deg) const {
+GSpline::deriv(int _deg) const {
 
   Eigen::VectorXd result_coeff(coefficients_);
   int der_coor;
@@ -34,12 +34,12 @@ PiecewiseFunction::deriv(int _deg) const {
     }
   }
 
-  return std::make_unique<PiecewiseFunction>(
+  return std::make_unique<GSpline>(
       get_domain(), get_codom_dim(), number_of_intervals_, *basis_,
       result_coeff, domain_interval_lengths_, get_name());
 }
 
-PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
+GSpline::GSpline(const GSpline &that)
     : Function(that), number_of_intervals_(that.number_of_intervals_),
       basis_(that.basis_->clone()), coefficients_(that.coefficients_),
       domain_break_points_(that.domain_break_points_),
@@ -52,7 +52,7 @@ PiecewiseFunction::PiecewiseFunction(const PiecewiseFunction &that)
   }
 }
 
-PiecewiseFunction::PiecewiseFunction(PiecewiseFunction &&that)
+GSpline::GSpline(GSpline &&that)
     : Function(std::move(that)),
       number_of_intervals_(that.number_of_intervals_),
       basis_(that.basis_->move_clone()),
@@ -67,7 +67,7 @@ PiecewiseFunction::PiecewiseFunction(PiecewiseFunction &&that)
   }
 }
 
-PiecewiseFunction::PiecewiseFunction(
+GSpline::GSpline(
     std::pair<double, double> _domain, std::size_t _codom_dim,
     std::size_t _n_intervals, const basis::Basis &_basis,
     const Eigen::Ref<const Eigen::VectorXd> _coefficents,
@@ -88,9 +88,9 @@ PiecewiseFunction::PiecewiseFunction(
   }
 }
 
-PiecewiseFunction::~PiecewiseFunction() {}
+GSpline::~GSpline() {}
 
-void PiecewiseFunction::value(
+void GSpline::value(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) const {
 
@@ -114,7 +114,7 @@ void PiecewiseFunction::value(
   }
 }
 
-std::size_t PiecewiseFunction::get_interval(double _domain_point) const {
+std::size_t GSpline::get_interval(double _domain_point) const {
   if (_domain_point <= domain_break_points_(0))
     return 0;
   for (int i = 0; i < number_of_intervals_; i++) {
@@ -127,7 +127,7 @@ std::size_t PiecewiseFunction::get_interval(double _domain_point) const {
 }
 
 Eigen::Ref<const Eigen::VectorXd>
-PiecewiseFunction::coefficient_segment(std::size_t _interval,
+GSpline::coefficient_segment(std::size_t _interval,
                                        std::size_t _component) const {
   int i0 = _interval * basis_->get_dim() * get_codom_dim() +
            basis_->get_dim() * _component;
@@ -135,21 +135,21 @@ PiecewiseFunction::coefficient_segment(std::size_t _interval,
 }
 
 Eigen::Ref<Eigen::VectorXd>
-PiecewiseFunction::coefficient_segment(std::size_t _interval,
+GSpline::coefficient_segment(std::size_t _interval,
                                        std::size_t _component) {
   int i0 = _interval * basis_->get_dim() * get_codom_dim() +
            basis_->get_dim() * _component;
   return coefficients_.segment(i0, basis_->get_dim());
 }
 
-double PiecewiseFunction::interval_to_window(double _domain_point,
+double GSpline::interval_to_window(double _domain_point,
                                              std::size_t _interval) const {
   return 2.0 * (_domain_point - domain_break_points_[_interval]) /
              domain_interval_lengths_[_interval] -
          1.0;
 }
 
-Eigen::VectorXd PiecewiseFunction::get_coeff() { return coefficients_; }
+Eigen::VectorXd GSpline::get_coeff() { return coefficients_; }
 
 const Eigen::Ref<const Eigen::VectorXd>
 get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficients,

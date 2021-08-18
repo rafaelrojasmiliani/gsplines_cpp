@@ -19,7 +19,7 @@ add_library(
   gsplines SHARED
   ${PROJECT_SOURCE_DIR}/src/BasisLegendre.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
-  ${PROJECT_SOURCE_DIR}/src/PiecewiseFunction.cpp
+  ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
   ${PROJECT_SOURCE_DIR}/src/Sobolev.cpp
   ${PROJECT_SOURCE_DIR}/src/ipopt_interface.cpp
   ${PROJECT_SOURCE_DIR}/src/ipopt_solver.cpp

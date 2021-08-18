@@ -5,7 +5,7 @@
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis.hpp>
 #include <gsplines/Interpolator.hpp>
-#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/GSpline.hpp>
 
 #include <memory>
 #include <utility>
@@ -13,7 +13,7 @@
 
 namespace gsplines {
 class SobolevNorm {
-  friend class PiecewiseFunction;
+  friend class GSpline;
 
 private:
   SobolevNorm &operator=(const SobolevNorm &);

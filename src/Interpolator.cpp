@@ -147,14 +147,14 @@ void Interpolator::fill_interpolating_vector(
   }
 }
 
-PiecewiseFunction Interpolator::interpolate(
+GSpline Interpolator::interpolate(
     const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   const Eigen::VectorXd &vector_resut =
       solve_interpolation(_interval_lengths, _waypoints);
 
-  return PiecewiseFunction({0.0, _interval_lengths.sum()}, codom_dim_,
+  return GSpline({0.0, _interval_lengths.sum()}, codom_dim_,
                            num_intervals_, *basis_, vector_resut,
                            _interval_lengths);
 }

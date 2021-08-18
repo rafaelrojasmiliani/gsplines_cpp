@@ -1,5 +1,5 @@
 
-#include <gsplines/PiecewiseFunction.hpp>
+#include <gsplines/GSpline.hpp>
 #include <gsplines/Sobolev.hpp>
 #include <iostream>
 
