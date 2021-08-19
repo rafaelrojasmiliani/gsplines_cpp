@@ -59,3 +59,11 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
+  execute_process(
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different
+      ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json)
+endif()
