@@ -1,8 +1,8 @@
 #ifndef IPOPT_SOLVER_H
 #define IPOPT_SOLVER_H
 
-#include <gsplines/Interpolator.hpp>
 #include <gsplines/GSpline.hpp>
+#include <gsplines/Interpolator.hpp>
 #include <gsplines/ipopt_interface.hpp>
 
 namespace gsplines_opt {
@@ -13,5 +13,19 @@ optimal_sobolev_norm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
                      std::vector<std::pair<std::size_t, double>> _weights,
                      double _exec_time);
 
+gsplines::GSpline
+broken_lines_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+
+gsplines::GSpline
+minimum_acceleration_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+
+gsplines::GSpline
+minimum_jerk_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+
+gsplines::GSpline
+minimum_snap_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+
+gsplines::GSpline
+minimum_crackle_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
 } // namespace gsplines_opt
 #endif /* IPOPT_SOLVER_H */
