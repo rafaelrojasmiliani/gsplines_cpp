@@ -1,7 +1,8 @@
 #include <iostream>
 
-#include <gsplines/Interpolator.hpp>
+#include <gsplines/BasisLegendre.hpp>
 #include <gsplines/GSpline.hpp>
+#include <gsplines/Interpolator.hpp>
 #include <gsplines/ipopt_interface.hpp>
 #include <ifopt/ipopt_solver.h>
 #include <ifopt/problem.h>
@@ -57,5 +58,40 @@ optimal_sobolev_norm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
   std::cout << tauv << '\n';
   // 6. Return solution
   return inter.interpolate(tauv, _waypoints);
+}
+
+gsplines::GSpline
+broken_lines_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(2),
+                              {{1, 1.0}}, _waypoints.rows() - 1);
+}
+
+gsplines::GSpline
+minimum_acceleration_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(4),
+                              {{2, 1.0}}, _waypoints.rows() - 1);
+}
+
+gsplines::GSpline
+minimum_jerk_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(6),
+                              {{3, 1.0}}, _waypoints.rows() - 1);
+}
+
+gsplines::GSpline
+minimum_snap_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(8),
+                              {{4, 1.0}}, _waypoints.rows() - 1);
+}
+
+gsplines::GSpline
+minimum_crackle_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(10),
+                              {{5, 1.0}}, _waypoints.rows() - 1);
 }
 } // namespace gsplines_opt

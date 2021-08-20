@@ -155,7 +155,11 @@ PYBIND11_MODULE(pygsplines, m) {
       .def("deriv_wrt_interval_len",
            &gsplines::SobolevNorm::deriv_wrt_interval_len);
 
-  m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
+  m.def("broken_lines_path", &gsplines_opt::broken_lines_path);
+  m.def("minimum_acceleration_path", &gsplines_opt::minimum_acceleration_path);
+  m.def("minimum_jerk_path", &gsplines_opt::minimum_jerk_path);
+  m.def("minimum_snap_path", &gsplines_opt::minimum_snap_path);
+  m.def("minimum_crackle_path", &gsplines_opt::minimum_crackle_path);
 
   m.def("legendre_gauss_lobatto_points_weights",
         &gsplines::collocation::legendre_gauss_lobatto_points_and_weights);
