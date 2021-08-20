@@ -111,6 +111,9 @@ PYBIND11_MODULE(pygsplines, m) {
       .def("__call__", &gsplines::GSpline::operator())
       .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
+      .def("get_waypoints", &gsplines::GSpline::get_waypoints)
+      .def("linear_scaling_new_execution_time",
+           &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);
 
   py::class_<gsplines::functions::CanonicPolynomial,
