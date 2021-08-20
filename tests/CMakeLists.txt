@@ -18,8 +18,14 @@ endforeach()
 foreach(file_path ${test_py_list})
   get_filename_component(barename ${file_path} NAME)
   string(REPLACE ".py" "_py" new_name ${barename})
+  string(REPLACE ".py" "" mod_name ${barename})
   add_test(
     NAME ${new_name}
-    COMMAND python3 -m unittest ${NEw_name}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+    COMMAND python3 -m unittest tests.${mod_name}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  set_tests_properties(
+    ${new_name}
+    PROPERTIES ENVIRONMENT
+               PYTHONPATH=${PROJECT_SOURCE_DIR}/build:$ENV{PYTHONPATH})
+
 endforeach()
