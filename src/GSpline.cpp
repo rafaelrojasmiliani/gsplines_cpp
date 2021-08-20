@@ -43,7 +43,7 @@ GSpline::GSpline(const GSpline &that)
       basis_(that.basis_->clone()), coefficients_(that.coefficients_),
       domain_break_points_(that.domain_break_points_),
       domain_interval_lengths_(that.domain_interval_lengths_),
-      waypoints_(that.waypoints_) {
+      waypoints_(that.waypoints_), basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() !=
       number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
@@ -59,7 +59,7 @@ GSpline::GSpline(GSpline &&that)
       coefficients_(std::move(that.coefficients_)),
       domain_break_points_(std::move(that.domain_break_points_)),
       domain_interval_lengths_(std::move(that.domain_interval_lengths_)),
-      waypoints_(std::move(that.waypoints_)) {
+      waypoints_(std::move(that.waypoints_)), basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() !=
       number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
@@ -76,7 +76,8 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
     : Function(_domain, _codom_dim, _name), number_of_intervals_(_n_intervals),
       basis_(_basis.clone()), coefficients_(_coefficents),
       domain_break_points_(_n_intervals + 1), domain_interval_lengths_(_tauv),
-      waypoints_(_n_intervals + 1, _codom_dim) {
+      waypoints_(_n_intervals + 1, _codom_dim),
+      basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() != _n_intervals * basis_->get_dim() * _codom_dim) {
     printf("Error: The number of coefficients is incorrect\n");
@@ -103,16 +104,14 @@ void GSpline::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
 
   int i, j;
 
-  static Eigen::VectorXd basis_buffer(basis_->get_dim());
-
   for (i = 0; i < result_cols; i++) {
     current_interval = get_interval(_domain_points(i));
     s = interval_to_window(_domain_points(i), current_interval);
     tau = domain_interval_lengths_(current_interval);
-    basis_->eval_on_window(s, tau, basis_buffer);
+    basis_->eval_on_window(s, tau, basis_buffer_);
     for (j = 0; j < get_codom_dim(); j++) {
       _result(i, j) =
-          coefficient_segment(current_interval, j).adjoint() * basis_buffer;
+          coefficient_segment(current_interval, j).adjoint() * basis_buffer_;
     }
   }
 }

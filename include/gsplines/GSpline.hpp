@@ -18,6 +18,7 @@ private:
   Eigen::VectorXd domain_break_points_;
   Eigen::VectorXd domain_interval_lengths_;
   Eigen::MatrixXd waypoints_;
+  mutable Eigen::VectorXd basis_buffer_;
   double interval_to_window(double _t, std::size_t _interval) const;
 
   Eigen::Ref<const Eigen::VectorXd>
