@@ -3,7 +3,7 @@
 #include "pyfunctions.hpp"
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 
-PYBIND11_MODULE(pygsplines, m) {
+PYBIND11_MODULE(gsplines, m) {
   py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")
       .def(py::init<std::size_t, const std::string &>())
       .def("get_dim", &gsplines::basis::Basis::get_dim)
@@ -165,5 +165,5 @@ PYBIND11_MODULE(pygsplines, m) {
         &gsplines::collocation::legendre_gauss_lobatto_points_and_weights);
   m.def("q_and_evaluation", &gsplines::collocation::q_and_evaluation);
   // Operations
-  // m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
+  m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
 }
