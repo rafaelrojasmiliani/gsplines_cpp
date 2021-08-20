@@ -53,7 +53,6 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
         top=0.95,
         wspace=0.25,
         hspace=0.15)
-    plt.show()
 
 
 class MyTest(unittest.TestCase):
@@ -70,9 +69,13 @@ class MyTest(unittest.TestCase):
         waypoints = np.random.rand(intervals+1, dim)*6.14
         exec_time = intervals
         res = optimal_sobolev_norm(waypoints, basis, [(1, 1)], exec_time)
-        q3 = minimum_jerk_path(waypoints)
+        q_array = [res, broken_lines_path(waypoints),
+                   minimum_acceleration_path(waypoints),
+                   minimum_jerk_path(waypoints)]
 
-        show_piecewisefunction(res, 5, 0.001)
+        for q in q_array:
+            show_piecewisefunction(q, 5, 0.001)
+        plt.show()
 
 
 if __name__ == '__main__':

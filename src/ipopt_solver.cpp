@@ -64,34 +64,39 @@ gsplines::GSpline
 broken_lines_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(2),
-                              {{1, 1.0}}, _waypoints.rows() - 1);
+                              {{1, 1.0}}, _waypoints.rows() - 1)
+      .linear_scaling_new_execution_time(1.0);
 }
 
 gsplines::GSpline
 minimum_acceleration_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(4),
-                              {{2, 1.0}}, _waypoints.rows() - 1);
+                              {{2, 2.0}}, _waypoints.rows() - 1)
+      .linear_scaling_new_execution_time(1.0);
 }
 
 gsplines::GSpline
 minimum_jerk_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(6),
-                              {{3, 1.0}}, _waypoints.rows() - 1);
+                              {{3, 3.0}}, _waypoints.rows() - 1)
+      .linear_scaling_new_execution_time(1.0);
 }
 
 gsplines::GSpline
 minimum_snap_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(8),
-                              {{4, 1.0}}, _waypoints.rows() - 1);
+                              {{4, 1.0}}, _waypoints.rows() - 1)
+      .linear_scaling_new_execution_time(1.0);
 }
 
 gsplines::GSpline
 minimum_crackle_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(10),
-                              {{5, 1.0}}, _waypoints.rows() - 1);
+                              {{5, 1.0}}, _waypoints.rows() - 1)
+      .linear_scaling_new_execution_time(1.0);
 }
 } // namespace gsplines_opt
