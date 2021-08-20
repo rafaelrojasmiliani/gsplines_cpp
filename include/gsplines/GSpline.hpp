@@ -17,6 +17,7 @@ private:
   Eigen::VectorXd coefficients_;
   Eigen::VectorXd domain_break_points_;
   Eigen::VectorXd domain_interval_lengths_;
+  Eigen::MatrixXd waypoints_;
   double interval_to_window(double _t, std::size_t _interval) const;
 
   Eigen::Ref<const Eigen::VectorXd>
@@ -53,6 +54,9 @@ public:
   const Eigen::Ref<const Eigen::VectorXd> get_domain_breakpoints() {
     return domain_break_points_;
   }
+  const Eigen::Ref<const Eigen::MatrixXd> get_waypoints() const {
+    return waypoints_;
+  }
 
   virtual ~GSpline();
   const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
@@ -64,6 +68,8 @@ public:
   const basis::Basis &get_basis() const { return *basis_; }
 
   std::size_t get_number_of_intervals() const { return number_of_intervals_; }
+
+  GSpline linear_scaling_new_execution_time(double _new_exec_time) const;
 };
 
 const Eigen::Ref<const Eigen::VectorXd>
