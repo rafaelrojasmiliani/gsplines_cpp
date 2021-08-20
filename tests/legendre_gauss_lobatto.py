@@ -16,12 +16,12 @@ import sympy as sp
 np.random.seed()
 
 try:
-    from pygsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
+    from gsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
+    from gsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
 
 
 class MyTest(unittest.TestCase):

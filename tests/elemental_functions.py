@@ -16,12 +16,12 @@ from .tools import debug_on
 np.random.seed()
 
 try:
-    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
+    from gsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
+    from gsplines import Sin, Cos, Exponential, Identity, ConstFunction, CanonicPolynomial
 
 
 def sp_identity(_var):

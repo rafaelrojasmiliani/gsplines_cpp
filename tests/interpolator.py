@@ -8,14 +8,14 @@ from numpy.polynomial.legendre import Legendre
 import matplotlib.pyplot as plt
 import time
 try:
-    from pygsplines import BasisLegendre
-    from pygsplines import PyInterpolator as Interpolator
+    from gsplines import BasisLegendre
+    from gsplines import PyInterpolator as Interpolator
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import BasisLegendre
-    from pygsplines import PyInterpolator as Interpolator
+    from gsplines import BasisLegendre
+    from gsplines import PyInterpolator as Interpolator
 
 
 def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title=''):

@@ -55,6 +55,8 @@ target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
 target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
                                         ${ifopt_LIBRARIES} gsplines)
 
+set_target_properties(pygsplines PROPERTIES OUTPUT_NAME gsplines)
+
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   enable_testing()
   add_subdirectory(tests)

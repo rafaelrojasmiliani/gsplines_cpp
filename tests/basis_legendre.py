@@ -6,12 +6,12 @@ import numpy as np
 from numpy.polynomial.legendre import Legendre
 from .tools import debug_on
 try:
-    from pygsplines import BasisLegendre
+    from gsplines import BasisLegendre
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import BasisLegendre
+    from gsplines import BasisLegendre
 
 
 class MyTest(unittest.TestCase):

@@ -8,15 +8,20 @@ from numpy.polynomial.legendre import Legendre
 import matplotlib.pyplot as plt
 import time
 try:
-    from pygsplines import BasisLegendre
-    from pygsplines import PyInterpolator as Interpolator
+    from gsplines import BasisLegendre
+    from gsplines import PyInterpolator as Interpolator
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import BasisLegendre
-    from pygsplines import PyInterpolator as Interpolator
-    from pygsplines import optimal_sobolev_norm
+    from gsplines import BasisLegendre
+    from gsplines import PyInterpolator as Interpolator
+    from gsplines import optimal_sobolev_norm
+    from gsplines import broken_lines_path
+    from gsplines import minimum_acceleration_path
+    from gsplines import minimum_jerk_path
+    from gsplines import minimum_snap_path
+    from gsplines import minimum_crackle_path
 
 
 def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
@@ -65,6 +70,7 @@ class MyTest(unittest.TestCase):
         waypoints = np.random.rand(intervals+1, dim)*6.14
         exec_time = intervals
         res = optimal_sobolev_norm(waypoints, basis, [(1, 1)], exec_time)
+        q3 = minimum_jerk_path(waypoints)
 
         show_piecewisefunction(res, 5, 0.001)
 

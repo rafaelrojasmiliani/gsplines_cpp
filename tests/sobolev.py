@@ -10,16 +10,16 @@ import pathlib
 from itertools import tee
 
 try:
-    from pygsplines import BasisLegendre
-    from pygsplines import PyInterpolator as Interpolator
-    from pygsplines import SobolevNorm
+    from gsplines import BasisLegendre
+    from gsplines import PyInterpolator as Interpolator
+    from gsplines import SobolevNorm
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from pygsplines import BasisLegendre
-    from pygsplines import SobolevNorm
-    from pygsplines import PyInterpolator as Interpolator
+    from gsplines import BasisLegendre
+    from gsplines import SobolevNorm
+    from gsplines import PyInterpolator as Interpolator
 
 
 def pairwise(iterable):
