@@ -112,6 +112,7 @@ PYBIND11_MODULE(gsplines, m) {
       .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
       .def("get_waypoints", &gsplines::GSpline::get_waypoints)
+      .def("get_basis", &gsplines::GSpline::get_basis)
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);
@@ -166,4 +167,5 @@ PYBIND11_MODULE(gsplines, m) {
   m.def("q_and_evaluation", &gsplines::collocation::q_and_evaluation);
   // Operations
   m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
+  m.def("string_to_basis", gsplines::basis::string_to_basis);
 }
