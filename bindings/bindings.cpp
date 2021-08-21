@@ -7,6 +7,7 @@ PYBIND11_MODULE(gsplines, m) {
   py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")
       .def(py::init<std::size_t, const std::string &>())
       .def("get_dim", &gsplines::basis::Basis::get_dim)
+      .def("get_name", &gsplines::basis::Basis::get_name)
       .def("eval_on_window", &gsplines::basis::Basis::eval_on_window)
       .def("eval_derivative_on_window",
            &gsplines::basis::Basis::eval_derivative_on_window)
@@ -111,8 +112,10 @@ PYBIND11_MODULE(gsplines, m) {
       .def("__call__", &gsplines::GSpline::operator())
       .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
+      .def("get_number_of_intervals", &gsplines::GSpline::get_number_of_intervals)
+      .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
       .def("get_waypoints", &gsplines::GSpline::get_waypoints)
-      .def("get_basis", &gsplines::GSpline::get_basis)
+      .def("get_basis_name", &gsplines::GSpline::get_basis_name)
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);

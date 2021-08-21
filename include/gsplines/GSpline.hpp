@@ -66,7 +66,7 @@ public:
     return domain_interval_lengths_;
   }
 
-  const basis::Basis &get_basis() const { return *basis_; }
+  const std::string &get_basis_name() const { return basis_->get_name(); }
 
   std::size_t get_number_of_intervals() const { return number_of_intervals_; }
 

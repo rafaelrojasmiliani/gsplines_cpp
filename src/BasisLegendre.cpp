@@ -36,7 +36,6 @@ BasisLegendre::BasisLegendre(BasisLegendre &&that)
       derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)) {
 }
 
-BasisLegendre::~BasisLegendre() {}
 
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
