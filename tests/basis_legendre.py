@@ -15,11 +15,11 @@ except ImportError:
 
 
 class MyTest(unittest.TestCase):
-    @debug_on()
+    # @debug_on()
     def __init__(self, *args, **kwargs):
         super(MyTest, self).__init__(*args, **kwargs)
 
-    @debug_on()
+    # @debug_on()
     def test(self):
         n = 2*np.random.randint(1, 8)
         basis = BasisLegendre(n)
@@ -34,17 +34,23 @@ class MyTest(unittest.TestCase):
 
             basis.eval_on_window(tval, 2.0, vec)
             for j in range(n):
-                assert abs(basis_nominal[j](tval)-vec[j]) < 1.0e-7
+                self.assertLess(abs(basis_nominal[j](
+                    tval)-vec[j]), 1.0e-7, "Error on value")
 
         for d in range(1, n):
-            print('n={:d} d={:d}'.format(n, d))
             basis.eval_derivative_on_window(tval, 2.0, d, vec)
             for j in range(n):
-                if abs(basis_nominal[j].deriv(d)(tval)-vec[j]) > 1.0e-7:
-                    print([basis_nominal[m].deriv(d)(tval)
-                          for m in range(0, n)])
-                    print([vec[m]
-                          for m in range(0, n)])
+                nom_val = basis_nominal[j].deriv(d)(
+                    tval)
+                test_val = vec[j]
+
+                if abs(nom_val) < 1.0e-5:
+                    self.assertTrue(abs(nom_val - test_val) <
+                                    1.0e-7, 'error on derivative')
+                else:
+                    self.assertTrue(abs(nom_val - test_val) /
+                                    abs(nom_val) < 1.0e-7,
+                                    'error on derivative')
 
 
 if __name__ == '__main__':

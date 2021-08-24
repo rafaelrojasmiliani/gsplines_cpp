@@ -129,7 +129,8 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
 
 class MyTest(unittest.TestCase):
     """ Test elemental function and operations"""
-    @debug_on()
+    # @debug_on()
+
     def __init__(self, *args, **kwargs):
         unittest.TestCase.__init__(self, *args, **kwargs)
         np.random.seed()
@@ -140,21 +141,21 @@ class MyTest(unittest.TestCase):
         self.const_function = functools.partial(ConstFunction, (-1, 1))
         self.time_spam = np.reshape(np.arange(-1, 1, 0.2), (-1, 1))
 
-    @debug_on()
+    # @debug_on()
     def error_test(self, _f_nom, _f_test):
         """ calls np.linalg.norm """
         nom_val = _f_nom(self.time_spam)
         nom_val_max = np.abs(np.max(nom_val))
         if nom_val_max > 1.0e-9:
-            assert(np.linalg.norm(
+            self.assertTrue(np.linalg.norm(
                 _f_test(self.time_spam) -
                 nom_val)/nom_val_max < 1.0e-9)
         else:
-            assert(np.linalg.norm(
+            self.assertTrue(np.linalg.norm(
                 _f_test(self.time_spam) -
                 nom_val) < 1.0e-9)
 
-    @debug_on()
+    # @ debug_on()
     def add_test(self):
         """ test sum """
 
@@ -165,7 +166,7 @@ class MyTest(unittest.TestCase):
 
         self.error_test(f_nom, f_test)
 
-    @debug_on()
+    # @ debug_on()
     def mul_test(self):
         """ TEst multiplication """
 
@@ -176,7 +177,7 @@ class MyTest(unittest.TestCase):
 
         self.error_test(f_nom, f_test)
 
-    @debug_on()
+    # @ debug_on()
     def subs_test(self):
         """ TEst multiplication """
 
@@ -187,7 +188,7 @@ class MyTest(unittest.TestCase):
 
         self.error_test(f_nom, f_test)
 
-    @debug_on()
+    # @ debug_on()
     def comp_test(self):
         """ TEst multiplication """
 
@@ -198,7 +199,7 @@ class MyTest(unittest.TestCase):
 
         self.error_test(f_nom, f_test)
 
-    @debug_on()
+    # @ debug_on()
     def deriv_test(self):
         """ TEst multiplication """
 
@@ -217,15 +218,15 @@ class MyTest(unittest.TestCase):
 
             self.error_test(f_d_nom_eval, f_d_test)
 
-    @debug_on()
+    # @ debug_on()
     def polynomial_test(self):
         for _ in range(100):
             coeff = np.random.rand(2+np.random.randint(1, 5))
             pol_nom = Polynomial(coeff)
             pol_test = CanonicPolynomial((-1, 1), coeff)
 
-            assert np.linalg.norm(pol_nom(self.time_spam) -
-                                  pol_test(self.time_spam)) < 1.0e-9
+            self.assertTrue(np.linalg.norm(pol_nom(self.time_spam) -
+                                           pol_test(self.time_spam)) < 1.0e-9)
             self.error_test(pol_nom, pol_test)
             print("\n----ok\n")
 
@@ -236,12 +237,13 @@ class MyTest(unittest.TestCase):
                 print(" ***COMPUTE DERIV ", deg)
                 pol_d_test = pol_test.deriv(deg)
                 print(" +++COMPUTE DERIV ", deg)
-                assert np.linalg.norm(pol_d_nom(self.time_spam) -
-                                      pol_d_test(self.time_spam)) < 1.0e-9
+                self.assertTrue(
+                    np.linalg.norm(pol_d_nom(self.time_spam) -
+                                   pol_d_test(self.time_spam)) < 1.0e-9)
                 self.error_test(pol_d_nom, pol_d_test)
                 print("\n+++ok\n")
 
-    @ debug_on()
+    # @ debug_on()
     def test(self):
         """ runs all tests"""
         self.add_test()

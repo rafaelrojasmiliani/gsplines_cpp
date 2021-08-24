@@ -54,12 +54,12 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title=''):
 
 
 class MyTest(unittest.TestCase):
-    @debug_on()
+    # @debug_on()
     def __init__(self, *args, **kwargs):
         super(MyTest, self).__init__(*args, **kwargs)
         np.random.seed()
 
-    @debug_on()
+    # @debug_on()
     def compute_gspline_test(self):
         """ Test the computation of an interpolating gpline """
         basis = BasisLegendre(6)
@@ -74,7 +74,7 @@ class MyTest(unittest.TestCase):
 
         show_piecewisefunction(res, 5, 0.10, waypoints)
 
-#    @debug_on()
+#    #@debug_on()
 #    def interpolation_test_computation_time(self):
 #        """ copmutes the time it takes to interpolate """
 #        basis = BasisLegendre(6)
@@ -94,7 +94,7 @@ class MyTest(unittest.TestCase):
 #
 #        print('mean time = ', tmean/iters)
 
-    @debug_on()
+    # @debug_on()
     def derivative_y(self):
         ''' Compare the numerical derivate of y w.r.t tau with the nominal one
         '''
@@ -148,12 +148,12 @@ class MyTest(unittest.TestCase):
                 if ep > errp:
                     errp = ep
 
-                assert ep < 5.0e-2, '''
+                self.assertTrue(ep < 5.0e-2, '''
                 error on dydtau = {:10.7e}
                 relative error  = {:10.7e}
                 value of dydtau test = {:10.7e}
                 value of dydtau nom = {:10.7e}
-                '''.format(e, ep, dydtauiTest[eidx], dydtauNom[eidx])
+                '''.format(e, ep, dydtauiTest[eidx], dydtauNom[eidx]))
 
     def test(self):
 

@@ -32,11 +32,12 @@ install_vim_plugins(){
     git clone https://github.com/tpope/vim-fugitive.git /etc/vim/bundle/vim-fugitive
     git clone https://github.com/sukima/xmledit.git /etc/vim/bundle/xmledit
     git clone https://github.com/puremourning/vimspector.git /etc/vim/bundle/vimspector
-    git clone https://github.com/preservim/nerdtree.git /etc/vim/nerdtree
-    git clone https://github.com/Xuyuanp/nerdtree-git-plugin.git /etc/vim/nerdtree-git-plugin
-    cd /etc/vim/bundle/YouCompleteMe && git submodule update --init --recursive && python3 install.py --clang-completer --ts-completer --java-completer --cs-completer
+    git clone https://github.com/preservim/nerdtree.git /etc/vim/bundle/nerdtree
+    git clone https://github.com/Xuyuanp/nerdtree-git-plugin.git /etc/vim/bundle/nerdtree-git-plugin
+    cd /etc/vim/bundle/YouCompleteMe && git submodule update --init --recursive && python3 install.py --clang-completer
     cd /etc/vim/bundle/vimspector && python3 install_gadget.py --enable-c --enable-cpp #--enable-python
-    git clone https://github.com/lfv89/vim-interestingwords.git /etv/vim/vim-interestingwords
+    git clone https://github.com/lfv89/vim-interestingwords.git /etv/vim/bundle/vim-interestingwords
+    git clone https://github.com/kkoomen/vim-doge.git /etc/vim/bundle/vim-doge
 }
 
 main(){
