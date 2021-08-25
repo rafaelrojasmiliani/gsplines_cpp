@@ -56,12 +56,12 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
 
 
 class MyTest(unittest.TestCase):
-    @debug_on()
+    # @debug_on()
     def __init__(self, *args, **kwargs):
         super(MyTest, self).__init__(*args, **kwargs)
         np.random.seed()
 
-    @debug_on()
+    # @debug_on()
     def test(self):
         basis = BasisLegendre(4)
         dim = 7  # np.random.randint(1, 10)
