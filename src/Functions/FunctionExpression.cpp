@@ -16,27 +16,16 @@ std::size_t FunctionExpression::num_call_move_constructor_ = 0;
 
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const std::string &_name)
-    : FunctionBase(_domain, _codom_dim, _name), type_(_type), function_array_(),
-      eval_operation_(nullptr), deriv_operation_(nullptr) {
+    : FunctionInheritanceHelper(_domain, _codom_dim, _name), type_(_type),
+      function_array_(), eval_operation_(nullptr), deriv_operation_(nullptr) {
 
-  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
+  for (const std::unique_ptr<FunctionBase> &f : _function_array) {
     function_array_.push_back(f->clone());
   }
 
-  assert(not(get_type() == SINGLE and get_name() == ""));
-  initialize();
-
-  num_call_constructor_++;
-}
-
-FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
-                                       std::size_t _codom_dim)
-    : FunctionBase(_domain, _codom_dim, "DUMMY"), type_(SINGLE),
-      function_array_(), eval_operation_(nullptr), deriv_operation_(nullptr) {
-
-  assert(not(get_type() == SINGLE and get_name() == ""));
+  assert(not(get_type() == UNIQUE and get_name() == ""));
   initialize();
 
   num_call_constructor_++;
@@ -44,33 +33,33 @@ FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
 
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
-    std::list<std::unique_ptr<FunctionExpression>> &&_function_array,
+    std::list<std::unique_ptr<FunctionBase>> &&_function_array,
     const std::string &_name)
-    : FunctionBase(_domain, _codom_dim, _name), type_(_type),
+    : FunctionInheritanceHelper(_domain, _codom_dim, _name), type_(_type),
       eval_operation_(nullptr), deriv_operation_(nullptr),
       function_array_(std::move(_function_array)) {
 
-  assert(not(get_type() == SINGLE and get_name() == ""));
+  assert(not(get_type() == UNIQUE and get_name() == ""));
   initialize();
 
   num_call_simple_constructor_++;
 }
 
 FunctionExpression::FunctionExpression(const FunctionExpression &that)
-    : FunctionBase(that), type_(that.type_),
+    : FunctionInheritanceHelper(that), type_(that.type_),
       eval_operation_(that.eval_operation_),
       deriv_operation_(that.deriv_operation_) {
 
-  assert(not(get_type() == SINGLE and get_name() == ""));
+  assert(not(get_type() == UNIQUE and get_name() == ""));
   // printf("lllllllll\n");
-  for (const std::unique_ptr<FunctionExpression> &f : that.function_array_) {
+  for (const std::unique_ptr<FunctionBase> &f : that.function_array_) {
     function_array_.push_back(f->clone());
   }
   num_call_copy_constructor_++;
 }
 
 FunctionExpression::FunctionExpression(FunctionExpression &&that)
-    : FunctionBase(that), type_(that.type_),
+    : FunctionInheritanceHelper(that), type_(that.type_),
       eval_operation_(that.eval_operation_),
       deriv_operation_(that.deriv_operation_),
       function_array_(std::move(that.function_array_)) {
@@ -123,11 +112,6 @@ void FunctionExpression::initialize() {
     deriv_operation_ = deriv_concat_functions;
     break;
 
-  case SINGLE:
-    eval_operation_ = eval_single_functions;
-    deriv_operation_ = deriv_single_functions;
-    break;
-
   case UNIQUE:
     eval_operation_ = eval_unique_functions;
     deriv_operation_ = deriv_unique_functions;
@@ -152,8 +136,6 @@ std::string FunctionExpression::type_to_str() const {
 
   case CONCATENATION:
     return "CONCATENATION";
-  case SINGLE:
-    return "SINGLE: " + get_name();
   case UNIQUE:
     return "UNIQUE: " + get_name();
   default:
@@ -167,32 +149,27 @@ void FunctionExpression::print(std::size_t _indent) const {
   FunctionBase::print(_indent);
   printf("%*s %s  %s\n", 4 * (int)_indent, "", "Expression type",
          type_to_str().c_str());
-  for (const std::unique_ptr<FunctionExpression> &f : function_array_) {
+  for (const std::unique_ptr<FunctionBase> &f : function_array_) {
     f->print(_indent + 1);
   }
 }
 
-std::unique_ptr<FunctionExpression> deriv_single_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    std::size_t _deg) {
-  throw std::invalid_argument("Single functions can't implement this method");
-}
-
-void eval_single_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
-    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-    Eigen::Ref<Eigen::MatrixXd> _result) {
-  throw std::invalid_argument("Single functions can't implement this method");
-}
-
 std::unique_ptr<FunctionExpression> deriv_unique_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
-  return _function_array.front()->deriv(_deg);
+
+  std::pair<double, double> domain = _function_array.front()->get_domain();
+  std::size_t codom_dim = _function_array.front()->get_codom_dim();
+  std::list<std::unique_ptr<FunctionBase>> result_array;
+  result_array.push_back(_function_array.front()->deriv(_deg));
+
+  return std::make_unique<FunctionExpression>(domain, codom_dim,
+                                              FunctionExpression::Type::UNIQUE,
+                                              std::move(result_array));
 }
 
 void eval_unique_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
   // printf("EVAL UNIQUE !°°° .............. \n\n");

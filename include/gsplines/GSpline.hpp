@@ -7,7 +7,9 @@
 
 namespace gsplines {
 class SobolevNorm;
-class GSpline : public functions::Function {
+class GSpline
+    : public functions::FunctionInheritanceHelper<GSpline, functions::Function,
+                                                  GSpline> {
   friend SobolevNorm;
 
 private:
@@ -39,12 +41,6 @@ public:
   GSpline(const GSpline &that);
   GSpline(GSpline &&that);
 
-  std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override;
-
-  std::unique_ptr<FunctionExpression> clone() const override;
-
-  std::unique_ptr<FunctionExpression> move_clone() override;
-
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
              Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
@@ -59,7 +55,7 @@ public:
     return waypoints_;
   }
 
-  virtual ~GSpline();
+  virtual ~GSpline() = default;
   const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
 
   const Eigen::VectorXd &get_interval_lengths() const {
@@ -71,6 +67,9 @@ public:
   std::size_t get_number_of_intervals() const { return number_of_intervals_; }
 
   GSpline linear_scaling_new_execution_time(double _new_exec_time) const;
+
+protected:
+  GSpline *deriv_impl(std::size_t _deg = 1) const override;
 };
 
 const Eigen::Ref<const Eigen::VectorXd>

@@ -4,14 +4,7 @@
 
 namespace gsplines {
 
-std::unique_ptr<functions::FunctionExpression> GSpline::clone() const {
-  return std::make_unique<GSpline>(*this);
-}
-
-std::unique_ptr<functions::FunctionExpression> GSpline::move_clone() {
-  return std::make_unique<GSpline>(std::move(*this));
-}
-std::unique_ptr<functions::FunctionExpression> GSpline::deriv(int _deg) const {
+GSpline *GSpline::deriv_impl(std::size_t _deg) const {
 
   Eigen::VectorXd result_coeff(coefficients_);
   int der_coor;
@@ -33,13 +26,14 @@ std::unique_ptr<functions::FunctionExpression> GSpline::deriv(int _deg) const {
     }
   }
 
-  return std::make_unique<GSpline>(get_domain(), get_codom_dim(),
-                                   number_of_intervals_, *basis_, result_coeff,
-                                   domain_interval_lengths_, get_name());
+  return new GSpline(get_domain(), get_codom_dim(), number_of_intervals_,
+                     *basis_, result_coeff, domain_interval_lengths_,
+                     get_name());
 }
 
 GSpline::GSpline(const GSpline &that)
-    : Function(that), number_of_intervals_(that.number_of_intervals_),
+    : FunctionInheritanceHelper(that),
+      number_of_intervals_(that.number_of_intervals_),
       basis_(that.basis_->clone()), coefficients_(that.coefficients_),
       domain_break_points_(that.domain_break_points_),
       domain_interval_lengths_(that.domain_interval_lengths_),
@@ -53,7 +47,7 @@ GSpline::GSpline(const GSpline &that)
 }
 
 GSpline::GSpline(GSpline &&that)
-    : Function(std::move(that)),
+    : FunctionInheritanceHelper(std::move(that)),
       number_of_intervals_(that.number_of_intervals_),
       basis_(that.basis_->move_clone()),
       coefficients_(std::move(that.coefficients_)),
@@ -73,10 +67,10 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
                  const Eigen::Ref<const Eigen::VectorXd> _coefficents,
                  const Eigen::Ref<const Eigen::VectorXd> _tauv,
                  const std::string &_name)
-    : Function(_domain, _codom_dim, _name), number_of_intervals_(_n_intervals),
-      basis_(_basis.clone()), coefficients_(_coefficents),
-      domain_break_points_(_n_intervals + 1), domain_interval_lengths_(_tauv),
-      waypoints_(_n_intervals + 1, _codom_dim),
+    : FunctionInheritanceHelper(_domain, _codom_dim, _name),
+      number_of_intervals_(_n_intervals), basis_(_basis.clone()),
+      coefficients_(_coefficents), domain_break_points_(_n_intervals + 1),
+      domain_interval_lengths_(_tauv), waypoints_(_n_intervals + 1, _codom_dim),
       basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() != _n_intervals * basis_->get_dim() * _codom_dim) {
@@ -92,8 +86,6 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
 
   GSpline::value(domain_break_points_, waypoints_);
 }
-
-GSpline::~GSpline() {}
 
 void GSpline::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                     Eigen::Ref<Eigen::MatrixXd> _result) const {

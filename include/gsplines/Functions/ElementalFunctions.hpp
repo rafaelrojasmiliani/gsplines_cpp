@@ -5,6 +5,8 @@
 #include <eigen3/Eigen/Core>
 #include <functional>
 #include <gsplines/Functions/Function.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -14,7 +16,8 @@ namespace functions {
 
 class DomainLinearDilation;
 
-class ConstFunction : public Function {
+class ConstFunction
+    : public FunctionInheritanceHelper<ConstFunction, Function, ConstFunction> {
 
 private:
   Eigen::VectorXd values_;
@@ -29,194 +32,107 @@ public:
   ConstFunction(const ConstFunction &_that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override {
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-    _result = Eigen::MatrixXd::Ones(_domain_points.size(), get_codom_dim())
-                  .array()
-                  .rowwise() *
-              values_.transpose().array();
-  };
-
-  std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<ConstFunction>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<ConstFunction>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg = 1) const override {
-    if (_deg == 0) {
-      return std::make_unique<ConstFunction>(*this);
-    }
-    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
-  }
+protected:
+  ConstFunction *deriv_impl(std::size_t _deg = 1) const override;
 };
 
-class DomainLinearDilation : public Function {
+class DomainLinearDilation
+    : public FunctionInheritanceHelper<DomainLinearDilation, Function,
+                                       ConstFunction> {
 private:
   double dilation_factor_;
 
 public:
   DomainLinearDilation(std::pair<double, double> _domain,
                        double _dilation_factor,
-                       const std::string &_name = "DomainLinearDilation")
-      : Function(_domain, 1, _name), dilation_factor_(_dilation_factor) {}
+                       const std::string &_name = "DomainLinearDilation");
 
-  DomainLinearDilation(const DomainLinearDilation &that)
-      : Function(that), dilation_factor_(that.dilation_factor_) {}
+  DomainLinearDilation(const DomainLinearDilation &that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override {
-    _result.noalias() = dilation_factor_ * _domain_points;
-  };
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  virtual std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<DomainLinearDilation>(*this);
-  }
-
-  virtual std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<DomainLinearDilation>(std::move(*this));
-  }
-
-  virtual std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
-    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
-                                           dilation_factor_);
-  }
+protected:
+  virtual ConstFunction *deriv_impl(std::size_t _deg) const override;
 };
 
 class Identity : public DomainLinearDilation {
 
 public:
-  Identity(std::pair<double, double> _domain)
-      : DomainLinearDilation(_domain, 1.0, "Identity") {}
+  Identity(std::pair<double, double> _domain);
 
-  Identity(const Identity &that) : DomainLinearDilation(that) {}
+  Identity(const Identity &that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override {
-    _result = _domain_points;
-  };
-
-  std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<Identity>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<Identity>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
-    if (_deg == 0)
-      return std::make_unique<Identity>(*this);
-    if (_deg == 1)
-      return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(),
-                                             1.0);
-    return std::make_unique<ConstFunction>(get_domain(), get_codom_dim(), 0.0);
-  }
+             Eigen::Ref<Eigen::MatrixXd> _result) const override;
 };
 
-class Exponential : public Function {
+class Exponential
+    : public FunctionInheritanceHelper<Exponential, Function, Exponential> {
 public:
-  Exponential(std::pair<double, double> _domain)
-      : Function(_domain, 1, "Exponential") {}
+  Exponential(std::pair<double, double> _domain);
 
-  Exponential(const Exponential &that) : Function(that) {}
+  Exponential(const Exponential &that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
              Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<Exponential>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<Exponential>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override {
-    return std::make_unique<Exponential>(*this);
-  }
+protected:
+  virtual Exponential *deriv_impl(std::size_t _deg) const override;
 };
 
-class Sin;
-
-class Cos : public Function {
+class Cos
+    : public FunctionInheritanceHelper<Cos, Function, FunctionExpression> {
 public:
-  Cos(std::pair<double, double> _domain) : Function(_domain, 1, "Cos") {}
+  Cos(std::pair<double, double> _domain);
 
-  Cos(const Cos &that) : Function(that) {}
+  Cos(const Cos &that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
              Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<Cos>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<Cos>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override;
+protected:
+  FunctionExpression *deriv_impl(std::size_t _deg) const override;
 };
 
-class Sin : public Function {
+class Sin
+    : public FunctionInheritanceHelper<Sin, Function, FunctionExpression> {
 public:
-  Sin(std::pair<double, double> _domain) : Function(_domain, 1, "Sin") {}
+  Sin(std::pair<double, double> _domain);
 
-  Sin(const Sin &that) : Function(that) {}
+  Sin(const Sin &that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
              Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::unique_ptr<FunctionExpression> clone() const override {
-    printf("CLONING SIN\n");
-    return std::make_unique<Sin>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    printf("CLONING SIN\n");
-    return std::make_unique<Sin>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override;
+protected:
+  FunctionExpression *deriv_impl(std::size_t _deg) const override;
 };
 
-class CanonicPolynomial : public Function {
+class CanonicPolynomial
+    : public FunctionInheritanceHelper<CanonicPolynomial, Function,
+                                       CanonicPolynomial> {
 protected:
   Eigen::VectorXd coefficients_;
 
 public:
   CanonicPolynomial(std::pair<double, double> _domain,
-                    const Eigen::VectorXd &_coefficients)
-      : Function(_domain, 1, "CanonicPolynomial"),
-        coefficients_(_coefficients) {}
+                    const Eigen::VectorXd &_coefficients);
 
   CanonicPolynomial(std::pair<double, double> _domain,
-                    Eigen::VectorXd &&_coefficients)
-      : Function(_domain, 1, "CanonicPolynomial"),
-        coefficients_(std::move(_coefficients)) {}
+                    Eigen::VectorXd &&_coefficients);
 
-  CanonicPolynomial(const CanonicPolynomial &that)
-      : Function(that), coefficients_(that.coefficients_) {}
+  CanonicPolynomial(const CanonicPolynomial &that);
 
-  CanonicPolynomial(CanonicPolynomial &&that)
-      : Function(std::move(that)),
-        coefficients_(std::move(that.coefficients_)) {}
+  CanonicPolynomial(CanonicPolynomial &&that);
 
   void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
              Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::unique_ptr<FunctionExpression> clone() const override {
-    return std::make_unique<CanonicPolynomial>(*this);
-  }
-
-  std::unique_ptr<FunctionExpression> move_clone() override {
-    return std::make_unique<CanonicPolynomial>(std::move(*this));
-  }
-
-  std::unique_ptr<FunctionExpression> deriv(int _deg) const override;
+protected:
+  CanonicPolynomial *deriv_impl(std::size_t _deg) const override;
 };
 } // namespace functions
 } // namespace gsplines
