@@ -21,12 +21,12 @@ FunctionExpression::concat(const FunctionExpression &_that) const & {
 
   concat_throw(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   if (get_type() == CONCATENATION) {
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -36,7 +36,7 @@ FunctionExpression::concat(const FunctionExpression &_that) const & {
   if (_that.get_type() == CONCATENATION) {
     std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -52,12 +52,12 @@ FunctionExpression::concat(FunctionExpression &&_that) const & {
 
   concat_throw(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   if (get_type() == CONCATENATION) {
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -81,16 +81,16 @@ FunctionExpression::concat(const FunctionExpression &_that) && {
 
   concat_throw(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
-  std::list<std::unique_ptr<FunctionExpression>> &target_array =
+  std::list<std::unique_ptr<FunctionBase>> &target_array =
       (get_type() == CONCATENATION) ? function_array_ : result_array;
 
   if (_that.get_type() == CONCATENATION) {
 
     std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                    std::back_inserter(target_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -111,9 +111,9 @@ FunctionExpression FunctionExpression::concat(FunctionExpression &&_that) && {
 
   concat_throw(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
-  std::list<std::unique_ptr<FunctionExpression>> &target_array =
+  std::list<std::unique_ptr<FunctionBase>> &target_array =
       (get_type() == CONCATENATION) ? function_array_ : result_array;
 
   if (_that.get_type() == CONCATENATION) {
@@ -137,15 +137,14 @@ FunctionExpression FunctionExpression::concat(FunctionExpression &&_that) && {
 //  FunctionExpression Evaluation
 //  -----------------------------
 
-std::list<std::unique_ptr<FunctionExpression>>::const_iterator
-get_interval_function(
+std::list<std::unique_ptr<FunctionBase>>::const_iterator get_interval_function(
     double _domain_point,
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array) {
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array) {
 
-  std::list<std::unique_ptr<FunctionExpression>>::const_iterator result =
+  std::list<std::unique_ptr<FunctionBase>>::const_iterator result =
       std::find_if(
           _function_array.begin(), _function_array.end(),
-          [&_domain_point](const std::unique_ptr<FunctionExpression> &element) {
+          [&_domain_point](const std::unique_ptr<FunctionBase> &element) {
             // printf("function is %s\n", element->get_name().c_str());
             // printf("domain is %lf, %lf\n", element->get_domain().first,
             //       element->get_domain().second);
@@ -155,15 +154,15 @@ get_interval_function(
   return result;
 }
 
-std::unique_ptr<FunctionExpression> deriv_concat_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+FunctionExpression *deriv_concat_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
 
   // printf("---------- deriv concat function ---------------\n");
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
-  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
+  for (const std::unique_ptr<FunctionBase> &f : _function_array) {
     result_array.push_back(f->deriv(_deg));
     // printf("    domain %lf, %lf\n", f->get_domain().first,
     //      f->get_domain().second);
@@ -176,13 +175,13 @@ std::unique_ptr<FunctionExpression> deriv_concat_functions(
                                    _function_array.back()->get_domain().second};
 
   // printf("domain %lf, %lf\n", domain.first, domain.second);
-  return std::make_unique<FunctionExpression>(
+  return new FunctionExpression(
       domain, _function_array.front()->get_codom_dim(),
       FunctionExpression::Type::CONCATENATION, result_array);
 }
 
 void eval_concat_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
 
@@ -192,7 +191,7 @@ void eval_concat_functions(
 
   for (std::size_t i = 0; i < _domain_points.size(); i++) {
 
-    std::list<std::unique_ptr<FunctionExpression>>::const_iterator f =
+    std::list<std::unique_ptr<FunctionBase>>::const_iterator f =
         get_interval_function(_domain_points[i], _function_array);
     std::size_t idx = std::distance(_function_array.begin(), f);
     /*printf("++ ----- ++\n");
