@@ -82,7 +82,7 @@ FunctionExpression::get_arg_domains() const {
 
   std::transform(function_array_.begin(), function_array_.end(),
                  std::back_inserter(result),
-                 [](const std::unique_ptr<FunctionExpression> &element) {
+                 [](const std::unique_ptr<FunctionBase> &element) {
                    return element->get_domain();
                  });
 

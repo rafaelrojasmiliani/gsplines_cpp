@@ -4,6 +4,7 @@
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis.hpp>
 #include <gsplines/Functions/Function.hpp>
+#include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 
 namespace gsplines {
 class SobolevNorm;

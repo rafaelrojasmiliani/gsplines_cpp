@@ -154,25 +154,25 @@ void eval_concat_functions(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
-FunctionExpression *
-deriv_unique_functions(const std::list<FunctionBase> *&_function_array,
-                       std::size_t _deg);
+FunctionExpression *deriv_unique_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
 
-FunctionExpression *
-deriv_sum_functions(const std::list<FunctionBase> *&_function_array,
-                    std::size_t _deg);
+FunctionExpression *deriv_sum_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
 
-FunctionExpression *
-deriv_mul_functions(const std::list<FunctionBase> *&_function_array,
-                    std::size_t _deg);
+FunctionExpression *deriv_mul_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
 
-FunctionExpression *
-deriv_compose_functions(const std::list<FunctionBase> *&_function_array,
-                        std::size_t _deg);
+FunctionExpression *deriv_compose_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
 
-FunctionExpression *
-deriv_concat_functions(const std::list<FunctionBase> *&_function_array,
-                       std::size_t _deg);
+FunctionExpression *deriv_concat_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
 
 } // namespace functions
 } // namespace gsplines
