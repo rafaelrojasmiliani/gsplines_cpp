@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <iostream>
 
@@ -65,6 +66,21 @@ FunctionExpression::FunctionExpression(FunctionExpression &&that)
       function_array_(std::move(that.function_array_)) {
 
   num_call_move_constructor_++;
+}
+
+FunctionExpression::FunctionExpression(const Function &_that)
+    : FunctionExpression(_that.get_domain(), _that.get_codom_dim(), UNIQUE,
+                         {}) {
+
+  function_array_.push_back(_that.clone());
+  num_call_copy_constructor_++;
+}
+FunctionExpression::FunctionExpression(Function &&_that)
+    : FunctionExpression(_that.get_domain(), _that.get_codom_dim(), UNIQUE,
+                         {}) {
+
+  function_array_.push_back(_that.move_clone());
+  num_call_copy_constructor_++;
 }
 
 void FunctionExpression::print_performace() {

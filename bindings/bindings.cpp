@@ -31,7 +31,7 @@ PYBIND11_MODULE(gsplines, m) {
       .def("is_point_in_domain",
            &gsplines::functions::FunctionExpression::is_point_in_domain)
       .def("get_domain", &gsplines::functions::FunctionExpression::get_domain)
-      .def("deriv", &gsplines::functions::FunctionExpression::derivate,
+      .def("deriv", &gsplines::functions::FunctionExpression::deriv,
            py::arg("_deg") = 1)
       .def("print", &gsplines::functions::FunctionExpression::print,
            py::arg("_indent") = 0)
@@ -112,7 +112,8 @@ PYBIND11_MODULE(gsplines, m) {
       .def("__call__", &gsplines::GSpline::operator())
       .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
-      .def("get_number_of_intervals", &gsplines::GSpline::get_number_of_intervals)
+      .def("get_number_of_intervals",
+           &gsplines::GSpline::get_number_of_intervals)
       .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
       .def("get_waypoints", &gsplines::GSpline::get_waypoints)
       .def("get_basis_name", &gsplines::GSpline::get_basis_name)

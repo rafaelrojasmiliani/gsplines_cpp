@@ -28,6 +28,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionMul.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsComp.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsConcat.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/Functions.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionExpression.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionBase.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp

@@ -1,29 +1,85 @@
 
 #include <cmath>
 #include <gsplines/Functions/Function.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
 #include <stdexcept>
 
 namespace gsplines {
 namespace functions {
 
-Function::Function(std::pair<double, double> _domain, std::size_t _codom_dim,
-                   const std::string &_name)
-    : FunctionExpression(_domain, _codom_dim, FunctionExpression::SINGLE,
-                         std::list<std::unique_ptr<FunctionExpression>>(),
-                         _name) {}
+FunctionExpression Function::operator+(const FunctionExpression &that) const & {
+  return FunctionExpression(*this) + that;
+}
+FunctionExpression Function::operator+(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) + std::move(that);
+}
+FunctionExpression Function::operator+(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) + that;
+}
+FunctionExpression Function::operator+(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) + std::move(that);
+}
 
-Function::Function(const Function &that) : FunctionExpression(that) {}
+FunctionExpression Function::operator-(const FunctionExpression &that) const & {
 
-FunctionExpression Function::derivate(int _deg) const {
+  return FunctionExpression(*this) - that;
+}
+FunctionExpression Function::operator-(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) - std::move(that);
+}
+FunctionExpression Function::operator-(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) - that;
+}
+FunctionExpression Function::operator-(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) - std::move(that);
+}
+FunctionExpression Function::operator-() const & {
+  return -FunctionExpression(*this);
+}
+FunctionExpression Function::operator-() && {
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  return -FunctionExpression(std::move(*this));
+}
 
-  result_array.push_back(this->deriv(_deg));
-  const std::string name = get_name();
+FunctionExpression Function::operator*(const FunctionExpression &that) const & {
+  return FunctionExpression(*this) * that;
+}
+FunctionExpression Function::operator*(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) + std::move(that);
+}
+FunctionExpression Function::operator*(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) * that;
+}
+FunctionExpression Function::operator*(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) + std::move(that);
+}
 
-  return FunctionExpression(get_domain(), get_codom_dim(),
-                            FunctionExpression::Type::UNIQUE,
-                            std::move(result_array), name);
+FunctionExpression Function::compose(const FunctionExpression &that) const & {
+  return FunctionExpression(*this).compose(that);
+}
+FunctionExpression Function::compose(FunctionExpression &&that) const & {
+  return FunctionExpression(*this).compose(std::move(that));
+}
+
+FunctionExpression Function::compose(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)).compose(that);
+}
+FunctionExpression Function::compose(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)).compose(std::move(that));
+}
+
+FunctionExpression Function::concat(const FunctionExpression &that) const & {
+  return FunctionExpression(*this).concat(that);
+}
+FunctionExpression Function::concat(FunctionExpression &&that) const & {
+  return FunctionExpression(*this).concat(std::move(that));
+}
+
+FunctionExpression Function::concat(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)).concat(that);
+}
+FunctionExpression Function::concat(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)).concat(std::move(that));
 }
 } // namespace functions
 } // namespace gsplines
