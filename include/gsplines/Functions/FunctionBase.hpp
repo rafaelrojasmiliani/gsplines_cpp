@@ -10,6 +10,7 @@
 namespace gsplines {
 namespace functions {
 
+class FunctionExpression;
 class FunctionBase {
 private:
   std::size_t codom_dim_;
@@ -70,6 +71,8 @@ public:
   value(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
     return operator()(_domain_points);
   }
+
+  FunctionExpression derivate(std::size_t _deg = 1);
 
 protected:
   void set_domain(double _t0, double _t1) {

@@ -22,111 +22,109 @@ PYBIND11_MODULE(gsplines, m) {
            &gsplines::basis::BasisLegendre::eval_derivative_on_window)
       .def("eval_derivative_wrt_tau_on_window",
            &gsplines::basis::BasisLegendre::eval_derivative_wrt_tau_on_window);
+  /*
+    // Function Expression
+    py::class_<gsplines::functions::FunctionExpression>(m, "FunctionExpression")
+        .def(py::init<std::pair<double, double>, std::size_t>())
+        .def("get_codom_dim",
+             &gsplines::functions::FunctionExpression::get_codom_dim)
+        .def("is_point_in_domain",
+             &gsplines::functions::FunctionExpression::is_point_in_domain)
+        .def("get_domain", &gsplines::functions::FunctionExpression::get_domain)
+        .def("deriv", &gsplines::functions::FunctionExpression::deriv,
+             py::arg("_deg") = 1)
+        .def("print", &gsplines::functions::FunctionExpression::print,
+             py::arg("_indent") = 0)
+        .def("concat",
+             [](const gsplines::functions::FunctionExpression &_self,
+                const gsplines::functions::FunctionExpression &_that) {
+               return _self.concat(_that);
+             })
+        .def("compose",
+             [](const gsplines::functions::FunctionExpression &_self,
+                const gsplines::functions::FunctionExpression &_that) {
+               return _self.compose(_that);
+             })
+        .def(
+            "__add__",
+            [](const gsplines::functions::FunctionExpression &_lhs,
+               const gsplines::functions::FunctionExpression &_rhs) {
+              return _lhs + _rhs;
+            },
+            py::is_operator())
+        .def(
+            "__sub__",
+            [](const gsplines::functions::FunctionExpression &_lhs,
+               const gsplines::functions::FunctionExpression &_rhs) {
+              return _lhs - _rhs;
+            },
+            py::is_operator())
+        .def(
+            "__mul__",
+            [](const gsplines::functions::FunctionExpression &_lhs,
+               const gsplines::functions::FunctionExpression &_rhs) {
+              return _lhs * _rhs;
+            },
+            py::is_operator())
+        .def(
+            "__neg__",
+            [](const gsplines::functions::FunctionExpression &_this) {
+              return -_this;
+            },
+            py::is_operator())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  // Function Expression
-  py::class_<gsplines::functions::FunctionExpression>(m, "FunctionExpression")
-      .def(py::init<std::pair<double, double>, std::size_t>())
-      .def("get_codom_dim",
-           &gsplines::functions::FunctionExpression::get_codom_dim)
-      .def("is_point_in_domain",
-           &gsplines::functions::FunctionExpression::is_point_in_domain)
-      .def("get_domain", &gsplines::functions::FunctionExpression::get_domain)
-      .def("deriv", &gsplines::functions::FunctionExpression::deriv,
-           py::arg("_deg") = 1)
-      .def("print", &gsplines::functions::FunctionExpression::print,
-           py::arg("_indent") = 0)
-      .def("concat",
-           [](const gsplines::functions::FunctionExpression &_self,
-              const gsplines::functions::FunctionExpression &_that) {
-             return _self.concat(_that);
-           })
-      .def("compose",
-           [](const gsplines::functions::FunctionExpression &_self,
-              const gsplines::functions::FunctionExpression &_that) {
-             return _self.compose(_that);
-           })
-      .def(
-          "__add__",
-          [](const gsplines::functions::FunctionExpression &_lhs,
-             const gsplines::functions::FunctionExpression &_rhs) {
-            return _lhs + _rhs;
-          },
-          py::is_operator())
-      .def(
-          "__sub__",
-          [](const gsplines::functions::FunctionExpression &_lhs,
-             const gsplines::functions::FunctionExpression &_rhs) {
-            return _lhs - _rhs;
-          },
-          py::is_operator())
-      .def(
-          "__mul__",
-          [](const gsplines::functions::FunctionExpression &_lhs,
-             const gsplines::functions::FunctionExpression &_rhs) {
-            return _lhs * _rhs;
-          },
-          py::is_operator())
-      .def(
-          "__neg__",
-          [](const gsplines::functions::FunctionExpression &_this) {
-            return -_this;
-          },
-          py::is_operator())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::Exponential,
+               gsplines::functions::FunctionExpression>(m, "Exponential")
+        .def(py::init<std::pair<double, double>>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::ConstFunction,
+               gsplines::functions::FunctionExpression>(m, "ConstFunction")
+        .def(py::init<std::pair<double, double>, std::size_t, double>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::functions::Exponential,
-             gsplines::functions::FunctionExpression>(m, "Exponential")
-      .def(py::init<std::pair<double, double>>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
-  py::class_<gsplines::functions::ConstFunction,
-             gsplines::functions::FunctionExpression>(m, "ConstFunction")
-      .def(py::init<std::pair<double, double>, std::size_t, double>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::Cos,
+    gsplines::functions::FunctionExpression>( m, "Cos")
+        .def(py::init<std::pair<double, double>>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::functions::Cos, gsplines::functions::FunctionExpression>(
-      m, "Cos")
-      .def(py::init<std::pair<double, double>>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::DomainLinearDilation,
+               gsplines::functions::FunctionExpression>(m,
+    "DomainLinearDilation") .def(py::init<std::pair<double, double>, double>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::functions::DomainLinearDilation,
-             gsplines::functions::FunctionExpression>(m, "DomainLinearDilation")
-      .def(py::init<std::pair<double, double>, double>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::Identity,
+               gsplines::functions::DomainLinearDilation>(m, "Identity")
+        .def(py::init<std::pair<double, double>>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::functions::Identity,
-             gsplines::functions::DomainLinearDilation>(m, "Identity")
-      .def(py::init<std::pair<double, double>>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::functions::Sin,
+    gsplines::functions::FunctionExpression>( m, "Sin")
+        .def(py::init<std::pair<double, double>>())
+        .def("__call__", &gsplines::functions::FunctionExpression::operator());
 
-  py::class_<gsplines::functions::Sin, gsplines::functions::FunctionExpression>(
-      m, "Sin")
-      .def(py::init<std::pair<double, double>>())
-      .def("__call__", &gsplines::functions::FunctionExpression::operator());
+    py::class_<gsplines::GSpline, gsplines::functions::FunctionExpression>(
+        m, "GSpline")
+        .def(py::init<std::pair<double, double>, std::size_t, std::size_t,
+                      gsplines::basis::Basis &,
+                      const Eigen::Ref<const Eigen::VectorXd>,
+                      const Eigen::Ref<const Eigen::VectorXd>>())
+        .def("__call__", &gsplines::GSpline::operator())
+        .def("get_exec_time", &gsplines::GSpline::get_exec_time)
+        .def("get_domain_breakpoints",
+    &gsplines::GSpline::get_domain_breakpoints) .def("get_number_of_intervals",
+             &gsplines::GSpline::get_number_of_intervals)
+        .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
+        .def("get_waypoints", &gsplines::GSpline::get_waypoints)
+        .def("get_basis_name", &gsplines::GSpline::get_basis_name)
+        .def("linear_scaling_new_execution_time",
+             &gsplines::GSpline::linear_scaling_new_execution_time)
+        .def("get_coefficients", &gsplines::GSpline::get_coefficients);
 
-  py::class_<gsplines::GSpline, gsplines::functions::FunctionExpression>(
-      m, "GSpline")
-      .def(py::init<std::pair<double, double>, std::size_t, std::size_t,
-                    gsplines::basis::Basis &,
-                    const Eigen::Ref<const Eigen::VectorXd>,
-                    const Eigen::Ref<const Eigen::VectorXd>>())
-      .def("__call__", &gsplines::GSpline::operator())
-      .def("get_exec_time", &gsplines::GSpline::get_exec_time)
-      .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
-      .def("get_number_of_intervals",
-           &gsplines::GSpline::get_number_of_intervals)
-      .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
-      .def("get_waypoints", &gsplines::GSpline::get_waypoints)
-      .def("get_basis_name", &gsplines::GSpline::get_basis_name)
-      .def("linear_scaling_new_execution_time",
-           &gsplines::GSpline::linear_scaling_new_execution_time)
-      .def("get_coefficients", &gsplines::GSpline::get_coefficients);
-
-  py::class_<gsplines::functions::CanonicPolynomial,
-             gsplines::functions::FunctionExpression>(m, "CanonicPolynomial")
-      .def(py::init<std::pair<double, double>,
-                    const Eigen::Ref<const Eigen::VectorXd>>());
-  /* Interpolator
-   * */
+    py::class_<gsplines::functions::CanonicPolynomial,
+               gsplines::functions::FunctionExpression>(m, "CanonicPolynomial")
+        .def(py::init<std::pair<double, double>,
+                      const Eigen::Ref<const Eigen::VectorXd>>());
 
   py::class_<gsplines::Interpolator>(m, "Interpolator")
       .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>());
@@ -172,4 +170,5 @@ PYBIND11_MODULE(gsplines, m) {
   // Operations
   m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
   m.def("string_to_basis", gsplines::basis::string_to_basis);
+  */
 }

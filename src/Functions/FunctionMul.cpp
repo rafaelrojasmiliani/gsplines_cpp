@@ -280,7 +280,6 @@ FunctionExpression::operator*(FunctionExpression &&_that) && {
       "This condition should not happen."
       " All Multiplication cases should be addressed FunctionMul.cpp"));
 }
-/*
 FunctionExpression FunctionExpression::operator-() const & {
 
   return ConstFunction(get_domain(), 1, -1.0) * (*this);
@@ -299,13 +298,12 @@ FunctionExpression operator*(double _value, FunctionExpression &&_that) {
 
   return ConstFunction(_that.get_domain(), 1, _value) * std::move(_that);
 }
-*/
 /* -----
  *  FunctionExpression Evaluation
  * -----*/
 
 void eval_mul_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
   // NOTE: the first element of _function_array has larger codomain dimension
@@ -314,7 +312,7 @@ void eval_mul_functions(
 
   _function_array.front()->value(_domain_points, _result);
 
-  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it;
+  std::list<std::unique_ptr<FunctionBase>>::const_iterator it;
   for (it = std::next(_function_array.begin(), 1); it != _function_array.end();
        it++) {
     (*it)->value(_domain_points, temp);
