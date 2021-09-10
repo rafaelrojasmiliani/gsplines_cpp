@@ -12,7 +12,6 @@ set(PYTHON_VERSION
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # include ifopt with custon ROS installation
 set(ifopt_DIR /opt/ros/noetic/share/ifopt/cmake)
-find_package(GSL REQUIRED)
 find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
@@ -34,12 +33,10 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp
   ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoPointsWeights.cpp)
 
-target_link_libraries(gsplines ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
-                      ${ifopt_LIBRARIES})
+target_link_libraries(gsplines ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES})
 target_include_directories(
-  gsplines
-  PUBLIC ${PROJECT_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
-         ${Eigen3_INCLUDE_DIRS} ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
+  gsplines PUBLIC ${PROJECT_SOURCE_DIR}/include ${Eigen3_INCLUDE_DIRS}
+                  ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
 # set_target_properties(gsplines PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib)
 
 link_directories(${PROJECT_SOURCE_DIR}/build)
@@ -50,10 +47,9 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 pybind11_add_module(pygsplines ${PROJECT_SOURCE_DIR}/bindings/bindings.cpp)
-target_include_directories(pygsplines PUBLIC include ${GSL_INCLUDE_DIRS}
-                                             /usr/include/eigen3)
-target_link_libraries(pygsplines PUBLIC ${GSL_LIBRARIES} ${Eigen3_LIBRARIES}
-                                        ${ifopt_LIBRARIES} gsplines)
+target_include_directories(pygsplines PUBLIC include /usr/include/eigen3)
+target_link_libraries(pygsplines PUBLIC ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES}
+                                        gsplines)
 
 set_target_properties(pygsplines PROPERTIES OUTPUT_NAME gsplines)
 
