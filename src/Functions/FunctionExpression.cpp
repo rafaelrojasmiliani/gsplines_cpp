@@ -154,7 +154,7 @@ void FunctionExpression::print(std::size_t _indent) const {
   }
 }
 
-std::unique_ptr<FunctionExpression> deriv_unique_functions(
+FunctionExpression *deriv_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
 
@@ -163,9 +163,9 @@ std::unique_ptr<FunctionExpression> deriv_unique_functions(
   std::list<std::unique_ptr<FunctionBase>> result_array;
   result_array.push_back(_function_array.front()->deriv(_deg));
 
-  return std::make_unique<FunctionExpression>(domain, codom_dim,
-                                              FunctionExpression::Type::UNIQUE,
-                                              std::move(result_array));
+  return new FunctionExpression(domain, codom_dim,
+                                FunctionExpression::Type::UNIQUE,
+                                std::move(result_array));
 }
 
 void eval_unique_functions(

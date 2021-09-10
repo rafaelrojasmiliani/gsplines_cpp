@@ -53,7 +53,7 @@ public:
     return std::unique_ptr<FunctionBase>(this->move_clone_impl());
   }
 
-  std::unique_ptr<FunctionBase> deriv(std::size_t _deg) const & {
+  std::unique_ptr<FunctionBase> deriv(std::size_t _deg = 1) const & {
     return std::unique_ptr<FunctionBase>(this->deriv_impl(_deg));
   }
   virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,

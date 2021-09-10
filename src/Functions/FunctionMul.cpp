@@ -57,13 +57,13 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
   const FunctionExpression &f_scalar =
       return_second_or_mim_codom_dim(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   if (f_vector.get_type() == MULTIPLICATION) {
     std::transform(f_vector.function_array_.begin(),
                    f_vector.function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -74,7 +74,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
     std::transform(f_scalar.function_array_.begin(),
                    f_scalar.function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -97,7 +97,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) const & {
   const FunctionExpression &f_scalar =
       return_second_or_mim_codom_dim(*this, _that);
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   if (_that.get_type() == FunctionExpression::Type::MULTIPLICATION) {
 
@@ -112,7 +112,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) const & {
     if (get_type() == MULTIPLICATION) {
       std::transform(function_array_.begin(), function_array_.end(),
                      std::front_inserter(result_array),
-                     [](const std::unique_ptr<FunctionExpression> &element) {
+                     [](const std::unique_ptr<FunctionBase> &element) {
                        return element->clone();
                      });
     } else {
@@ -122,7 +122,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) const & {
     if (get_type() == MULTIPLICATION) {
       std::transform(function_array_.begin(), function_array_.end(),
                      std::back_inserter(result_array),
-                     [](const std::unique_ptr<FunctionExpression> &element) {
+                     [](const std::unique_ptr<FunctionBase> &element) {
                        return element->clone();
                      });
     } else {
@@ -151,7 +151,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
         std::transform(_that.function_array_.begin(),
                        _that.function_array_.end(),
                        std::back_inserter(function_array_),
-                       [](const std::unique_ptr<FunctionExpression> &element) {
+                       [](const std::unique_ptr<FunctionBase> &element) {
                          return element->clone();
                        });
       } else {
@@ -160,7 +160,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
       return std::move(*this);
 
     } else {
-      std::list<std::unique_ptr<FunctionExpression>> result_array;
+      std::list<std::unique_ptr<FunctionBase>> result_array;
 
       std::pair<double, double> domain = get_domain();
       std::size_t codom_dim = get_codom_dim();
@@ -171,7 +171,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
         std::transform(_that.function_array_.begin(),
                        _that.function_array_.end(),
                        std::back_inserter(result_array),
-                       [](const std::unique_ptr<FunctionExpression> &element) {
+                       [](const std::unique_ptr<FunctionBase> &element) {
                          return element->clone();
                        });
       } else {
@@ -187,7 +187,7 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
         std::transform(_that.function_array_.rbegin(),
                        _that.function_array_.rend(),
                        std::front_inserter(function_array_),
-                       [](const std::unique_ptr<FunctionExpression> &element) {
+                       [](const std::unique_ptr<FunctionBase> &element) {
                          return element->clone();
                        });
       } else {
@@ -196,13 +196,13 @@ FunctionExpression::operator*(const FunctionExpression &_that) && {
       return std::move(*this);
 
     } else {
-      std::list<std::unique_ptr<FunctionExpression>> result_array;
+      std::list<std::unique_ptr<FunctionBase>> result_array;
       result_array.push_back(this->move_clone());
       if (_that.get_type() == MULTIPLICATION) {
         std::transform(_that.function_array_.rbegin(),
                        _that.function_array_.rend(),
                        std::front_inserter(result_array),
-                       [](const std::unique_ptr<FunctionExpression> &element) {
+                       [](const std::unique_ptr<FunctionBase> &element) {
                          return element->clone();
                        });
       } else {
@@ -239,7 +239,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) && {
       return std::move(*this);
 
     } else {
-      std::list<std::unique_ptr<FunctionExpression>> result_array;
+      std::list<std::unique_ptr<FunctionBase>> result_array;
       result_array.push_back(this->move_clone());
       if (_that.get_type() == MULTIPLICATION) {
         std::move(_that.function_array_.begin(), _that.function_array_.end(),
@@ -262,7 +262,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) && {
       return std::move(*this);
 
     } else {
-      std::list<std::unique_ptr<FunctionExpression>> result_array;
+      std::list<std::unique_ptr<FunctionBase>> result_array;
       result_array.push_back(this->move_clone());
 
       if (_that.get_type() == MULTIPLICATION) {
@@ -325,17 +325,17 @@ void eval_mul_functions(
 // http://
 // scholar.rose-hulman.edu/cgi/viewcontent.cgi?article=1352&context=rhumj
 
-std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array) {
+FunctionExpression *first_deriv_mul_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array) {
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::pair<double, double> domain = _function_array.front()->get_domain();
-  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it_1 =
+  std::list<std::unique_ptr<FunctionBase>>::const_iterator it_1 =
       _function_array.begin();
-  std::list<std::unique_ptr<FunctionExpression>>::const_iterator it_2;
+  std::list<std::unique_ptr<FunctionBase>>::const_iterator it_2;
 
-  std::list<std::unique_ptr<FunctionExpression>> elem_array_1;
+  std::list<std::unique_ptr<FunctionBase>> elem_array_1;
 
   elem_array_1.push_back((*it_1)->deriv());
 
@@ -351,7 +351,7 @@ std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
   for (it_1 = std::next(_function_array.begin(), 1);
        it_1 != _function_array.end(); it_1++) {
 
-    std::list<std::unique_ptr<FunctionExpression>> elem_array;
+    std::list<std::unique_ptr<FunctionBase>> elem_array;
 
     for (it_2 = _function_array.begin(); it_2 != _function_array.end();
          it_2++) {
@@ -368,28 +368,32 @@ std::unique_ptr<FunctionExpression> first_deriv_mul_functions(
         domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
         std::move(elem_array)));
   }
-  return std::make_unique<FunctionExpression>(domain, codom_dim,
-                                              FunctionExpression::Type::SUM,
-                                              std::move(result_array));
+  return new FunctionExpression(domain, codom_dim,
+                                FunctionExpression::Type::SUM,
+                                std::move(result_array));
 }
-std::unique_ptr<FunctionExpression> deriv_mul_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+
+FunctionExpression *deriv_mul_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
 
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::pair<double, double> domain = _function_array.front()->get_domain();
   if (_deg == 0) {
-    return std::make_unique<FunctionExpression>(
-        domain, codom_dim, FunctionExpression::Type::MULTIPLICATION,
-        _function_array);
+    return new FunctionExpression(domain, codom_dim,
+                                  FunctionExpression::Type::MULTIPLICATION,
+                                  _function_array);
   }
 
-  std::unique_ptr<FunctionExpression> result =
-      first_deriv_mul_functions(_function_array);
+  FunctionExpression *result = first_deriv_mul_functions(_function_array);
+  FunctionExpression *buffer_pointer = result;
 
   for (std::size_t k = 1; k < _deg; k++) {
-    result = result->deriv()->move_clone();
+    result = result->deriv()->move_clone().release();
+    delete buffer_pointer;
+    buffer_pointer = result;
   }
+  buffer_pointer = nullptr;
 
   return result;
 }

@@ -3,15 +3,13 @@
 
 #include <cstddef>
 #include <eigen3/Eigen/Core>
-#include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Functions/FunctionBase.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
 
 namespace gsplines {
 namespace functions {
-
-class FunctionExpression;
 
 class Function : public FunctionBase {
 

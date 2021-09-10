@@ -15,19 +15,22 @@ public:
       : Base(std::move(_that)){};
 
   std::unique_ptr<Current> clone() const & {
-    return std::unique_ptr<Current>(this->clone_impl());
+    return std::unique_ptr<Current>(static_cast<Current *>(this->clone_impl()));
   }
 
   std::unique_ptr<Current> clone() && {
-    return std::unique_ptr<Current>(this->move_clone_impl());
+    return std::unique_ptr<Current>(
+        static_cast<Current *>(this->move_clone_impl()));
   }
 
-  std::unique_ptr<Current> move_clone() const & {
-    return std::unique_ptr<Current>(this->move_clone_impl());
+  std::unique_ptr<Current> move_clone() {
+    return std::unique_ptr<Current>(
+        static_cast<Current *>(this->move_clone_impl()));
   }
 
   std::unique_ptr<DerivativeClass> deriv(std::size_t _deg) const & {
-    return std::unique_ptr<DerivativeClass>(this->deriv_impl(_deg));
+    return std::unique_ptr<DerivativeClass>(
+        static_cast<DerivativeClass *>(this->deriv_impl(_deg)));
   }
 
   ~FunctionInheritanceHelper() = default;

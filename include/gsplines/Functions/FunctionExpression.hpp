@@ -15,6 +15,7 @@
 
 namespace gsplines {
 namespace functions {
+class Function;
 
 class FunctionExpression
     : public FunctionInheritanceHelper<FunctionExpression, FunctionBase,
@@ -31,7 +32,7 @@ private:
       const Eigen::Ref<const Eigen::VectorXd> &,
       Eigen::Ref<Eigen::MatrixXd> _result);
 
-  typedef std::unique_ptr<FunctionExpression>(Deriv_Function_Type)(
+  typedef FunctionExpression *(Deriv_Function_Type)(
       const std::list<std::unique_ptr<FunctionBase>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
@@ -58,8 +59,10 @@ public:
                      const std::string &_name = "FunctionExpression");
 
   FunctionExpression(const FunctionExpression &that);
-
   FunctionExpression(FunctionExpression &&that);
+
+  FunctionExpression(const Function &that);
+  FunctionExpression(Function &&that);
 
   virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                      Eigen::Ref<Eigen::MatrixXd> _result) const {
@@ -110,23 +113,21 @@ public:
 
   void initialize();
 
-  virtual ~FunctionExpression() {}
+  virtual ~FunctionExpression() = default;
+
   std::unique_ptr<FunctionExpression> deriv(std::size_t _deg = 1) const {
-    return deriv_operation_(function_array_, _deg);
+    return std::unique_ptr<FunctionExpression>(this->deriv_impl(_deg));
   }
 
-private:
+protected:
+  //
   virtual FunctionExpression *deriv_impl(std::size_t _deg = 1) const {
-    return nullptr;
+    return deriv_operation_(function_array_, _deg);
   }
 };
 
 FunctionExpression operator*(double, const FunctionExpression &);
 FunctionExpression operator*(double, FunctionExpression &&);
-
-std::unique_ptr<FunctionExpression> deriv_unique_functions(
-    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
-    std::size_t _deg);
 
 void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
@@ -153,21 +154,25 @@ void eval_concat_functions(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
-std::unique_ptr<FunctionExpression> deriv_sum_functions(
-    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
-    std::size_t _deg);
+FunctionExpression *
+deriv_unique_functions(const std::list<FunctionBase> *&_function_array,
+                       std::size_t _deg);
 
-std::unique_ptr<FunctionExpression> deriv_mul_functions(
-    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
-    std::size_t _deg);
+FunctionExpression *
+deriv_sum_functions(const std::list<FunctionBase> *&_function_array,
+                    std::size_t _deg);
 
-std::unique_ptr<FunctionExpression> deriv_compose_functions(
-    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
-    std::size_t _deg);
+FunctionExpression *
+deriv_mul_functions(const std::list<FunctionBase> *&_function_array,
+                    std::size_t _deg);
 
-std::unique_ptr<FunctionExpression> deriv_concat_functions(
-    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
-    std::size_t _deg);
+FunctionExpression *
+deriv_compose_functions(const std::list<FunctionBase> *&_function_array,
+                        std::size_t _deg);
+
+FunctionExpression *
+deriv_concat_functions(const std::list<FunctionBase> *&_function_array,
+                       std::size_t _deg);
 
 } // namespace functions
 } // namespace gsplines
