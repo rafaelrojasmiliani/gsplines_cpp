@@ -22,12 +22,12 @@ FunctionExpression::operator+(const FunctionExpression &_that) const & {
 
   // printf("AAAAAAAAAAAAAAAAA\n");
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
   if (get_type() == SUM) {
     // printf("this sum, other const& \n");
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -41,7 +41,7 @@ FunctionExpression::operator+(const FunctionExpression &_that) const & {
   if (_that.get_type() == SUM) {
     std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -58,13 +58,13 @@ FunctionExpression::operator+(FunctionExpression &&_that) const & {
   sum_throw(*this, _that);
   // printf("BBBBBBBBBBBBBBBBBB\n");
 
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   if (get_type() == SUM) {
 
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else {
@@ -93,7 +93,7 @@ FunctionExpression::operator+(const FunctionExpression &_that) && {
       // printf("a-------\n");
       std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                      std::back_inserter(function_array_),
-                     [](const std::unique_ptr<FunctionExpression> &element) {
+                     [](const std::unique_ptr<FunctionBase> &element) {
                        return element->clone();
                      });
     } else {
@@ -102,7 +102,7 @@ FunctionExpression::operator+(const FunctionExpression &_that) && {
 
     return std::move(*this);
   }
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   std::pair<double, double> domain = get_domain();
   std::size_t codom_dim = get_codom_dim();
@@ -112,7 +112,7 @@ FunctionExpression::operator+(const FunctionExpression &_that) && {
   if (_that.get_type() == FunctionExpression::SUM) {
     std::transform(_that.function_array_.begin(), _that.function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   } else
@@ -137,7 +137,7 @@ FunctionExpression::operator+(FunctionExpression &&_that) && {
 
     return std::move(*this);
   }
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   std::pair<double, double> domain = get_domain();
   std::size_t codom_dim = get_codom_dim();
@@ -161,18 +161,18 @@ FunctionExpression
 FunctionExpression::operator-(const FunctionExpression &_that) const & {
 
   sum_throw(*this, _that);
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
   if (get_type() != SUM) {
     result_array.push_back(this->clone());
   } else {
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   }
 
-  std::list<std::unique_ptr<FunctionExpression>> aux_array;
+  std::list<std::unique_ptr<FunctionBase>> aux_array;
   aux_array.push_back(_that.clone());
   aux_array.push_back(std::make_unique<ConstFunction>(get_domain(), 1, -1.0));
 
@@ -189,18 +189,18 @@ FunctionExpression
 FunctionExpression::operator-(FunctionExpression &&_that) const & {
 
   sum_throw(*this, _that);
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
   if (get_type() != SUM) {
     result_array.push_back(this->clone());
   } else {
     std::transform(function_array_.begin(), function_array_.end(),
                    std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionExpression> &element) {
+                   [](const std::unique_ptr<FunctionBase> &element) {
                      return element->clone();
                    });
   }
 
-  std::list<std::unique_ptr<FunctionExpression>> aux_array;
+  std::list<std::unique_ptr<FunctionBase>> aux_array;
   aux_array.push_back(_that.move_clone());
   aux_array.push_back(std::make_unique<ConstFunction>(get_domain(), 1, -1.0));
 
@@ -224,7 +224,7 @@ FunctionExpression::operator-(const FunctionExpression &_that) && {
 
     return std::move(*this);
   }
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   std::pair<double, double> domain = get_domain();
   std::size_t codom_dim = get_codom_dim();
@@ -248,7 +248,7 @@ FunctionExpression::operator-(FunctionExpression &&_that) && {
 
     return std::move(*this);
   }
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array;
 
   std::pair<double, double> domain = get_domain();
   std::size_t codom_dim = get_codom_dim();
@@ -263,13 +263,13 @@ FunctionExpression::operator-(FunctionExpression &&_that) && {
  *  FunctionExpression Evaluation
  * -----*/
 void eval_sum_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
   Eigen::MatrixXd temp(_domain_points.size(),
                        _function_array.front()->get_codom_dim());
   _result.setZero();
-  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
+  for (const std::unique_ptr<FunctionBase> &f : _function_array) {
     f->value(_domain_points, temp);
     _result += temp;
     // std::cout << "result \n " << _result << "\n ---\n";
@@ -280,20 +280,20 @@ void eval_sum_functions(
 /* -----
  *  FunctionExpression Derivation
  * -----*/
-std::unique_ptr<FunctionExpression> deriv_sum_functions(
-    const std::list<std::unique_ptr<FunctionExpression>> &_function_array,
+FunctionExpression *deriv_sum_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
-  std::list<std::unique_ptr<FunctionExpression>> result_array;
-  for (const std::unique_ptr<FunctionExpression> &f : _function_array) {
+  std::list<std::unique_ptr<FunctionBase>> result_array;
+  for (const std::unique_ptr<FunctionBase> &f : _function_array) {
     // printf("func name = %s \n", f->get_name().c_str());
     result_array.push_back(f->deriv(_deg));
     // printf("func name = %s \n", result_array.back()->get_name().c_str());
   }
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::pair<double, double> domain = _function_array.front()->get_domain();
-  return std::make_unique<FunctionExpression>(domain, codom_dim,
-                                              FunctionExpression::Type::SUM,
-                                              std::move(result_array));
+  return new FunctionExpression(domain, codom_dim,
+                                FunctionExpression::Type::SUM,
+                                std::move(result_array));
 }
 
 } // namespace functions

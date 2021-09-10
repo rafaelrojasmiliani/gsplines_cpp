@@ -280,7 +280,7 @@ FunctionExpression::operator*(FunctionExpression &&_that) && {
       "This condition should not happen."
       " All Multiplication cases should be addressed FunctionMul.cpp"));
 }
-
+/*
 FunctionExpression FunctionExpression::operator-() const & {
 
   return ConstFunction(get_domain(), 1, -1.0) * (*this);
@@ -299,7 +299,7 @@ FunctionExpression operator*(double _value, FunctionExpression &&_that) {
 
   return ConstFunction(_that.get_domain(), 1, _value) * std::move(_that);
 }
-
+*/
 /* -----
  *  FunctionExpression Evaluation
  * -----*/
