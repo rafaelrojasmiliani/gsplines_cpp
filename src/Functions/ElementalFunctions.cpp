@@ -17,7 +17,7 @@ ConstFunction::ConstFunction(std::pair<double, double> _domain,
 ConstFunction::ConstFunction(const ConstFunction &_that)
     : FunctionInheritanceHelper(_that), values_(_that.values_) {}
 
-void ConstFunction::value(
+void ConstFunction::value_impl(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) const {
 
@@ -43,7 +43,7 @@ DomainLinearDilation::DomainLinearDilation(std::pair<double, double> _domain,
 DomainLinearDilation::DomainLinearDilation(const DomainLinearDilation &that)
     : FunctionInheritanceHelper(that), dilation_factor_(that.dilation_factor_) {
 }
-void DomainLinearDilation::value(
+void DomainLinearDilation::value_impl(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) const {
   _result.noalias() = dilation_factor_ * _domain_points;
@@ -58,8 +58,9 @@ Identity::Identity(std::pair<double, double> _domain)
 
 Identity::Identity(const Identity &that) : DomainLinearDilation(that) {}
 
-void Identity::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                     Eigen::Ref<Eigen::MatrixXd> _result) const {
+void Identity::value_impl(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
   _result = _domain_points;
 };
 
@@ -70,8 +71,9 @@ Exponential::Exponential(std::pair<double, double> _domain)
 Exponential::Exponential(const Exponential &that)
     : FunctionInheritanceHelper(that) {}
 
-void Exponential::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                        Eigen::Ref<Eigen::MatrixXd> _result) const {
+void Exponential::value_impl(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
   _result = Eigen::exp(_domain_points.array()).matrix();
 };
 Exponential *Exponential::deriv_impl(std::size_t _deg) const {
@@ -84,17 +86,23 @@ Cos::Cos(std::pair<double, double> _domain)
 
 Cos::Cos(const Cos &that) : FunctionInheritanceHelper(that) {}
 
-void Cos::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                Eigen::Ref<Eigen::MatrixXd> _result) const {
+void Cos::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                     Eigen::Ref<Eigen::MatrixXd> _result) const {
   _result = Eigen::cos(_domain_points.array()).matrix();
 };
 
 FunctionExpression *Cos::deriv_impl(std::size_t _deg) const {
-  /*
-return new FunctionExpression(ConstFunction(get_domain(), 1, -1.0) *
-                              Sin(get_domain()));
-                              */
-  return nullptr;
+  switch (_deg % 4) {
+  case 0:
+    return new FunctionExpression(Cos(*this));
+  case 3:
+    return new FunctionExpression(-Sin(get_domain()));
+  case 2:
+    return new FunctionExpression(-Cos(get_domain()));
+  case 1:
+    return new FunctionExpression(Sin(get_domain()));
+  }
+  throw std::invalid_argument("This case shoul not happen: Cos:deriv_impl");
 }
 
 // Sin
@@ -103,16 +111,23 @@ Sin::Sin(std::pair<double, double> _domain)
 
 Sin::Sin(const Sin &that) : FunctionInheritanceHelper(that) {}
 
-void Sin::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                Eigen::Ref<Eigen::MatrixXd> _result) const {
+void Sin::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                     Eigen::Ref<Eigen::MatrixXd> _result) const {
   _result = Eigen::sin(_domain_points.array()).matrix();
 };
 
 FunctionExpression *Sin::deriv_impl(std::size_t _deg) const {
-  /*
-return new FunctionExpression(Cos(get_domain()));
-*/
-  return nullptr;
+  switch (_deg % 4) {
+  case 0:
+    return new FunctionExpression(Sin(*this));
+  case 3:
+    return new FunctionExpression(Cos(get_domain()));
+  case 2:
+    return new FunctionExpression(-Sin(get_domain()));
+  case 1:
+    return new FunctionExpression(-Cos(get_domain()));
+  }
+  throw std::invalid_argument("This case shoul not happen: Sin:deriv_impl");
 }
 
 // CanonicPolynomial
@@ -133,7 +148,7 @@ CanonicPolynomial::CanonicPolynomial(CanonicPolynomial &&that)
     : FunctionInheritanceHelper(std::move(that)),
       coefficients_(std::move(that.coefficients_)) {}
 
-void CanonicPolynomial::value(
+void CanonicPolynomial::value_impl(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) const {
 

@@ -31,8 +31,8 @@ public:
 
   ConstFunction(const ConstFunction &_that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   ConstFunction *deriv_impl(std::size_t _deg = 1) const override;
@@ -51,8 +51,8 @@ public:
 
   DomainLinearDilation(const DomainLinearDilation &that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   virtual ConstFunction *deriv_impl(std::size_t _deg) const override;
@@ -65,8 +65,8 @@ public:
 
   Identity(const Identity &that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 };
 
 class Exponential
@@ -76,8 +76,8 @@ public:
 
   Exponential(const Exponential &that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   virtual Exponential *deriv_impl(std::size_t _deg) const override;
@@ -90,8 +90,8 @@ public:
 
   Cos(const Cos &that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   FunctionExpression *deriv_impl(std::size_t _deg) const override;
@@ -104,8 +104,8 @@ public:
 
   Sin(const Sin &that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   FunctionExpression *deriv_impl(std::size_t _deg) const override;
@@ -128,8 +128,8 @@ public:
 
   CanonicPolynomial(CanonicPolynomial &&that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
   CanonicPolynomial *deriv_impl(std::size_t _deg) const override;

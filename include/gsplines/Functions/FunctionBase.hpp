@@ -57,13 +57,19 @@ public:
   std::unique_ptr<FunctionBase> deriv(std::size_t _deg = 1) const & {
     return std::unique_ptr<FunctionBase>(this->deriv_impl(_deg));
   }
-  virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                     Eigen::Ref<Eigen::MatrixXd> _result) const = 0;
+  virtual void
+  value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const = 0;
+
+  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const {
+    value_impl(_domain_points, _result);
+  }
 
   Eigen::MatrixXd
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
     Eigen::MatrixXd result(_domain_points.size(), get_codom_dim());
-    value(_domain_points, result);
+    value_impl(_domain_points, result);
     return std::move(result);
   }
 

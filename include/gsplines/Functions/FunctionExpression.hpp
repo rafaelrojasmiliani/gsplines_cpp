@@ -64,8 +64,9 @@ public:
   FunctionExpression(const Function &that);
   FunctionExpression(Function &&that);
 
-  virtual void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                     Eigen::Ref<Eigen::MatrixXd> _result) const {
+  virtual void
+  value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+             Eigen::Ref<Eigen::MatrixXd> _result) const override {
 
     eval_operation_(function_array_, _domain_points, _result);
   };
@@ -105,7 +106,7 @@ public:
   virtual FunctionExpression concat(const FunctionExpression &that) &&;
   virtual FunctionExpression concat(FunctionExpression &&that) &&;
 
-  virtual void print(std::size_t _indent = 0) const;
+  virtual void print(std::size_t _indent = 0) const override;
 
   std::string type_to_str() const;
 
@@ -121,8 +122,10 @@ public:
 
 protected:
   //
-  virtual FunctionExpression *deriv_impl(std::size_t _deg = 1) const {
-    return deriv_operation_(function_array_, _deg);
+  virtual FunctionExpression *deriv_impl(std::size_t _deg = 1) const override {
+    FunctionExpression *result = deriv_operation_(function_array_, _deg);
+    assert(result != nullptr);
+    return result;
   }
 };
 

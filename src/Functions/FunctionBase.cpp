@@ -47,6 +47,7 @@ void FunctionBase::print(std::size_t _indent) const {
 }
 
 FunctionExpression FunctionBase::derivate(std::size_t _deg) {
+
   std::list<std::unique_ptr<FunctionBase>> result_array;
   result_array.push_back(std::unique_ptr<FunctionBase>(this->deriv_impl(_deg)));
   return FunctionExpression(get_domain(), get_codom_dim(),

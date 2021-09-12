@@ -42,8 +42,8 @@ public:
   GSpline(const GSpline &that);
   GSpline(GSpline &&that);
 
-  void value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-             Eigen::Ref<Eigen::MatrixXd> _result) const override;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
   std::size_t get_intervals_num() { return number_of_intervals_; }
   double get_exec_time() {

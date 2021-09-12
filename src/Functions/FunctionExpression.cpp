@@ -27,6 +27,7 @@ FunctionExpression::FunctionExpression(
   }
 
   assert(not(get_type() == UNIQUE and get_name() == ""));
+  // assert(not(get_type() == UNIQUE and function_array_.size() == 0));
   initialize();
 
   num_call_constructor_++;
@@ -41,6 +42,7 @@ FunctionExpression::FunctionExpression(
       function_array_(std::move(_function_array)) {
 
   assert(not(get_type() == UNIQUE and get_name() == ""));
+  // assert(not(get_type() == UNIQUE and function_array_.size() == 0));
   initialize();
 
   num_call_simple_constructor_++;
@@ -71,7 +73,6 @@ FunctionExpression::FunctionExpression(FunctionExpression &&that)
 FunctionExpression::FunctionExpression(const Function &_that)
     : FunctionExpression(_that.get_domain(), _that.get_codom_dim(), UNIQUE,
                          {}) {
-
   function_array_.push_back(_that.clone());
   num_call_copy_constructor_++;
 }
@@ -174,6 +175,7 @@ FunctionExpression *deriv_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg) {
 
+  assert(_function_array.size() == 1);
   std::pair<double, double> domain = _function_array.front()->get_domain();
   std::size_t codom_dim = _function_array.front()->get_codom_dim();
   std::list<std::unique_ptr<FunctionBase>> result_array;
@@ -188,6 +190,7 @@ void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result) {
+  assert(_function_array.size() == 1);
   // printf("EVAL UNIQUE !°°° .............. \n\n");
 
   _function_array.front()->value(_domain_points, _result);

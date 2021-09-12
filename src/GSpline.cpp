@@ -87,8 +87,8 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
   GSpline::value(domain_break_points_, waypoints_);
 }
 
-void GSpline::value(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                    Eigen::Ref<Eigen::MatrixXd> _result) const {
+void GSpline::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                         Eigen::Ref<Eigen::MatrixXd> _result) const {
 
   std::size_t result_cols(_domain_points.size());
   std::size_t current_interval = 0;
