@@ -9,13 +9,17 @@ import matplotlib.pyplot as plt
 import time
 try:
     from gsplines import BasisLegendre
-    from gsplines import PyInterpolator as Interpolator
+    from gsplines import optimal_sobolev_norm
+    from gsplines import broken_lines_path
+    from gsplines import minimum_acceleration_path
+    from gsplines import minimum_jerk_path
+    from gsplines import minimum_snap_path
+    from gsplines import minimum_crackle_path
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
     from gsplines import BasisLegendre
-    from gsplines import PyInterpolator as Interpolator
     from gsplines import optimal_sobolev_norm
     from gsplines import broken_lines_path
     from gsplines import minimum_acceleration_path
@@ -73,9 +77,9 @@ class MyTest(unittest.TestCase):
                    minimum_acceleration_path(waypoints),
                    minimum_jerk_path(waypoints)]
 
-        for q in q_array:
-            show_piecewisefunction(q, 5, 0.001)
-        plt.show()
+        # for q in q_array:
+        #    show_piecewisefunction(q, 5, 0.001)
+        # plt.show()
 
 
 if __name__ == '__main__':

@@ -46,8 +46,7 @@ private:
 
 public:
   DomainLinearDilation(std::pair<double, double> _domain,
-                       double _dilation_factor,
-                       const std::string &_name = "DomainLinearDilation");
+                       double _dilation_factor);
 
   DomainLinearDilation(const DomainLinearDilation &that);
 

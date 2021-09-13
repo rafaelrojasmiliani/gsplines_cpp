@@ -28,7 +28,8 @@ public:
     COMPOSITION,
     CONCATENATION,
     UNIQUE,
-    NEGATIVE
+    NEGATIVE,
+    EMPTY
   };
 
   std::list<std::unique_ptr<FunctionBase>> function_array_;
@@ -59,6 +60,8 @@ public:
       std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
       const std::list<std::unique_ptr<FunctionBase>> &_function_array,
       const std::string &_name = "FunctionExpression");
+
+  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim);
 
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
                      Type _type,

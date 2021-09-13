@@ -36,9 +36,8 @@ ConstFunction *ConstFunction::deriv_impl(std::size_t _deg) const {
 
 // DomainLinearDilation
 DomainLinearDilation::DomainLinearDilation(std::pair<double, double> _domain,
-                                           double _dilation_factor,
-                                           const std::string &_name)
-    : FunctionInheritanceHelper(_domain, 1, _name),
+                                           double _dilation_factor)
+    : FunctionInheritanceHelper(_domain, 1, "DomainLinearDilation"),
       dilation_factor_(_dilation_factor) {}
 DomainLinearDilation::DomainLinearDilation(const DomainLinearDilation &that)
     : FunctionInheritanceHelper(that), dilation_factor_(that.dilation_factor_) {
@@ -54,7 +53,7 @@ ConstFunction *DomainLinearDilation::deriv_impl(std::size_t _deg) const {
 }
 // Identity
 Identity::Identity(std::pair<double, double> _domain)
-    : DomainLinearDilation(_domain, 1.0, "Identity") {}
+    : DomainLinearDilation(_domain, 1.0) {}
 
 Identity::Identity(const Identity &that) : DomainLinearDilation(that) {}
 
@@ -161,26 +160,30 @@ void CanonicPolynomial::value_impl(
 
 CanonicPolynomial *CanonicPolynomial::deriv_impl(std::size_t _deg) const {
 
-  if (_deg == 0)
+  if (_deg == 0) {
     return new CanonicPolynomial(*this);
+  }
+
   Eigen::VectorXd result(coefficients_);
 
   std::size_t vsize = result.size();
 
-  /*
   if ((int)vsize - _deg <= 0) {
-    return new ConstFunction(get_domain(), get_codom_dim(), 0.0);
-  }*/
+    Eigen::VectorXd coeff_(1);
+    coeff_(0) = 0.0;
+    return new CanonicPolynomial(get_domain(), std::move(coeff_));
+  }
+
   for (std::size_t k = 1; k <= _deg; k++) {
     for (std::size_t uici = 0; uici < vsize - 1; uici++) {
       result(uici) = ((double)uici + 1.0) * result(uici + 1);
     }
     vsize--;
-    /*
     if (vsize == 0) {
-      return new ConstFunction(get_domain(), get_codom_dim(), result(0));
+      Eigen::VectorXd coeff_(1);
+      coeff_(0) = 0.0;
+      return new CanonicPolynomial(get_domain(), coeff_);
     }
-    */
   }
   return new CanonicPolynomial(get_domain(), std::move(result.head(vsize)));
 } // namespace functions

@@ -236,10 +236,10 @@ class MyTest(unittest.TestCase):
                 pol_d_nom = pol_nom.deriv(deg)
                 print(" ***COMPUTE DERIV ", deg)
                 pol_d_test = pol_test.deriv(deg)
-                print(" +++COMPUTE DERIV ", deg)
-                self.assertTrue(
+                print(" +++COMPUTE Error", deg)
+                self.assertLessEqual(
                     np.linalg.norm(pol_d_nom(self.time_spam) -
-                                   pol_d_test(self.time_spam)) < 1.0e-9)
+                                   pol_d_test(self.time_spam)), 1.0e-9)
                 self.error_test(pol_d_nom, pol_d_test)
                 print("\n+++ok\n")
 

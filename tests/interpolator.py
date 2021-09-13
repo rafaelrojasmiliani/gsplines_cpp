@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 import time
 try:
     from gsplines import BasisLegendre
-    from gsplines import PyInterpolator as Interpolator
+    from gsplines import Interpolator
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
     from gsplines import BasisLegendre
-    from gsplines import PyInterpolator as Interpolator
+    from gsplines import Interpolator
 
 
 def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title=''):

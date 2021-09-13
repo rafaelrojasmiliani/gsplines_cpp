@@ -11,7 +11,7 @@ from itertools import tee
 
 try:
     from gsplines import BasisLegendre
-    from gsplines import PyInterpolator as Interpolator
+    from gsplines import Interpolator
     from gsplines import SobolevNorm
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
@@ -19,7 +19,7 @@ except ImportError:
     sys.path.append(str(MOD_PATH_PYGSPLINES))
     from gsplines import BasisLegendre
     from gsplines import SobolevNorm
-    from gsplines import PyInterpolator as Interpolator
+    from gsplines import Interpolator
 
 
 def pairwise(iterable):

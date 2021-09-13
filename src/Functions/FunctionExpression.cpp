@@ -32,6 +32,9 @@ FunctionExpression::FunctionExpression(
 
   num_call_constructor_++;
 }
+FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
+                                       std::size_t _codom_dim)
+    : FunctionExpression(_domain, _codom_dim, EMPTY, {}, "Empty") {}
 
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
