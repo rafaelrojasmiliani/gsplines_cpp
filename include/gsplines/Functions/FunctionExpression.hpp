@@ -22,7 +22,14 @@ class FunctionExpression
                                        FunctionExpression> {
 
 public:
-  enum Type { SUM = 0, MULTIPLICATION, COMPOSITION, CONCATENATION, UNIQUE };
+  enum Type {
+    SUM = 0,
+    MULTIPLICATION,
+    COMPOSITION,
+    CONCATENATION,
+    UNIQUE,
+    NEGATIVE
+  };
 
   std::list<std::unique_ptr<FunctionBase>> function_array_;
 
@@ -127,6 +134,27 @@ protected:
     assert(result != nullptr);
     return result;
   }
+
+public:
+  static std::list<std::unique_ptr<FunctionBase>>
+  const_const_operation_handler(const FunctionExpression &_first,
+                                const FunctionExpression &_second,
+                                FunctionExpression::Type _opt_type);
+
+  static std::list<std::unique_ptr<FunctionBase>>
+  const_nonconst_operation_handler(const FunctionExpression &_first,
+                                   FunctionExpression &&_second,
+                                   FunctionExpression::Type _opt_type);
+
+  static std::list<std::unique_ptr<FunctionBase>>
+  nonconst_const_operation_handler(FunctionExpression &&_first,
+                                   const FunctionExpression &_second,
+                                   FunctionExpression::Type _opt_type);
+
+  static std::list<std::unique_ptr<FunctionBase>>
+  nonconst_nonconst_operation_handler(FunctionExpression &&_first,
+                                      FunctionExpression &&_second,
+                                      FunctionExpression::Type _opt_type);
 };
 
 FunctionExpression operator*(double, const FunctionExpression &);
@@ -157,6 +185,11 @@ void eval_concat_functions(
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+void eval_negative_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result);
+
 FunctionExpression *deriv_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
@@ -174,6 +207,10 @@ FunctionExpression *deriv_compose_functions(
     std::size_t _deg);
 
 FunctionExpression *deriv_concat_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg);
+
+FunctionExpression *deriv_negative_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 

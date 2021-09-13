@@ -29,6 +29,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsConcat.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/Functions.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionExpression.cpp
+  ${PROJECT_SOURCE_DIR}/src/Functions/FunctionGenericOperations.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionBase.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp
   ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoPointsWeights.cpp)

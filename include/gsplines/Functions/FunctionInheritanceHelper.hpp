@@ -4,6 +4,7 @@
 
 namespace gsplines {
 namespace functions {
+
 template <typename Current, typename Base, typename DerivativeClass>
 class FunctionInheritanceHelper : public Base {
 public:
@@ -31,6 +32,10 @@ public:
   std::unique_ptr<DerivativeClass> deriv(std::size_t _deg) const & {
     return std::unique_ptr<DerivativeClass>(
         static_cast<DerivativeClass *>(this->deriv_impl(_deg)));
+  }
+
+  DerivativeClass derivate(std::size_t _deg = 1) const {
+    return DerivativeClass(*deriv(_deg));
   }
 
   ~FunctionInheritanceHelper() = default;

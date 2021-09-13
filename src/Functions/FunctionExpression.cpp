@@ -134,6 +134,11 @@ void FunctionExpression::initialize() {
     deriv_operation_ = deriv_unique_functions;
     break;
 
+  case NEGATIVE:
+    eval_operation_ = eval_negative_functions;
+    deriv_operation_ = deriv_negative_functions;
+    break;
+
   default:
     throw std::invalid_argument("Function Expression Type not defined");
   }
@@ -155,6 +160,8 @@ std::string FunctionExpression::type_to_str() const {
     return "CONCATENATION";
   case UNIQUE:
     return "UNIQUE: " + get_name();
+  case NEGATIVE:
+    return "NEGATIVE: " + get_name();
   default:
     throw std::invalid_argument(
         "FunctionExpression Expression Type not defined");
@@ -195,6 +202,31 @@ void eval_unique_functions(
 
   _function_array.front()->value(_domain_points, _result);
   // std::cout << "in eval uniqune ..... \n" << _result << "----\n";
+}
+
+FunctionExpression *deriv_negative_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    std::size_t _deg) {
+
+  assert(_function_array.size() == 1);
+  std::pair<double, double> domain = _function_array.front()->get_domain();
+  std::size_t codom_dim = _function_array.front()->get_codom_dim();
+  std::list<std::unique_ptr<FunctionBase>> result_array;
+  result_array.push_back(_function_array.front()->deriv(_deg));
+
+  return new FunctionExpression(domain, codom_dim,
+                                FunctionExpression::Type::NEGATIVE,
+                                std::move(result_array));
+}
+
+void eval_negative_functions(
+    const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) {
+  assert(_function_array.size() == 1);
+
+  _function_array.front()->value(_domain_points, _result);
+  _result *= -1.0;
 }
 
 } // namespace functions

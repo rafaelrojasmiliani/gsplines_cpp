@@ -49,7 +49,8 @@ return_second_or_mim_codom_dim(const FunctionExpression &_f1,
 FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) const & {
 
-  // printf("HEEEEEEEEEEE ---- \n ");
+  printf("FunctionExpression::operator*(const FunctionExpression &_that) const "
+         "&\n");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
@@ -57,29 +58,9 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
   const FunctionExpression &f_scalar =
       return_second_or_mim_codom_dim(*this, _that);
 
-  std::list<std::unique_ptr<FunctionBase>> result_array;
-
-  if (f_vector.get_type() == MULTIPLICATION) {
-    std::transform(f_vector.function_array_.begin(),
-                   f_vector.function_array_.end(),
-                   std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionBase> &element) {
-                     return element->clone();
-                   });
-  } else {
-    result_array.push_back(f_vector.clone());
-  }
-
-  if (f_scalar.get_type() == MULTIPLICATION) {
-    std::transform(f_scalar.function_array_.begin(),
-                   f_scalar.function_array_.end(),
-                   std::back_inserter(result_array),
-                   [](const std::unique_ptr<FunctionBase> &element) {
-                     return element->clone();
-                   });
-  } else {
-    result_array.push_back(f_scalar.clone());
-  }
+  std::list<std::unique_ptr<FunctionBase>> result_array =
+      const_const_operation_handler(f_vector, f_scalar,
+                                    FunctionExpression::Type::MULTIPLICATION);
 
   return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
                             FunctionExpression::Type::MULTIPLICATION,
@@ -89,48 +70,24 @@ FunctionExpression::operator*(const FunctionExpression &_that) const & {
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) const & {
 
-  // printf("KKKKKKKKKKKKKKKKKKKKKEEEEEEEEEEE ---- \n ");
   compatibility_mul(*this, _that);
 
   const FunctionExpression &f_vector =
       return_first_or_max_codom_dim(*this, _that);
-  const FunctionExpression &f_scalar =
-      return_second_or_mim_codom_dim(*this, _that);
 
-  std::list<std::unique_ptr<FunctionBase>> result_array;
+  std::pair<double, double> domain = get_domain();
+  std::size_t codom_dim = f_vector.get_codom_dim();
 
-  if (_that.get_type() == FunctionExpression::Type::MULTIPLICATION) {
+  std::list<std::unique_ptr<FunctionBase>> result_array =
+      (get_codom_dim() >= _that.get_codom_dim())
+          ? const_nonconst_operation_handler(
+                *this, std::move(_that),
+                FunctionExpression::Type::MULTIPLICATION)
+          : nonconst_const_operation_handler(
+                std::move(_that), *this,
+                FunctionExpression::Type::MULTIPLICATION);
 
-    std::move(std::begin(_that.function_array_),
-              std::end(_that.function_array_),
-              std::back_inserter(result_array));
-  } else {
-    result_array.push_back(_that.move_clone());
-  }
-
-  if (get_codom_dim() >= _that.get_codom_dim()) {
-    if (get_type() == MULTIPLICATION) {
-      std::transform(function_array_.begin(), function_array_.end(),
-                     std::front_inserter(result_array),
-                     [](const std::unique_ptr<FunctionBase> &element) {
-                       return element->clone();
-                     });
-    } else {
-      result_array.push_front(this->clone());
-    }
-  } else {
-    if (get_type() == MULTIPLICATION) {
-      std::transform(function_array_.begin(), function_array_.end(),
-                     std::back_inserter(result_array),
-                     [](const std::unique_ptr<FunctionBase> &element) {
-                       return element->clone();
-                     });
-    } else {
-      result_array.push_back(this->clone());
-    }
-  }
-
-  return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
+  return FunctionExpression(domain, codom_dim,
                             FunctionExpression::Type::MULTIPLICATION,
                             std::move(result_array));
 }
@@ -139,155 +96,61 @@ FunctionExpression
 FunctionExpression::operator*(const FunctionExpression &_that) && {
 
   compatibility_mul(*this, _that);
-
   const FunctionExpression &f_vector =
       return_first_or_max_codom_dim(*this, _that);
-  const FunctionExpression &f_scalar =
-      return_second_or_mim_codom_dim(*this, _that);
 
-  if (get_codom_dim() >= _that.get_codom_dim()) {
-    if (get_type() == MULTIPLICATION) {
-      if (_that.get_type() == MULTIPLICATION) {
-        std::transform(_that.function_array_.begin(),
-                       _that.function_array_.end(),
-                       std::back_inserter(function_array_),
-                       [](const std::unique_ptr<FunctionBase> &element) {
-                         return element->clone();
-                       });
-      } else {
-        function_array_.push_back(_that.clone());
-      }
-      return std::move(*this);
+  std::pair<double, double> domain = get_domain();
+  std::size_t codom_dim = f_vector.get_codom_dim();
 
-    } else {
-      std::list<std::unique_ptr<FunctionBase>> result_array;
+  std::list<std::unique_ptr<FunctionBase>> result_array =
+      (get_codom_dim() >= _that.get_codom_dim())
+          ? nonconst_const_operation_handler(
+                std::move(*this), _that,
+                FunctionExpression::Type::MULTIPLICATION)
+          : const_nonconst_operation_handler(
+                _that, std::move(*this),
+                FunctionExpression::Type::MULTIPLICATION);
 
-      std::pair<double, double> domain = get_domain();
-      std::size_t codom_dim = get_codom_dim();
-
-      result_array.push_back(this->move_clone());
-
-      if (_that.get_type() == MULTIPLICATION) {
-        std::transform(_that.function_array_.begin(),
-                       _that.function_array_.end(),
-                       std::back_inserter(result_array),
-                       [](const std::unique_ptr<FunctionBase> &element) {
-                         return element->clone();
-                       });
-      } else {
-        result_array.push_back(_that.clone());
-      }
-      return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
-                                FunctionExpression::Type::MULTIPLICATION,
-                                std::move(result_array));
-    }
-  } else {
-    if (get_type() == MULTIPLICATION) {
-      if (_that.get_type() == MULTIPLICATION) {
-        std::transform(_that.function_array_.rbegin(),
-                       _that.function_array_.rend(),
-                       std::front_inserter(function_array_),
-                       [](const std::unique_ptr<FunctionBase> &element) {
-                         return element->clone();
-                       });
-      } else {
-        function_array_.push_front(_that.clone());
-      }
-      return std::move(*this);
-
-    } else {
-      std::list<std::unique_ptr<FunctionBase>> result_array;
-      result_array.push_back(this->move_clone());
-      if (_that.get_type() == MULTIPLICATION) {
-        std::transform(_that.function_array_.rbegin(),
-                       _that.function_array_.rend(),
-                       std::front_inserter(result_array),
-                       [](const std::unique_ptr<FunctionBase> &element) {
-                         return element->clone();
-                       });
-      } else {
-        result_array.push_front(_that.clone());
-      }
-      return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
-                                FunctionExpression::Type::MULTIPLICATION,
-                                std::move(result_array));
-    }
-  }
-  throw(std::invalid_argument(
-      "This condition should not happen."
-      " All Multiplication cases should be addressed FunctionMul.cpp"));
+  return FunctionExpression(domain, codom_dim,
+                            FunctionExpression::Type::MULTIPLICATION,
+                            std::move(result_array));
 }
 
 FunctionExpression
 FunctionExpression::operator*(FunctionExpression &&_that) && {
 
   compatibility_mul(*this, _that);
-
   const FunctionExpression &f_vector =
       return_first_or_max_codom_dim(*this, _that);
-  const FunctionExpression &f_scalar =
-      return_second_or_mim_codom_dim(*this, _that);
 
-  if (get_codom_dim() >= _that.get_codom_dim()) {
-    if (get_type() == MULTIPLICATION) {
-      if (_that.get_type() == MULTIPLICATION) {
-        std::move(_that.function_array_.begin(), _that.function_array_.end(),
-                  std::back_inserter(function_array_));
-      } else {
-        function_array_.push_back(_that.move_clone());
-      }
-      return std::move(*this);
+  std::pair<double, double> domain = get_domain();
+  std::size_t codom_dim = f_vector.get_codom_dim();
 
-    } else {
-      std::list<std::unique_ptr<FunctionBase>> result_array;
-      result_array.push_back(this->move_clone());
-      if (_that.get_type() == MULTIPLICATION) {
-        std::move(_that.function_array_.begin(), _that.function_array_.end(),
-                  std::back_inserter(result_array));
-      } else {
-        result_array.push_back(_that.move_clone());
-      }
-      return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
-                                FunctionExpression::Type::MULTIPLICATION,
-                                std::move(result_array));
-    }
-  } else {
-    if (get_type() == MULTIPLICATION) {
-      if (_that.get_type() == MULTIPLICATION) {
-        std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
-                  std::front_inserter(function_array_));
-      } else {
-        function_array_.push_front(_that.move_clone());
-      }
-      return std::move(*this);
+  std::list<std::unique_ptr<FunctionBase>> result_array =
+      (get_codom_dim() >= _that.get_codom_dim())
+          ? nonconst_nonconst_operation_handler(
+                std::move(*this), std::move(_that),
+                FunctionExpression::Type::MULTIPLICATION)
+          : nonconst_nonconst_operation_handler(
+                std::move(_that), std::move(*this),
+                FunctionExpression::Type::MULTIPLICATION);
 
-    } else {
-      std::list<std::unique_ptr<FunctionBase>> result_array;
-      result_array.push_back(this->move_clone());
-
-      if (_that.get_type() == MULTIPLICATION) {
-        std::move(_that.function_array_.rbegin(), _that.function_array_.rend(),
-                  std::front_inserter(result_array));
-      } else {
-        result_array.push_front(_that.move_clone());
-      }
-      return FunctionExpression(f_vector.get_domain(), f_vector.get_codom_dim(),
-                                FunctionExpression::Type::MULTIPLICATION,
-                                std::move(result_array));
-    }
-  }
-  throw(std::invalid_argument(
-      "This condition should not happen."
-      " All Multiplication cases should be addressed FunctionMul.cpp"));
+  return FunctionExpression(domain, codom_dim,
+                            FunctionExpression::Type::MULTIPLICATION,
+                            std::move(result_array));
 }
 FunctionExpression FunctionExpression::operator-() const & {
 
-  return ConstFunction(get_domain(), 1, -1.0) * (*this);
+  return FunctionExpression(get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::NEGATIVE,
+                            function_array_);
 }
 
 FunctionExpression FunctionExpression::operator-() && {
 
-  return ConstFunction(get_domain(), 1, -1.0) * std::move(*this);
+  return FunctionExpression(get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::NEGATIVE,
+                            std::move(function_array_));
 }
 
 FunctionExpression operator*(double _value, const FunctionExpression &_that) {

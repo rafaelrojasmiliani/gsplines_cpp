@@ -10,7 +10,7 @@
 namespace gsplines {
 namespace functions {
 
-class FunctionExpression;
+// class FunctionExpression;
 class FunctionBase {
 private:
   std::size_t codom_dim_;
@@ -78,7 +78,7 @@ public:
     return operator()(_domain_points);
   }
 
-  FunctionExpression derivate(std::size_t _deg = 1);
+  // virtual FunctionExpression derivate(std::size_t _deg = 1) const = 0;
 
 protected:
   void set_domain(double _t0, double _t1) {

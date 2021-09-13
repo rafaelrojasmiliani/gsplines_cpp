@@ -95,11 +95,11 @@ FunctionExpression *Cos::deriv_impl(std::size_t _deg) const {
   switch (_deg % 4) {
   case 0:
     return new FunctionExpression(Cos(*this));
-  case 3:
+  case 1:
     return new FunctionExpression(-Sin(get_domain()));
   case 2:
     return new FunctionExpression(-Cos(get_domain()));
-  case 1:
+  case 3:
     return new FunctionExpression(Sin(get_domain()));
   }
   throw std::invalid_argument("This case shoul not happen: Cos:deriv_impl");
@@ -120,11 +120,11 @@ FunctionExpression *Sin::deriv_impl(std::size_t _deg) const {
   switch (_deg % 4) {
   case 0:
     return new FunctionExpression(Sin(*this));
-  case 3:
+  case 1:
     return new FunctionExpression(Cos(get_domain()));
   case 2:
     return new FunctionExpression(-Sin(get_domain()));
-  case 1:
+  case 3:
     return new FunctionExpression(-Cos(get_domain()));
   }
   throw std::invalid_argument("This case shoul not happen: Sin:deriv_impl");

@@ -33,15 +33,15 @@ int main() {
   }
 
   {
+    printf("mmm+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
     FunctionExpression f_nom = (exp * sin);
 
-    printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
     FunctionExpression f_d_nom = (exp * cos) + (exp * sin);
-    printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
 
     for (int _ = 0; _ < 100; _++) {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
+      f_nom.print();
       assert(((exp(time_span).array() * sin(time_span).array()).matrix() -
               f_nom(time_span))
                  .norm() < 1.0e-9);

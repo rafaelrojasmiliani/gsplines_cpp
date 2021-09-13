@@ -17,6 +17,7 @@ int main() {
       -2 * sin.compose(DomainLinearDilation({-1, 1}, 2));
 
   f.print();
+  f.derivate().print();
   assert((f(time_span) - Eigen::cos(2 * time_span.array()).matrix()).norm() <
          1.0e-9);
   identity.value(time_span);
