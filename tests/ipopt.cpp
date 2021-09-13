@@ -1,6 +1,6 @@
 #include <gsplines/ipopt_solver.hpp>
 
-#include <gsplines/BasisLegendre.hpp>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/ipopt_solver.hpp>
 #include <iostream>
 

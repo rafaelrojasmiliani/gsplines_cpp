@@ -1,6 +1,6 @@
-#include <gsplines/Basis.hpp>
-#include <gsplines/BasisLagrange.hpp>
-#include <gsplines/BasisLegendre.hpp>
+#include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/BasisLagrange.hpp>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {

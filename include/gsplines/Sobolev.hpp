@@ -3,9 +3,9 @@
 #define SOBOLEV_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
-#include <gsplines/Basis.hpp>
-#include <gsplines/Interpolator.hpp>
+#include <gsplines/Basis/Basis.hpp>
 #include <gsplines/GSpline.hpp>
+#include <gsplines/Interpolator.hpp>
 
 #include <memory>
 #include <utility>

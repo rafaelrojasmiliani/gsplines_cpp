@@ -1,7 +1,7 @@
 #ifndef BASISLEGENDRE_H
 #define BASISLEGENDRE_H
 
-#include <gsplines/Basis.hpp>
+#include <gsplines/Basis/Basis.hpp>
 namespace gsplines {
 
 namespace basis {
@@ -9,7 +9,7 @@ namespace basis {
 class BasisLegendre : public Basis {
 
 private:
-  BasisLegendre &operator=(const BasisLegendre &) =delete;
+  BasisLegendre &operator=(const BasisLegendre &) = delete;
   std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
   mutable Eigen::VectorXd buff_next;
 
@@ -17,7 +17,7 @@ public:
   BasisLegendre(std::size_t _dim);
   BasisLegendre(const BasisLegendre &that);
   BasisLegendre(BasisLegendre &&that);
-  virtual ~BasisLegendre()=default;
+  virtual ~BasisLegendre() = default;
   void eval_on_window(double _s, double _tau,
                       Eigen::Ref<Eigen::VectorXd> _buff) const override;
 

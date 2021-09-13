@@ -2,10 +2,10 @@
 #ifndef PYBASIS
 #define PYBASIS
 #include <eigen3/Eigen/Core>
-#include <gsplines/Basis.hpp>
-#include <gsplines/BasisLegendre.hpp>
-#include <gsplines/Interpolator.hpp>
+#include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/GSpline.hpp>
+#include <gsplines/Interpolator.hpp>
 #include <gsplines/Sobolev.hpp>
 #include <gsplines/ipopt_solver.hpp>
 #include <pybind11/eigen.h>

@@ -16,8 +16,8 @@ find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
   gsplines SHARED
-  ${PROJECT_SOURCE_DIR}/src/BasisLegendre.cpp
-  ${PROJECT_SOURCE_DIR}/src/Basis.cpp
+  ${PROJECT_SOURCE_DIR}/src/Basis/BasisLegendre.cpp
+  ${PROJECT_SOURCE_DIR}/src/Basis/Basis.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
   ${PROJECT_SOURCE_DIR}/src/Sobolev.cpp

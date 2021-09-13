@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <gsplines/BasisLegendre.hpp>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/ipopt_interface.hpp>

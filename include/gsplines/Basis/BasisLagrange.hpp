@@ -1,7 +1,7 @@
 #ifndef BASISLAGRANGE_H
 #define BASISLAGRANGE_H
 
-#include <gsplines/Basis.hpp>
+#include <gsplines/Basis/Basis.hpp>
 namespace gsplines {
 
 namespace basis {

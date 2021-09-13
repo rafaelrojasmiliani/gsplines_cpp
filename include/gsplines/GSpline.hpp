@@ -2,7 +2,7 @@
 #define PIECEWISE_FUNCTION_H
 
 #include <eigen3/Eigen/Core>
-#include <gsplines/Basis.hpp>
+#include <gsplines/Basis/Basis.hpp>
 #include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 
@@ -37,7 +37,7 @@ public:
           std::size_t _n_intervals, const basis::Basis &_basis,
           const Eigen::Ref<const Eigen::VectorXd> _coefficents,
           const Eigen::Ref<const Eigen::VectorXd> _tauv,
-          const std::string &_name = "PieceWiseFunction");
+          const std::string &_name = "GSpline");
 
   GSpline(const GSpline &that);
   GSpline(GSpline &&that);

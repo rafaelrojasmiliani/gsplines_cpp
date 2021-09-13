@@ -1,4 +1,4 @@
-#include <gsplines/BasisLegendre.hpp>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {
@@ -35,7 +35,6 @@ BasisLegendre::BasisLegendre(BasisLegendre &&that)
     : Basis(std::move(that)), buff_next(that.get_dim()),
       derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)) {
 }
-
 
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
