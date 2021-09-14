@@ -188,5 +188,65 @@ CanonicPolynomial *CanonicPolynomial::deriv_impl(std::size_t _deg) const {
   return new CanonicPolynomial(get_domain(), std::move(result.head(vsize)));
 } // namespace functions
 
+DotProduct::DotProduct(const FunctionBase &_f1, const FunctionBase &_f2)
+    : FunctionInheritanceHelper(_f1.get_domain(), 1, "DotProduct"),
+      f1_(_f1.to_expression()), f2_(_f2.to_expression()) {
+
+  assert(_f1.get_codom_dim() == _f2.get_codom_dim());
+}
+DotProduct::DotProduct(FunctionBase &&_f1, FunctionBase &&_f2)
+    : FunctionInheritanceHelper(_f1.get_domain(), 1, "DotProduct"),
+      f1_(_f1.to_expression()), f2_(_f2.to_expression()) {
+
+  assert(_f1.get_codom_dim() == _f2.get_codom_dim());
+}
+
+DotProduct::DotProduct(const FunctionBase &_f1, FunctionBase &&_f2)
+    : FunctionInheritanceHelper(_f1.get_domain(), 1, "DotProduct"),
+      f1_(_f1.to_expression()), f2_(_f2.to_expression()) {
+
+  assert(_f1.get_codom_dim() == _f2.get_codom_dim());
+}
+
+DotProduct::DotProduct(const DotProduct &_that)
+    : FunctionInheritanceHelper(_that), f1_(_that.f1_), f2_(_that.f2_) {}
+
+DotProduct::DotProduct(DotProduct &&_that)
+    : FunctionInheritanceHelper(std::move(_that)), f1_(std::move(_that.f1_)),
+      f2_(std::move(_that.f2_)) {}
+
+void DotProduct::value_impl(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
+
+  Eigen::MatrixXd f1_res = f1_(_domain_points);
+  Eigen::MatrixXd f2_res = f2_(_domain_points);
+
+  _result = (f1_res.array() * f2_res.array()).rowwise().sum();
+}
+
+FunctionExpression *DotProduct::first_deriv_impl(std::size_t _deg) const {
+  return new FunctionExpression(f1_.derivate().dot(f2_) +
+                                f1_.dot(f2_.derivate()));
+}
+
+FunctionExpression *DotProduct::deriv_impl(std::size_t _deg) const {
+
+  if (_deg == 0) {
+    return new FunctionExpression(*this);
+  }
+
+  FunctionExpression *result = first_deriv_impl(_deg);
+  FunctionExpression *buffer_pointer = result;
+
+  for (std::size_t k = 1; k < _deg; k++) {
+    result = result->deriv()->move_clone().release();
+    delete buffer_pointer;
+    buffer_pointer = result;
+  }
+  buffer_pointer = nullptr;
+
+  return result;
+}
 } // namespace functions
 } // namespace gsplines

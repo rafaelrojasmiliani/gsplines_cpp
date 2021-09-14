@@ -1,4 +1,5 @@
 #include <cmath>
+#include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionBase.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <stdexcept>
@@ -45,6 +46,37 @@ void FunctionBase::print(std::size_t _indent) const {
          4 * (int)_indent, "", name_.c_str(), domain_.first, domain_.second,
          codom_dim_);
 }
+DotProduct FunctionBase::dot(const FunctionBase &_that) const & {
+  return DotProduct(*this, _that);
+}
+DotProduct FunctionBase::dot(FunctionBase &&_that) const & {
 
+  return DotProduct(*this, std::move(_that));
+}
+DotProduct FunctionBase::dot(const FunctionBase &_that) && {
+
+  return DotProduct(_that, std::move(*this));
+}
+DotProduct FunctionBase::dot(FunctionBase &&_that) && {
+
+  return DotProduct(std::move(_that), std::move(*this));
+}
+
+FunctionExpression FunctionBase::to_expression() const & {
+  std::list<std::unique_ptr<FunctionBase>> result_array;
+  result_array.push_back(clone());
+
+  return FunctionExpression(get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::UNIQUE,
+                            std::move(result_array));
+}
+FunctionExpression FunctionBase::to_expression() && {
+  std::list<std::unique_ptr<FunctionBase>> result_array;
+  result_array.push_back(move_clone());
+
+  return FunctionExpression(get_domain(), get_codom_dim(),
+                            FunctionExpression::Type::UNIQUE,
+                            std::move(result_array));
+}
 } // namespace functions
 } // namespace gsplines

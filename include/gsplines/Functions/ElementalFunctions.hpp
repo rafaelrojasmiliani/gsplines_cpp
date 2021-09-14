@@ -133,6 +133,29 @@ public:
 protected:
   CanonicPolynomial *deriv_impl(std::size_t _deg) const override;
 };
+
+class DotProduct : public FunctionInheritanceHelper<DotProduct, Function,
+                                                    FunctionExpression> {
+private:
+  FunctionExpression f1_;
+  FunctionExpression f2_;
+
+public:
+  DotProduct(const FunctionBase &_f1, const FunctionBase &_f2);
+  DotProduct(FunctionBase &&_f1, FunctionBase &&_f2);
+  DotProduct(const FunctionBase &_f1, FunctionBase &&_f2);
+
+  DotProduct(const DotProduct &that);
+
+  DotProduct(DotProduct &&that);
+
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override;
+
+protected:
+  FunctionExpression *deriv_impl(std::size_t _deg) const override;
+  FunctionExpression *first_deriv_impl(std::size_t _deg) const;
+};
 } // namespace functions
 } // namespace gsplines
 #endif

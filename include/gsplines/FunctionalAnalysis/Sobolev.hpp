@@ -29,7 +29,7 @@ class SobolevNorm {
   friend class GSpline;
 
 private:
-  SobolevNorm &operator=(const SobolevNorm &);
+  SobolevNorm &operator=(const SobolevNorm &) = delete;
   std::unique_ptr<basis::Basis> basis_;
   std::size_t num_intervals_;
   std::size_t codom_dim_;
@@ -57,6 +57,25 @@ public:
       const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
       Eigen::Ref<Eigen::VectorXd> _buff);
 };
+
+double sobolev_norm(const functions::FunctionBase &_in, std::size_t _deg,
+                    std::size_t _n_glp = 10, std::size_t _n_int = 1);
+
+double sobolev_inner_product(const functions::FunctionBase &_lhs,
+                             const functions::FunctionBase &_rhs,
+                             std::size_t _deg, std::size_t _n_glp = 10,
+                             std::size_t _n_int = 1);
+
+double sobolev_seminorm(const functions::FunctionBase &_in,
+                        const std::vector<std::pair<std::size_t, double>> &,
+                        std::size_t _n_glp = 10, std::size_t _n_int = 1);
+
+double l2_norm(const functions::FunctionBase &_in, std::size_t _n_glp = 10,
+               std::size_t _n_int = 1);
+
+double l2_inner_product(const functions::FunctionBase &_lhs,
+                        const functions::FunctionBase &_rhs,
+                        std::size_t _n_glp = 10, std::size_t _n_int = 1);
 } // namespace functional_analysis
 } // namespace gsplines
 

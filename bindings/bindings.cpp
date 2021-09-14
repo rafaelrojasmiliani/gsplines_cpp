@@ -57,6 +57,11 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
       .def("is_point_in_domain",
            &gsplines::functions::FunctionBase::is_point_in_domain)
       .def("get_domain", &gsplines::functions::FunctionBase::get_domain)
+      .def("dot",
+           [](const gsplines::functions::FunctionBase &_self,
+              const gsplines::functions::FunctionBase &_that) {
+             return _self.dot(_that);
+           })
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0);
 
@@ -140,6 +145,16 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
       .def("get_domain", &gsplines::functions::FunctionBase::get_domain)
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0)
+      .def("dot",
+           [](const gsplines::functions::Function &_self,
+              const gsplines::functions::FunctionBase &_that) {
+             return _self.dot(_that);
+           })
+      .def("dot",
+           [](const gsplines::functions::Function &_self,
+              const gsplines::functions::Function &_that) {
+             return _self.dot(_that);
+           })
       .def("concat",
            [](const gsplines::functions::Function &_self,
               const gsplines::functions::FunctionExpression &_that) {
@@ -200,10 +215,12 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
           [](const gsplines::functions::Function &_lhs,
              const gsplines::functions::Function &_rhs) { return _lhs * _rhs; },
           py::is_operator())
-      .def("deriv",
-           [](const gsplines::functions::Function &_self, std::size_t _deg) {
-             return gsplines::functions::FunctionExpression(_self).deriv(_deg);
-           });
+      .def(
+          "deriv",
+          [](const gsplines::functions::Function &_self, std::size_t _deg) {
+            return gsplines::functions::FunctionExpression(_self).deriv(_deg);
+          },
+          py::arg("_deg") = 1);
 
   py::class_<gsplines::functions::Exponential, gsplines::functions::Function>(
       functions_submodule, "Exponential")
@@ -237,6 +254,10 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
       .def(py::init<std::pair<double, double>,
                     const Eigen::Ref<const Eigen::VectorXd>>());
 
+  py::class_<gsplines::functions::DotProduct, gsplines::functions::Function>(
+      functions_submodule, "DotProduct")
+      .def(py::init<const gsplines::functions::FunctionExpression &,
+                    const gsplines::functions::FunctionExpression &>());
   // ----------------------
   // Collocation Submodule
   // ----------------------
@@ -300,6 +321,9 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
            &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);
 
+  // ------------------------------
+  // Functional Analysis submodule
+  // ------------------------------
   py::class_<gsplines::functional_analysis::SobolevNorm>(
       functional_analysis_submodule, "SobolevNormBase")
       .def(py::init<const Eigen::Ref<const Eigen::MatrixXd>,
