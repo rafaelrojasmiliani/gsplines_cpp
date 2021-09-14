@@ -15,12 +15,14 @@ import sympy as sp
 np.random.seed()
 
 try:
-    from gsplines import Sin, Cos, Exponential, Identity, ConstFunction
+    from gsplines.functions import Sin, Cos, Exponential, \
+        Identity, ConstFunction
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from gsplines import Sin, Cos, Exponential, Identity, ConstFunction
+    from gsplines.functions import Sin, Cos, Exponential, \
+        Identity, ConstFunction
 
 
 def sp_identity(_var):

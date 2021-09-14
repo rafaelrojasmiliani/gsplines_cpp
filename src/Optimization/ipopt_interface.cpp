@@ -1,6 +1,7 @@
-#include <gsplines/ipopt_interface.hpp>
+#include <gsplines/Optimization/ipopt_interface.hpp>
 
-namespace gsplines_opt {
+namespace gsplines {
+namespace optimization {
 
 TimeSegmentLenghtsVar::TimeSegmentLenghtsVar(std::size_t _num_intervals,
                                              double _exec_time)
@@ -50,19 +51,18 @@ void ExecTimeConstraint::FillJacobianBlock(std::string _set_name,
     _jac_block.coeffRef(0, i) = 1.0;
 }
 
-ExecTimeConstraint::~ExecTimeConstraint() {}
-
-SobolevNorm ::SobolevNorm(std::string _name,
-                          const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
-                          const gsplines::basis::Basis &_basis,
-                          std::vector<std::pair<std::size_t, double>> _weights)
+SobolevNorm::SobolevNorm(std::string _name,
+                         const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+                         const gsplines::basis::Basis &_basis,
+                         std::vector<std::pair<std::size_t, double>> _weights)
     : CostTerm(_name), basis_(_basis.clone()), weights_(_weights),
       waypoints_(_waypoints) {}
 
 double SobolevNorm::GetCost() const {
 
   static Eigen::VectorXd tauv(GetVariables()->GetRows());
-  static gsplines::SobolevNorm sobol_norm(waypoints_, *basis_, weights_);
+  static ::gsplines::functional_analysis::SobolevNorm sobol_norm(
+      waypoints_, *basis_, weights_);
   tauv = GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
   return sobol_norm(tauv);
 }
@@ -70,7 +70,8 @@ void SobolevNorm::FillJacobianBlock(std::string _var_set,
                                     Jacobian &_jac) const {
   static Eigen::VectorXd tauv(
       GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetRows());
-  static gsplines::SobolevNorm sobol_norm(waypoints_, *basis_, weights_);
+  static ::gsplines::functional_analysis::SobolevNorm sobol_norm(
+      waypoints_, *basis_, weights_);
   static Eigen::VectorXd result(
       GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetRows());
 
@@ -83,5 +84,5 @@ void SobolevNorm::FillJacobianBlock(std::string _var_set,
        i++)
     _jac.coeffRef(0, i) = result(i);
 }
-SobolevNorm::~SobolevNorm() {}
-} // namespace gsplines_opt
+} // namespace optimization
+} // namespace gsplines

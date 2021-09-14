@@ -1,5 +1,5 @@
 """
-    Test the cost function from the problem 1010
+    
 """
 import numpy as np
 from scipy.special import roots_legendre
@@ -10,15 +10,15 @@ import pathlib
 from itertools import tee
 
 try:
-    from gsplines import BasisLegendre
+    from gsplines.basis import BasisLegendre
     from gsplines import Interpolator
-    from gsplines import SobolevNorm
+    from gsplines.functional_analysis import SobolevNorm
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from gsplines import BasisLegendre
-    from gsplines import SobolevNorm
+    from gsplines.basis import BasisLegendre
+    from gsplines.functional_analysis import SobolevNorm
     from gsplines import Interpolator
 
 
@@ -52,12 +52,9 @@ class cMyTest(unittest.TestCase):
 
         cost = self.cost_
         q = self.inter_.interpolate(tauv, wp)
-        print('------')
 
         qd = q.deriv(1)
-        print('------')
         qdd = q.deriv(2)
-        print('------')
         qddd = q.deriv(3)
 
         def qd3norm(t):

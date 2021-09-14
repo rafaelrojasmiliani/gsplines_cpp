@@ -20,9 +20,9 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Basis/Basis.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
-  ${PROJECT_SOURCE_DIR}/src/Sobolev.cpp
-  ${PROJECT_SOURCE_DIR}/src/ipopt_interface.cpp
-  ${PROJECT_SOURCE_DIR}/src/ipopt_solver.cpp
+  ${PROJECT_SOURCE_DIR}/src/FunctionalAnalysis/Sobolev.cpp
+  ${PROJECT_SOURCE_DIR}/src/Optimization/ipopt_interface.cpp
+  ${PROJECT_SOURCE_DIR}/src/Optimization/ipopt_solver.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionSum.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionMul.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionsComp.cpp

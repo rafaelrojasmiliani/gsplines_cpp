@@ -10,8 +10,21 @@
 #include <memory>
 #include <utility>
 #include <vector>
+/*
+functional_analysis::sobolev_norm(
+    const FunctionBase &,
+    std::vector<std::pair<std::size_t, double>> _terms = {0, 1});
 
+functional_analysis::sobolev_inner_product(
+    const FunctionBase &, const FunctionBase,
+    std::vector<std::pair<std::size_t, double>> _terms = {0, 1});
+
+functional_analysis::definite_integral(const FunctionBase &,
+                                       std::size_t n_glp = 10,
+                                       std::size_t n_int = 1);
+*/
 namespace gsplines {
+namespace functional_analysis {
 class SobolevNorm {
   friend class GSpline;
 
@@ -37,13 +50,14 @@ public:
   SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
               const basis::Basis &_basis,
               std::vector<std::pair<std::size_t, double>> _weights);
-  virtual ~SobolevNorm() {}
+  virtual ~SobolevNorm() = default;
 
   double operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths);
   void deriv_wrt_interval_len(
       const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
       Eigen::Ref<Eigen::VectorXd> _buff);
 };
+} // namespace functional_analysis
 } // namespace gsplines
 
 #endif /* SOBOLEV_H */

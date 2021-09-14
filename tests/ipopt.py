@@ -8,24 +8,24 @@ from numpy.polynomial.legendre import Legendre
 import matplotlib.pyplot as plt
 import time
 try:
-    from gsplines import BasisLegendre
-    from gsplines import optimal_sobolev_norm
-    from gsplines import broken_lines_path
-    from gsplines import minimum_acceleration_path
-    from gsplines import minimum_jerk_path
-    from gsplines import minimum_snap_path
-    from gsplines import minimum_crackle_path
+    from gsplines.basis import BasisLegendre
+    from gsplines.optimization import optimal_sobolev_norm
+    from gsplines.optimization import broken_lines_path
+    from gsplines.optimization import minimum_acceleration_path
+    from gsplines.optimization import minimum_jerk_path
+    from gsplines.optimization import minimum_snap_path
+    from gsplines.optimization import minimum_crackle_path
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from gsplines import BasisLegendre
-    from gsplines import optimal_sobolev_norm
-    from gsplines import broken_lines_path
-    from gsplines import minimum_acceleration_path
-    from gsplines import minimum_jerk_path
-    from gsplines import minimum_snap_path
-    from gsplines import minimum_crackle_path
+    from gsplines.basis import BasisLegendre
+    from gsplines.optimization import optimal_sobolev_norm
+    from gsplines.optimization import broken_lines_path
+    from gsplines.optimization import minimum_acceleration_path
+    from gsplines.optimization import minimum_jerk_path
+    from gsplines.optimization import minimum_snap_path
+    from gsplines.optimization import minimum_crackle_path
 
 
 def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):

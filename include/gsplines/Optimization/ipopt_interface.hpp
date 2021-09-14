@@ -4,12 +4,13 @@
 #define IPOPT_INTERFACE_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
-#include <gsplines/Sobolev.hpp>
+#include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <ifopt/constraint_set.h>
 #include <ifopt/cost_term.h>
 #include <ifopt/variable_set.h>
 
-namespace gsplines_opt {
+namespace gsplines {
+namespace optimization {
 
 class TimeSegmentLenghtsVar : public ifopt::VariableSet {
 private:
@@ -35,7 +36,7 @@ public:
   void FillJacobianBlock(std::string _set_name,
                          Jacobian &_jac_block) const override;
 
-  virtual ~ExecTimeConstraint();
+  virtual ~ExecTimeConstraint() = default;
 
 private:
   Eigen::VectorXd values_;
@@ -52,7 +53,7 @@ public:
 
   double GetCost() const override;
   void FillJacobianBlock(std::string var_set, Jacobian &jac) const override;
-  virtual ~SobolevNorm();
+  virtual ~SobolevNorm() = default;
 
 private:
   /* data */
@@ -61,5 +62,6 @@ private:
   Eigen::MatrixXd waypoints_;
 };
 
-} // namespace gsplines_opt
+} // namespace optimization
+} // namespace gsplines
 #endif /* IPOPT_INTERFACE_H */

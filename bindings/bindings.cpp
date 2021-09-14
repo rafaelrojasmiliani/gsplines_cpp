@@ -2,14 +2,28 @@
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
+#include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Optimization/ipopt_solver.hpp>
 
-PYBIND11_MODULE(gsplines, m) {
-  // ---------
-  // Basis
-  // ---------
-  py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(m, "Basis")
+PYBIND11_MODULE(gsplines, gsplines_module) {
+  gsplines_module.doc() = "Generalized Splines Library with Optimization tools";
+
+  py::module basis_submodule = gsplines_module.def_submodule("basis");
+  py::module functions_submodule = gsplines_module.def_submodule("functions");
+  py::module optimization_submodule =
+      gsplines_module.def_submodule("optimization");
+  py::module collocation_submodule =
+      gsplines_module.def_submodule("collocation");
+  py::module functional_analysis_submodule =
+      gsplines_module.def_submodule("functional_analysis");
+
+  // ----------------
+  // Basis Submodule
+  // ----------------
+  py::class_<gsplines::basis::Basis, gsplines::basis::PyBasis>(basis_submodule,
+                                                               "Basis")
       .def(py::init<std::size_t, const std::string &>())
       .def("get_dim", &gsplines::basis::Basis::get_dim)
       .def("get_name", &gsplines::basis::Basis::get_name)
@@ -20,7 +34,7 @@ PYBIND11_MODULE(gsplines, m) {
            &gsplines::basis::Basis::eval_derivative_wrt_tau_on_window);
 
   py::class_<gsplines::basis::BasisLegendre, gsplines::basis::Basis>(
-      m, "BasisLegendre")
+      basis_submodule, "BasisLegendre")
       .def(py::init<std::size_t>())
       .def("eval_on_window", &gsplines::basis::BasisLegendre::eval_on_window)
       .def("eval_derivative_on_window",
@@ -28,27 +42,14 @@ PYBIND11_MODULE(gsplines, m) {
       .def("eval_derivative_wrt_tau_on_window",
            &gsplines::basis::BasisLegendre::eval_derivative_wrt_tau_on_window);
 
-  py::class_<gsplines::Interpolator>(m, "InterpolatorBase")
-      .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>());
+  basis_submodule.def("string_to_basis", gsplines::basis::string_to_basis);
 
-  py::class_<gsplines::PyInterpolator, gsplines::Interpolator>(m,
-                                                               "Interpolator")
-      .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>())
-      .def("interpolate", &gsplines::PyInterpolator::py_interpolate)
-      .def("solve_interpolation",
-           &gsplines::PyInterpolator::py_solve_interpolation)
-      .def("print_interpolating_matrix",
-           &gsplines::PyInterpolator::print_interpolating_matrix)
-      .def("get_coeff_derivative_wrt_tau",
-           &gsplines::PyInterpolator::get_coeff_derivative_wrt_tau)
-      .def("print_interpolating_vector",
-           &gsplines::PyInterpolator::print_interpolating_vector);
-
-  // ---------
-  // Functions Base
-  // ---------
+  // --------------------
+  // Functions Submodule
+  // --------------------
   py::class_<gsplines::functions::FunctionBase,
-             gsplines::functions::PyFunctionBase>(m, "FunctionBase")
+             gsplines::functions::PyFunctionBase>(functions_submodule,
+                                                  "FunctionBase")
       .def(py::init<std::pair<double, double>, std::size_t,
                     const std::string &>())
       .def("get_codom_dim", &gsplines::functions::FunctionBase::get_codom_dim)
@@ -59,11 +60,9 @@ PYBIND11_MODULE(gsplines, m) {
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0);
 
-  // ---------
-  // Function Expression
-  // ---------
   py::class_<gsplines::functions::FunctionExpression,
-             gsplines::functions::FunctionBase>(m, "FunctionExpression")
+             gsplines::functions::FunctionBase>(functions_submodule,
+                                                "FunctionExpression")
       .def(py::init<std::pair<double, double>, std::size_t>())
       .def("deriv", &gsplines::functions::FunctionExpression::derivate,
            py::arg("_deg") = 1)
@@ -129,11 +128,9 @@ PYBIND11_MODULE(gsplines, m) {
           [](const gsplines::functions::FunctionExpression &_lhs,
              const gsplines::functions::Function &_rhs) { return _lhs * _rhs; },
           py::is_operator());
-  // ---------
-  // Function
-  // ---------
+
   py::class_<gsplines::functions::Function, gsplines::functions::PyFunction>(
-      m, "Function")
+      gsplines_module, "Function")
       .def(py::init<std::pair<double, double>, std::size_t,
                     const std::string &>())
       .def("__call__", &gsplines::functions::FunctionBase::operator())
@@ -208,10 +205,86 @@ PYBIND11_MODULE(gsplines, m) {
              return gsplines::functions::FunctionExpression(_self).deriv(_deg);
            });
 
-  // ---------
-  // GSplines
-  // ---------
-  py::class_<gsplines::GSpline, gsplines::functions::Function>(m, "GSpline")
+  py::class_<gsplines::functions::Exponential, gsplines::functions::Function>(
+      functions_submodule, "Exponential")
+      .def(py::init<std::pair<double, double>>());
+
+  py::class_<gsplines::functions::ConstFunction, gsplines::functions::Function>(
+      functions_submodule, "ConstFunction")
+      .def(py::init<std::pair<double, double>, std::size_t, double>());
+
+  py::class_<gsplines::functions::Cos, gsplines::functions::Function>(
+      functions_submodule, "Cos")
+      .def(py::init<std::pair<double, double>>());
+
+  py::class_<gsplines::functions::DomainLinearDilation,
+             gsplines::functions::Function>(functions_submodule,
+                                            "DomainLinearDilation")
+      .def(py::init<std::pair<double, double>, double>());
+
+  py::class_<gsplines::functions::Identity,
+             gsplines::functions::DomainLinearDilation>(functions_submodule,
+                                                        "Identity")
+      .def(py::init<std::pair<double, double>>());
+
+  py::class_<gsplines::functions::Sin, gsplines::functions::Function>(
+      functions_submodule, "Sin")
+      .def(py::init<std::pair<double, double>>());
+
+  py::class_<gsplines::functions::CanonicPolynomial,
+             gsplines::functions::Function>(functions_submodule,
+                                            "CanonicPolynomial")
+      .def(py::init<std::pair<double, double>,
+                    const Eigen::Ref<const Eigen::VectorXd>>());
+
+  // ----------------------
+  // Collocation Submodule
+  // ----------------------
+  collocation_submodule.def(
+      "legendre_gauss_lobatto_points_weights",
+      &gsplines::collocation::legendre_gauss_lobatto_points_and_weights);
+  collocation_submodule.def("q_and_evaluation",
+                            &gsplines::collocation::q_and_evaluation);
+
+  // -----------------------
+  // Optimization Submodule
+  // -----------------------
+  optimization_submodule.def("broken_lines_path",
+                             &gsplines::optimization::broken_lines_path);
+  optimization_submodule.def(
+      "minimum_acceleration_path",
+      &gsplines::optimization::minimum_acceleration_path);
+  optimization_submodule.def("minimum_jerk_path",
+                             &gsplines::optimization::minimum_jerk_path);
+  optimization_submodule.def("minimum_snap_path",
+                             &gsplines::optimization::minimum_snap_path);
+  optimization_submodule.def("minimum_crackle_path",
+                             &gsplines::optimization::minimum_crackle_path);
+
+  optimization_submodule.def("optimal_sobolev_norm",
+                             &gsplines::optimization::optimal_sobolev_norm);
+
+  // ---------------
+  // Gsplines module
+  // ---------------
+  py::class_<gsplines::Interpolator>(gsplines_module, "InterpolatorBase")
+      .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>());
+
+  py::class_<gsplines::PyInterpolator, gsplines::Interpolator>(gsplines_module,
+                                                               "Interpolator")
+      .def(py::init<std::size_t, std::size_t, gsplines::basis::Basis &>())
+      .def("interpolate", &gsplines::PyInterpolator::py_interpolate)
+      .def("solve_interpolation",
+           &gsplines::PyInterpolator::py_solve_interpolation)
+      .def("print_interpolating_matrix",
+           &gsplines::PyInterpolator::print_interpolating_matrix)
+      .def("get_coeff_derivative_wrt_tau",
+           &gsplines::PyInterpolator::get_coeff_derivative_wrt_tau)
+      .def("print_interpolating_vector",
+           &gsplines::PyInterpolator::print_interpolating_vector);
+
+  py::class_<gsplines::GSpline, gsplines::functions::Function>(gsplines_module,
+                                                               "GSpline")
       .def(py::init<
            std::pair<double, double>, std::size_t, std::size_t,
            gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,
@@ -227,61 +300,21 @@ PYBIND11_MODULE(gsplines, m) {
            &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);
 
-  // Function Expression
-
-  py::class_<gsplines::functions::Exponential, gsplines::functions::Function>(
-      m, "Exponential")
-      .def(py::init<std::pair<double, double>>());
-
-  py::class_<gsplines::functions::ConstFunction, gsplines::functions::Function>(
-      m, "ConstFunction")
-      .def(py::init<std::pair<double, double>, std::size_t, double>());
-
-  py::class_<gsplines::functions::Cos, gsplines::functions::Function>(m, "Cos")
-      .def(py::init<std::pair<double, double>>());
-
-  py::class_<gsplines::functions::DomainLinearDilation,
-             gsplines::functions::Function>(m, "DomainLinearDilation")
-      .def(py::init<std::pair<double, double>, double>());
-
-  py::class_<gsplines::functions::Identity,
-             gsplines::functions::DomainLinearDilation>(m, "Identity")
-      .def(py::init<std::pair<double, double>>());
-
-  py::class_<gsplines::functions::Sin, gsplines::functions::Function>(m, "Sin")
-      .def(py::init<std::pair<double, double>>());
-
-  py::class_<gsplines::functions::CanonicPolynomial,
-             gsplines::functions::Function>(m, "CanonicPolynomial")
-      .def(py::init<std::pair<double, double>,
-                    const Eigen::Ref<const Eigen::VectorXd>>());
-
-  py::class_<gsplines::SobolevNorm>(m, "SobolevNorm")
+  py::class_<gsplines::functional_analysis::SobolevNorm>(
+      functional_analysis_submodule, "SobolevNormBase")
       .def(py::init<const Eigen::Ref<const Eigen::MatrixXd>,
                     gsplines::basis::Basis &,
                     std::vector<std::pair<std::size_t, double>>>())
-      .def("__call__", &gsplines::SobolevNorm::operator())
+      .def("__call__", &gsplines::functional_analysis::SobolevNorm::operator())
       .def("deriv_wrt_interval_len",
-           &gsplines::SobolevNorm::deriv_wrt_interval_len);
+           &gsplines::functional_analysis::SobolevNorm::deriv_wrt_interval_len);
 
-  py::class_<gsplines::PySobolevNorm>(m, "PySobolevNorm")
+  py::class_<gsplines::PySobolevNorm>(functional_analysis_submodule,
+                                      "SobolevNorm")
       .def(py::init<const py::EigenDRef<const Eigen::MatrixXd>,
                     gsplines::basis::Basis &,
                     std::vector<std::pair<std::size_t, double>>>())
-      .def("__call__", &gsplines::SobolevNorm::operator())
+      .def("__call__", &gsplines::PySobolevNorm::operator())
       .def("deriv_wrt_interval_len",
-           &gsplines::SobolevNorm::deriv_wrt_interval_len);
-
-  m.def("broken_lines_path", &gsplines_opt::broken_lines_path);
-  m.def("minimum_acceleration_path", &gsplines_opt::minimum_acceleration_path);
-  m.def("minimum_jerk_path", &gsplines_opt::minimum_jerk_path);
-  m.def("minimum_snap_path", &gsplines_opt::minimum_snap_path);
-  m.def("minimum_crackle_path", &gsplines_opt::minimum_crackle_path);
-
-  m.def("legendre_gauss_lobatto_points_weights",
-        &gsplines::collocation::legendre_gauss_lobatto_points_and_weights);
-  m.def("q_and_evaluation", &gsplines::collocation::q_and_evaluation);
-  // Operations
-  m.def("optimal_sobolev_norm", &gsplines_opt::optimal_sobolev_norm);
-  m.def("string_to_basis", gsplines::basis::string_to_basis);
+           &gsplines::PySobolevNorm::deriv_wrt_interval_len);
 }

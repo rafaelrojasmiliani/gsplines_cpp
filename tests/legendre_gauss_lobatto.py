@@ -16,12 +16,14 @@ import sympy as sp
 np.random.seed()
 
 try:
-    from gsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
+    from gsplines.collocation import legendre_gauss_lobatto_points_weights, \
+        q_and_evaluation
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from gsplines import legendre_gauss_lobatto_points_weights, q_and_evaluation
+    from gsplines.collocation import legendre_gauss_lobatto_points_weights, \
+        q_and_evaluation
 
 
 class MyTest(unittest.TestCase):
@@ -39,14 +41,14 @@ class MyTest(unittest.TestCase):
             points_nom = scheme.points
             for root in points_nom:
                 ln_test = q_and_evaluation(root, pol_degre)[2]
-                assert(np.abs(ln_test) < 1.0e-9)
+                self.assertLessEqual(np.abs(ln_test), 1.0e-9)
 
         for pol_degre in range(4, 30):
             scheme = quadpy.c1.gauss_lobatto(pol_degre)
             points_nom = scheme.points
             for root in points_nom:
                 ln_test = q_and_evaluation(root, pol_degre-1)[0]
-                assert(np.abs(ln_test) < 1.0e-9)
+                self.assertLessEqual(np.abs(ln_test), 1.0e-9)
 
     @ debug_on()
     def points_test(self):
@@ -59,7 +61,8 @@ class MyTest(unittest.TestCase):
             points_test, _ = \
                 legendre_gauss_lobatto_points_weights(number_of_points)
 
-            assert np.linalg.norm(points_nom - points_test.T) < 1.0e-9
+            self.assertLessEqual(np.linalg.norm(
+                points_nom - points_test.T), 1.0e-9)
 
     @ debug_on()
     def weights_test(self):
@@ -72,7 +75,8 @@ class MyTest(unittest.TestCase):
             _, weights_test = \
                 legendre_gauss_lobatto_points_weights(number_of_points)
 
-            assert np.linalg.norm(weights_nom - weights_test.T) < 1.0e-9
+            self.assertLessEqual(np.linalg.norm(
+                weights_nom - weights_test.T), 1.0e-9)
 
     @ debug_on()
     def test(self):

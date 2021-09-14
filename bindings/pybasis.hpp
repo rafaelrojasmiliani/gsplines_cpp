@@ -4,10 +4,9 @@
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis/Basis.hpp>
 #include <gsplines/Basis/BasisLegendre.hpp>
+#include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
-#include <gsplines/Sobolev.hpp>
-#include <gsplines/ipopt_solver.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -75,7 +74,7 @@ public:
   }
 };
 
-class PySobolevNorm : public SobolevNorm {
+class PySobolevNorm : public functional_analysis::SobolevNorm {
 public:
   PySobolevNorm(const py::EigenDRef<const Eigen::MatrixXd> _waypoints,
                 basis::Basis &_basis,

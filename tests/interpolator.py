@@ -8,13 +8,13 @@ from numpy.polynomial.legendre import Legendre
 import matplotlib.pyplot as plt
 import time
 try:
-    from gsplines import BasisLegendre
+    from gsplines.basis import BasisLegendre
     from gsplines import Interpolator
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
-    from gsplines import BasisLegendre
+    from gsplines.basis import BasisLegendre
     from gsplines import Interpolator
 
 

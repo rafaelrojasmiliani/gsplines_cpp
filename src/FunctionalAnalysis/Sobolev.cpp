@@ -1,9 +1,10 @@
 
+#include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/GSpline.hpp>
-#include <gsplines/Sobolev.hpp>
 #include <iostream>
 
 namespace gsplines {
+namespace functional_analysis {
 SobolevNorm::SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
                          const basis::Basis &_basis,
                          std::vector<std::pair<std::size_t, double>> _weights)
@@ -13,8 +14,8 @@ SobolevNorm::SobolevNorm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
       waypoints_(_waypoints), matrix_(_basis.get_dim(), _basis.get_dim()),
       matrix_2_(_basis.get_dim(), _basis.get_dim()) {}
 
-double SobolevNorm::
-operator()(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths) {
+double SobolevNorm::operator()(
+    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths) {
 
   const Eigen::Ref<const Eigen::VectorXd> coeff =
       interpolator_.solve_interpolation(_interval_lengths, waypoints_);
@@ -90,4 +91,5 @@ double SobolevNorm::inner_prod(
 
   return result;
 }
+} // namespace functional_analysis
 } // namespace gsplines
