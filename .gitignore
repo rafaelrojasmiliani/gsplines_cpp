@@ -10,3 +10,4 @@ gsplines.egg-info/*
 build/
 ifopt_notes
 npm-debug.log
+compile_commands.json
