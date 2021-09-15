@@ -84,8 +84,8 @@ public:
   DotProduct dot(const FunctionBase &_that) &&;
   DotProduct dot(FunctionBase &&_that) &&;
 
-  // virtual DotProduct derivate(std::size_t _deg = 1) const = 0;
-  //
+  FunctionExpression derivate(std::size_t _deg = 1) const;
+
   FunctionExpression to_expression() const &;
   FunctionExpression to_expression() &&;
 
