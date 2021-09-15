@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Functions/FunctionBase.hpp>
+#include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 
