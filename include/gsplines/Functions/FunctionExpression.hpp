@@ -116,6 +116,12 @@ public:
   virtual FunctionExpression concat(const FunctionExpression &that) &&;
   virtual FunctionExpression concat(FunctionExpression &&that) &&;
 
+  void operator+=(FunctionExpression &&that);
+  void operator+=(const FunctionExpression &that);
+
+  void operator*=(FunctionExpression &&that);
+  void operator*=(const FunctionExpression &that);
+
   virtual void print(std::size_t _indent = 0) const override;
 
   std::string type_to_str() const;

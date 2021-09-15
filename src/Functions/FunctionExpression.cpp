@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <iostream>
@@ -34,7 +35,11 @@ FunctionExpression::FunctionExpression(
 }
 FunctionExpression::FunctionExpression(std::pair<double, double> _domain,
                                        std::size_t _codom_dim)
-    : FunctionExpression(_domain, _codom_dim, EMPTY, {}, "Empty") {}
+    : FunctionExpression(_domain, _codom_dim, UNIQUE, {}, "ZERO") {
+
+  function_array_.push_back(
+      std::make_unique<ConstFunction>(_domain, _codom_dim, 0.0));
+}
 
 FunctionExpression::FunctionExpression(
     std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
