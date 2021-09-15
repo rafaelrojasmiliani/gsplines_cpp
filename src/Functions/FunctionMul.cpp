@@ -161,6 +161,37 @@ FunctionExpression operator*(double _value, FunctionExpression &&_that) {
 
   return ConstFunction(_that.get_domain(), 1, _value) * std::move(_that);
 }
+
+void FunctionExpression::operator*=(FunctionExpression &&that) {
+  Type initial_type = get_type();
+  if (initial_type == UNIQUE) {
+    type_ = MULTIPLICATION;
+    initialize();
+  } else if (initial_type != MULTIPLICATION) {
+    FunctionExpression aux = FunctionExpression(std::move(*this));
+    function_array_.clear();
+    type_ = MULTIPLICATION;
+    initialize();
+    function_array_.push_back(aux.move_clone());
+  }
+  function_array_.push_back(that.move_clone());
+}
+
+void FunctionExpression::operator*=(const FunctionExpression &that) {
+
+  Type initial_type = get_type();
+  if (initial_type == UNIQUE) {
+    type_ = MULTIPLICATION;
+    initialize();
+  } else if (initial_type != MULTIPLICATION) {
+    FunctionExpression aux = FunctionExpression(std::move(*this));
+    function_array_.clear();
+    type_ = MULTIPLICATION;
+    initialize();
+    function_array_.push_back(aux.move_clone());
+  }
+  function_array_.push_back(that.clone());
+}
 /* -----
  *  FunctionExpression Evaluation
  * -----*/

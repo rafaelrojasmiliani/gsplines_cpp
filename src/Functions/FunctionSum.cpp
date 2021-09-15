@@ -136,5 +136,35 @@ FunctionExpression *deriv_sum_functions(
                                 std::move(result_array));
 }
 
+void FunctionExpression::operator+=(FunctionExpression &&that) {
+  Type initial_type = get_type();
+  if (initial_type == UNIQUE) {
+    type_ = SUM;
+    initialize();
+  } else if (initial_type != SUM) {
+    FunctionExpression aux = FunctionExpression(std::move(*this));
+    function_array_.clear();
+    type_ = SUM;
+    initialize();
+    function_array_.push_back(aux.move_clone());
+  }
+  function_array_.push_back(that.move_clone());
+}
+
+void FunctionExpression::operator+=(const FunctionExpression &that) {
+
+  Type initial_type = get_type();
+  if (initial_type == UNIQUE) {
+    type_ = SUM;
+    initialize();
+  } else if (initial_type != SUM) {
+    FunctionExpression aux = FunctionExpression(std::move(*this));
+    function_array_.clear();
+    type_ = SUM;
+    initialize();
+    function_array_.push_back(aux.move_clone());
+  }
+  function_array_.push_back(that.clone());
+}
 } // namespace functions
 } // namespace gsplines
