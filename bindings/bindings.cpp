@@ -134,8 +134,8 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
              const gsplines::functions::Function &_rhs) { return _lhs * _rhs; },
           py::is_operator());
 
-  py::class_<gsplines::functions::Function, gsplines::functions::PyFunction>(
-      gsplines_module, "Function")
+  py::class_<gsplines::functions::Function, gsplines::functions::PyFunction,
+             gsplines::functions::FunctionBase>(functions_submodule, "Function")
       .def(py::init<std::pair<double, double>, std::size_t,
                     const std::string &>())
       .def("__call__", &gsplines::functions::FunctionBase::operator())
@@ -341,4 +341,32 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
       .def("__call__", &gsplines::PySobolevNorm::operator())
       .def("deriv_wrt_interval_len",
            &gsplines::PySobolevNorm::deriv_wrt_interval_len);
+
+  functional_analysis_submodule.def(
+      "sobolev_semi_inner_product",
+      &gsplines::functional_analysis::sobolev_semi_inner_product,
+      py::arg("_lhs"), py::arg("_rhs"), py::arg("_weights"),
+      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+
+  functional_analysis_submodule.def(
+      "sobolev_semi_norm", &gsplines::functional_analysis::sobolev_semi_norm,
+      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+
+  functional_analysis_submodule.def(
+      "sobolev_inner_product",
+      &gsplines::functional_analysis::sobolev_inner_product,
+      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+
+  functional_analysis_submodule.def(
+      "sobolev_norm", &gsplines::functional_analysis::sobolev_norm,
+      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+
+  functional_analysis_submodule.def(
+      "l2_inner_product", &gsplines::functional_analysis::l2_inner_product,
+      py::arg("_lhs"), py::arg("_rhs"), py::arg("_n_glp") = 10,
+      py::arg("_n_int") = 1);
+
+  functional_analysis_submodule.def(
+      "l2_norm", &gsplines::functional_analysis::l2_norm, py::arg("_in"),
+      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
 }

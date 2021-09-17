@@ -6,6 +6,7 @@ from scipy.special import roots_legendre
 import unittest
 import sys
 import pathlib
+import quadpy
 
 from itertools import tee
 
@@ -13,6 +14,13 @@ try:
     from gsplines.basis import BasisLegendre
     from gsplines import Interpolator
     from gsplines.functional_analysis import SobolevNorm
+    from gsplines import Interpolator
+    from gsplines.functional_analysis import sobolev_semi_inner_product
+    from gsplines.functional_analysis import sobolev_semi_norm
+    from gsplines.functional_analysis import sobolev_inner_product
+    from gsplines.functional_analysis import sobolev_norm
+    from gsplines.functional_analysis import l2_inner_product
+    from gsplines.functional_analysis import l2_norm
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
@@ -20,6 +28,12 @@ except ImportError:
     from gsplines.basis import BasisLegendre
     from gsplines.functional_analysis import SobolevNorm
     from gsplines import Interpolator
+    from gsplines.functional_analysis import sobolev_semi_inner_product
+    from gsplines.functional_analysis import sobolev_semi_norm
+    from gsplines.functional_analysis import sobolev_inner_product
+    from gsplines.functional_analysis import sobolev_norm
+    from gsplines.functional_analysis import l2_inner_product
+    from gsplines.functional_analysis import l2_norm
 
 
 def pairwise(iterable):
@@ -32,7 +46,6 @@ def pairwise(iterable):
 class cMyTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(cMyTest, self).__init__(*args, **kwargs)
-        print('a')
         np.random.seed()
         self.N_ = N = 6  # np.random.randint(2, 10)
         self.dim_ = dim = 2  # np.random.randint(1, 8)
@@ -42,9 +55,30 @@ class cMyTest(unittest.TestCase):
         self.basis_ = basis
         self.cost_ = SobolevNorm(wp, basis, [(3, 1.0)])
         self.inter_ = Interpolator(dim, N, basis)
-        print('b')
+        self.scheme = quadpy.c1.gauss_lobatto(10)
 
-    def test_value(self):
+    def norms(self):
+        wp = self.wp_
+        N = self.N_
+        tauv = np.array([1.0]*N)
+
+        cost = self.cost_
+        q = self.inter_.interpolate(tauv, wp)
+
+        qd = q.deriv(1)
+        qdd = q.deriv(2)
+        qddd = q.deriv(3)
+
+        def norm(_t, _fun):
+            return np.einsum('ij,ij->i', _fun(_t), _fun(_t))
+
+        nom_res = self.scheme.integrate(lambda t: norm(t, q), q.get_domain())
+
+        test_res = l2_norm(q)
+
+        self.assertLessEqual(abs(nom_res-test_res), 1.0e-9)
+
+    def value(self):
         print('testing value')
         wp = self.wp_
         N = self.N_
@@ -87,6 +121,9 @@ class cMyTest(unittest.TestCase):
             if err < 1.0e-4:
                 break
 
+    def test(self):
+        self.value()
+        self.norms()
 #    def test_gradient(self):
 #        print('a')
 #        N = self.N_

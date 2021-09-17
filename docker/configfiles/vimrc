@@ -58,7 +58,7 @@ call vundle#begin('/etc/vim/bundle/')
         let g:ale_lint_on_enter = 1
         let g:ale_lint_on_insert_leave = 1
         let g:ale_fix_on_save = 1
-        let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
+        let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")' --extension-pkg-allow-list=.so"
     " ------- vim-substitute -------
     Plugin 'vim-substitute'
         let g:substitute_SingleWordSize=100

@@ -1,4 +1,5 @@
 
+#include <gsplines/FunctionalAnalysis/Integral.hpp>
 #include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/GSpline.hpp>
@@ -102,27 +103,54 @@ sobolev_semi_inner_product(const functions::FunctionBase &_lhs,
   functions::FunctionExpression sum(_lhs.get_domain(), 1);
 
   for (const std::pair<std::size_t, double> &term : _terms) {
-    functions::FunctionExpression m = _lhs.derivate().dot(_rhs.derivate());
+    sum +=
+        term.second * _lhs.derivate(term.first).dot(_rhs.derivate(term.first));
   }
+
+  return integral(sum, _n_glp, _n_int);
 }
 
-double sobolev_semi_norm(const functions::FunctionBase &,
+double sobolev_semi_norm(const functions::FunctionBase &_in,
                          std::vector<std::pair<std::size_t, double>> _terms,
-                         std::size_t _n_glp = 10, std::size_t _n_int = 1) {}
+                         std::size_t _n_glp, std::size_t _n_int) {
 
-double sobolev_seminorm(const functions::FunctionBase &_in,
-                        const std::vector<std::pair<std::size_t, double>> &,
-                        std::size_t _n_glp = 10, std::size_t _n_int = 1) {}
+  return sobolev_semi_inner_product(_in, _in, _terms, _n_glp, _n_int);
+}
 
-double sobolev_norm(const functions::FunctionBase &, std::size_t _deriv_deg,
-                    std::size_t _n_glp = 10, std::size_t _n_int = 1) {}
+double sobolev_inner_product(const functions::FunctionBase &_lhs,
+                             const functions::FunctionBase &_rhs,
+                             std::size_t _deriv_deg, std::size_t _n_glp,
+                             std::size_t _n_int) {
 
-double l2_norm(const functions::FunctionBase &_in, std::size_t _n_glp = 10,
-               std::size_t _n_int = 1) {}
+  std::vector<std::pair<std::size_t, double>> terms;
+  for (std::size_t i = 0; i <= _deriv_deg; i++) {
+    terms.push_back({i, 1.0});
+  }
+
+  return sobolev_semi_inner_product(_lhs, _rhs, terms, _n_glp, _n_int);
+}
+
+double sobolev_norm(const functions::FunctionBase &_in, std::size_t _deriv_deg,
+                    std::size_t _n_glp, std::size_t _n_int) {
+
+  std::vector<std::pair<std::size_t, double>> terms;
+  for (std::size_t i = 0; i <= _deriv_deg; i++) {
+    terms.push_back({i, 1.0});
+  }
+
+  return sobolev_semi_norm(_in, terms, _n_glp, _n_int);
+}
+
+double l2_norm(const functions::FunctionBase &_in, std::size_t _n_glp,
+               std::size_t _n_int) {
+  return sobolev_norm(_in, 0, _n_glp, _n_int);
+}
 
 double l2_inner_product(const functions::FunctionBase &_lhs,
-                        const functions::FunctionBase &_rhs,
-                        std::size_t _n_glp = 10, std::size_t _n_int = 1) {}
+                        const functions::FunctionBase &_rhs, std::size_t _n_glp,
+                        std::size_t _n_int) {
+  return sobolev_inner_product(_lhs, _rhs, 0, _n_glp, _n_int);
+}
 
 } // namespace functional_analysis
 } // namespace gsplines

@@ -21,6 +21,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
   ${PROJECT_SOURCE_DIR}/src/FunctionalAnalysis/Sobolev.cpp
+  ${PROJECT_SOURCE_DIR}/src/FunctionalAnalysis/Integral.cpp
   ${PROJECT_SOURCE_DIR}/src/Optimization/ipopt_interface.cpp
   ${PROJECT_SOURCE_DIR}/src/Optimization/ipopt_solver.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionSum.cpp
