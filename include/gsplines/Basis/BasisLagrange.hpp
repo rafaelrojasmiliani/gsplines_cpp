@@ -18,7 +18,8 @@ public:
   BasisLagrange(const BasisLagrange &that);
   BasisLagrange(BasisLagrange &&that);
 
-  virtual ~BasisLagrange();
+  virtual ~BasisLagrange() = default;
+
   void eval_on_window(double _s, double _tau,
                       Eigen::Ref<Eigen::VectorXd> _buff) const override;
 
@@ -50,6 +51,9 @@ public:
   barycentric_weights(Eigen::Ref<const Eigen::VectorXd> _points);
   static Eigen::MatrixXd
   derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points);
+  static Eigen::MatrixXd
+  derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
+                    std::size_t _deg);
 };
 
 } // namespace basis

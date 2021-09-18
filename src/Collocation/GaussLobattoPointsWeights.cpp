@@ -119,5 +119,18 @@ legendre_gauss_lobatto_points_and_weights(std::size_t _n) {
   return std::pair<Eigen::VectorXd, Eigen::VectorXd>(std::move(points),
                                                      std::move(weights));
 }
+
+Eigen::VectorXd legendre_gauss_lobatto_points(std::size_t _n) {
+  Eigen::VectorXd result;
+  std::tie(result, std::ignore) = legendre_gauss_lobatto_points_and_weights(_n);
+  return result;
+}
+
+Eigen::VectorXd legendre_gauss_lobatto_weights(std::size_t _n) {
+
+  Eigen::VectorXd result;
+  std::tie(std::ignore, result) = legendre_gauss_lobatto_points_and_weights(_n);
+  return result;
+}
 } // namespace collocation
 } // namespace gsplines

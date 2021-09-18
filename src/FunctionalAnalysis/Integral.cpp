@@ -14,7 +14,7 @@ double integral(const functions::FunctionBase &_in, std::size_t _n_glp,
   double left_bound;
   double right_bound;
   std::tie(left_bound, right_bound) = _in.get_domain();
-  double local_interval_length = right_bound - left_bound;
+  double local_interval_length = (right_bound - left_bound) / _n_int;
   std::tie(glp, glw) =
       collocation::legendre_gauss_lobatto_points_and_weights(_n_glp);
 

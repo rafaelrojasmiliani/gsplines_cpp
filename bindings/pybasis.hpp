@@ -3,6 +3,7 @@
 #define PYBASIS
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/BasisLagrange.hpp>
 #include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/GSpline.hpp>

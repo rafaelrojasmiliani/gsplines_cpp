@@ -45,7 +45,7 @@ public:
   void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                   Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::size_t get_intervals_num() { return number_of_intervals_; }
+  std::size_t get_intervals_num() const { return number_of_intervals_; }
   double get_exec_time() {
     return domain_break_points_.tail(1)(0) - domain_break_points_(0);
   }
@@ -59,6 +59,13 @@ public:
   virtual ~GSpline() = default;
   const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
 
+  // Eigen::VectorXd &get_coefficients() { return coefficients_; }
+
+  Eigen::MatrixXd get_derivative_matrix_block(std::size_t _interval) const {
+    return basis_->get_derivative_matrix() * 2 /
+           domain_interval_lengths_(_interval);
+  }
+
   const Eigen::VectorXd &get_interval_lengths() const {
     return domain_interval_lengths_;
   }
@@ -67,10 +74,12 @@ public:
 
   std::size_t get_number_of_intervals() const { return number_of_intervals_; }
 
+  std::size_t get_basis_dim() const { return basis_->get_dim(); }
+
   GSpline linear_scaling_new_execution_time(double _new_exec_time) const;
 
 protected:
-  GSpline *deriv_impl(std::size_t _deg = 1) const override;
+  virtual GSpline *deriv_impl(std::size_t _deg = 1) const override;
 };
 
 const Eigen::Ref<const Eigen::VectorXd>

@@ -35,12 +35,11 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
 
   py::class_<gsplines::basis::BasisLegendre, gsplines::basis::Basis>(
       basis_submodule, "BasisLegendre")
-      .def(py::init<std::size_t>())
-      .def("eval_on_window", &gsplines::basis::BasisLegendre::eval_on_window)
-      .def("eval_derivative_on_window",
-           &gsplines::basis::BasisLegendre::eval_derivative_on_window)
-      .def("eval_derivative_wrt_tau_on_window",
-           &gsplines::basis::BasisLegendre::eval_derivative_wrt_tau_on_window);
+      .def(py::init<std::size_t>());
+
+  py::class_<gsplines::basis::BasisLagrange, gsplines::basis::Basis>(
+      basis_submodule, "BasisLagrange")
+      .def(py::init<Eigen::Ref<const Eigen::VectorXd>>());
 
   basis_submodule.def("string_to_basis", gsplines::basis::string_to_basis);
 
@@ -350,16 +349,19 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
 
   functional_analysis_submodule.def(
       "sobolev_semi_norm", &gsplines::functional_analysis::sobolev_semi_norm,
-      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+      py::arg("_in"), py::arg("_weights"), py::arg("_n_glp") = 10,
+      py::arg("_n_int") = 1);
 
   functional_analysis_submodule.def(
       "sobolev_inner_product",
-      &gsplines::functional_analysis::sobolev_inner_product,
-      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+      &gsplines::functional_analysis::sobolev_inner_product, py::arg("_lhs"),
+      py::arg("_rhs"), py::arg("_deg"), py::arg("_n_glp") = 10,
+      py::arg("_n_int") = 1);
 
   functional_analysis_submodule.def(
       "sobolev_norm", &gsplines::functional_analysis::sobolev_norm,
-      py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+      py::arg("_in"), py::arg("_weights"), py::arg("_n_glp") = 10,
+      py::arg("_n_int") = 1);
 
   functional_analysis_submodule.def(
       "l2_inner_product", &gsplines::functional_analysis::l2_inner_product,
