@@ -316,6 +316,7 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
       .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
       .def("get_waypoints", &gsplines::GSpline::get_waypoints)
       .def("get_basis_name", &gsplines::GSpline::get_basis_name)
+      .def("deriv", &gsplines::GSpline::derivate, py::arg("_deg") = 1)
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time)
       .def("get_coefficients", &gsplines::GSpline::get_coefficients);

@@ -13,6 +13,7 @@ private:
   size_t dim_;
   Basis &operator=(const Basis &);
   const std::string name_;
+  Eigen::VectorXd parameters_;
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
@@ -29,7 +30,7 @@ public:
         derivative_matrix_(std::move(that.derivative_matrix_)),
         name_(that.name_) {}
 
-  virtual ~Basis() {}
+  virtual ~Basis() = default;
   std::size_t get_dim() const { return dim_; }
 
   virtual void eval_on_window(double _s, double _tau,
@@ -55,6 +56,13 @@ public:
   virtual std::unique_ptr<Basis> move_clone() = 0;
 
   const std::string &get_name() const { return name_; };
+
+  /*
+  virtual Eigen::MatrixXd l2_matrix() const = 0;
+  virtual Eigen::MatrixXd derivative_matrix(std::size_t _deg) const = 0;
+  virtual Eigen::MatrixXd left_continuity_block(std::size_t _deg) const = 0;
+  virtual Eigen::MatrixXd right_continuity_block(std::size_t _deg) const = 0;
+  */
 };
 
 std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);

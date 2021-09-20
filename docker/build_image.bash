@@ -9,6 +9,6 @@ docker build -t "gsplinespp" \
     --build-arg myuid="$myuid" \
     --build-arg mygroup="$mygroup" \
     --build-arg mygid="$mygid" \
-      -f ./image.dockerfile .
+    --no-cache  -f ./image.dockerfile .
 
 exit 0
