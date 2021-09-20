@@ -50,7 +50,7 @@ optimal_sobolev_norm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
   ipopt.SetOption("linear_solver", "mumps");
   ipopt.SetOption("jacobian_approximation", "exact");
   ipopt.SetOption("derivative_test", "first-order");
-  ipopt.SetOption("hessian-approximation", "limited-memory");
+  ipopt.SetOption("hessian_approximation", "limited-memory");
   ipopt.SetOption("jac_c_constant", "yes");
 
   // 4. Ask the solver to solve the problem

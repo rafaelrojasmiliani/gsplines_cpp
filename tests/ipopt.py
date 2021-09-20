@@ -77,9 +77,9 @@ class MyTest(unittest.TestCase):
                    minimum_acceleration_path(waypoints),
                    minimum_jerk_path(waypoints)]
 
-        # for q in q_array:
-        #    show_piecewisefunction(q, 5, 0.001)
-        # plt.show()
+        for q in q_array:
+            show_piecewisefunction(q, 5, 0.001)
+        plt.show()
 
 
 if __name__ == '__main__':

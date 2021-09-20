@@ -6,14 +6,51 @@ import numpy as np
 from numpy.polynomial import Polynomial
 from scipy.special import factorial
 from scipy.interpolate import lagrange
+import matplotlib.pyplot as plt
 
 try:
     from gsplines.basis import BasisLagrange
+    from gsplines.basis import BasisLegendre
+    from gsplines.optimization import optimal_sobolev_norm
+
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
     from gsplines.basis import BasisLagrange
+    from gsplines.basis import BasisLegendre
+    from gsplines.optimization import optimal_sobolev_norm
+
+
+def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
+    dim = _q.get_codom_dim()
+    fig, ax = plt.subplots(_up_to_deriv + 1, dim)
+    if dim == 1:
+        ax = np.array([[ax[i]] for i in range(_up_to_deriv + 1)])
+    if _title:
+        fig.suptitle(_title)
+    t = np.arange(0.0, _q.get_exec_time(), _dt)
+
+    for i in range(0, _up_to_deriv + 1):
+        q = _q.deriv(i)
+        qt = q(t)
+        for j in range(0, dim):
+            ax[i, j].plot(t, qt[:, j])
+            ax[i, j].grid()
+            if i == 0:
+                ax[i, j].set_title('coordinate {:d}'.format(j + 1), fontsize=8)
+
+            if hasattr(_q, 'get_domain_breakpoints'):
+                for ti in _q.get_domain_breakpoints():
+                    ax[i, j].axvline(ti, alpha=0.1, color='red')
+
+    plt.subplots_adjust(
+        left=0.025,
+        bottom=0.05,
+        right=0.975,
+        top=0.95,
+        wspace=0.25,
+        hspace=0.15)
 
 
 def get_vector_with_one_one(_dim: int, _one_index: int) -> np.array:
@@ -69,9 +106,34 @@ class MyTest(unittest.TestCase):
 
             self.assertLessEqual(err, 5.0e-6, "deg = {:d}".format(i))
 
+    def plot_optimization(self):
+
+        n_nodes = 6
+        nodes = np.array([np.cos((2*k-1)/2/n_nodes*np.pi)
+                          for k in range(1, n_nodes+1)])
+
+        dim = 7  # np.random.randint(1, 10)
+        intervals = 4
+
+        exec_time = intervals
+        waypoints = np.random.rand(intervals+1, dim)*6.14
+        basis_lagrange = BasisLagrange(nodes)
+        basis_legendre = BasisLegendre(n_nodes)
+        curve_1 = optimal_sobolev_norm(
+            waypoints, basis_lagrange, [(1, 1)], exec_time)
+        curve_2 = optimal_sobolev_norm(
+            waypoints, basis_legendre, [(1, 1)], exec_time)
+        # curve_1 = op
+        show_piecewisefunction(curve_1, 5, 0.001)
+        show_piecewisefunction(curve_2, 5, 0.001)
+        plt.show()
+        pass
+
     def test(self):
         for _ in range(10):
             self.value()
+
+        self.plot_optimization()
 
 
 def main():
