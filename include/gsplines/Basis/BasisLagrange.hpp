@@ -10,8 +10,11 @@ class BasisLagrange : public Basis {
 
 private:
   BasisLagrange &operator=(const BasisLagrange &);
-  Eigen::VectorXd domain_points_;
-  Eigen::VectorXd barycentric_weights_;
+  const Eigen::VectorXd domain_points_;
+  const Eigen::VectorXd barycentric_weights_;
+  std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
+  mutable Eigen::MatrixXd deriv_buff_1_;
+  mutable Eigen::MatrixXd deriv_buff_2_;
 
 public:
   BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points);
@@ -54,6 +57,9 @@ public:
   static Eigen::MatrixXd
   derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
                     std::size_t _deg);
+  static Eigen::MatrixXd
+  change_interpolation_points(Eigen::Ref<const Eigen::VectorXd> _old_points,
+                              Eigen::Ref<const Eigen::VectorXd> _new_points);
 };
 
 } // namespace basis

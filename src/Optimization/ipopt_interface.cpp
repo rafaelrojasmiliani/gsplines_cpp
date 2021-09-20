@@ -17,7 +17,9 @@ TimeSegmentLenghtsVar::~TimeSegmentLenghtsVar() {}
 void TimeSegmentLenghtsVar::SetVariables(const Eigen::VectorXd &_vec) {
   values_ = _vec;
 }
+
 Eigen::VectorXd TimeSegmentLenghtsVar::GetValues() const { return values_; }
+
 ifopt::Component::VecBound TimeSegmentLenghtsVar::GetBounds() const {
   return bounds_;
 }
@@ -32,11 +34,10 @@ ExecTimeConstraint::ExecTimeConstraint(std::size_t _num_intervals,
 
 Eigen::VectorXd ExecTimeConstraint::GetValues() const {
 
-  static Eigen::VectorXd tauv(GetRows());
-  static Eigen::VectorXd result(1);
+  Eigen::VectorXd result(1);
 
-  tauv = GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
-  result(0) = tauv.sum();
+  result(0) =
+      GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues().sum();
   return result;
 }
 ifopt::Component::VecBound ExecTimeConstraint::GetBounds() const {
@@ -56,33 +57,27 @@ SobolevNorm::SobolevNorm(std::string _name,
                          const gsplines::basis::Basis &_basis,
                          std::vector<std::pair<std::size_t, double>> _weights)
     : CostTerm(_name), basis_(_basis.clone()), weights_(_weights),
-      waypoints_(_waypoints) {}
+      waypoints_(_waypoints), sobol_norm_(_waypoints, _basis, _weights),
+      buff_1_(_waypoints.rows() - 1), buff_2_(_waypoints.rows() - 1) {}
 
 double SobolevNorm::GetCost() const {
 
-  static Eigen::VectorXd tauv(GetVariables()->GetRows());
-  static ::gsplines::functional_analysis::SobolevNorm sobol_norm(
-      waypoints_, *basis_, weights_);
-  tauv = GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
-  return sobol_norm(tauv);
+  buff_1_.noalias() =
+      GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
+  return sobol_norm_(buff_1_);
 }
 void SobolevNorm::FillJacobianBlock(std::string _var_set,
                                     Jacobian &_jac) const {
-  static Eigen::VectorXd tauv(
-      GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetRows());
-  static ::gsplines::functional_analysis::SobolevNorm sobol_norm(
-      waypoints_, *basis_, weights_);
-  static Eigen::VectorXd result(
-      GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetRows());
 
-  tauv = GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
+  buff_1_.noalias() =
+      GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetValues();
 
-  sobol_norm.deriv_wrt_interval_len(tauv, result);
+  sobol_norm_.deriv_wrt_interval_len(buff_1_, buff_2_);
 
   for (unsigned int i = 0;
        i < GetVariables()->GetComponent("TimeSegmentLenghtsVar")->GetRows();
        i++)
-    _jac.coeffRef(0, i) = result(i);
+    _jac.coeffRef(0, i) = buff_2_(i);
 }
 } // namespace optimization
 } // namespace gsplines

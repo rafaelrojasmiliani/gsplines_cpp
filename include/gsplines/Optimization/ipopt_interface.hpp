@@ -60,6 +60,9 @@ private:
   std::unique_ptr<gsplines::basis::Basis> basis_;
   std::vector<std::pair<std::size_t, double>> weights_;
   Eigen::MatrixXd waypoints_;
+  mutable ::gsplines::functional_analysis::SobolevNorm sobol_norm_;
+  mutable Eigen::VectorXd buff_1_;
+  mutable Eigen::VectorXd buff_2_;
 };
 
 } // namespace optimization

@@ -154,9 +154,8 @@ GSpline Interpolator::interpolate(
   const Eigen::VectorXd &vector_resut =
       solve_interpolation(_interval_lengths, _waypoints);
 
-  return GSpline({0.0, _interval_lengths.sum()}, codom_dim_,
-                           num_intervals_, *basis_, vector_resut,
-                           _interval_lengths);
+  return GSpline({0.0, _interval_lengths.sum()}, codom_dim_, num_intervals_,
+                 *basis_, vector_resut, _interval_lengths);
 }
 
 void Interpolator::print_interpolating_matrix() {
@@ -344,5 +343,12 @@ const Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
   sol_buffer_ = solver.solve(interpolating_vector_);
   // 4. Return the interpolating function
   return sol_buffer_;
+}
+
+GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+                    const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+                    const basis::Basis &_basis) {
+  return Interpolator(_waypoints.cols(), _waypoints.rows() - 1, _basis)
+      .interpolate(_interval_lengths, _waypoints);
 }
 } // namespace gsplines

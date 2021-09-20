@@ -63,5 +63,8 @@ public:
                       const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
 };
 
+GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+                    const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+                    const basis::Basis &_basis);
 } // namespace gsplines
 #endif /* INTERPOLATOR_H */

@@ -117,17 +117,18 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
 void BasisLegendre::add_derivative_matrix(double tau, std::size_t _deg,
                                           Eigen::Ref<Eigen::MatrixXd> _mat) {
 
-  unsigned int i, j;
   double scale = _deg > 0 ? pow(2.0 / tau, 2 * _deg - 1) : tau / 2.0;
+
   if (_deg < get_dim() + 1)
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
 }
 
 void BasisLegendre::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
-  unsigned int i, j;
+
   double scale = _deg > 0 ? -0.5 * (2.0 * _deg - 1.0) * pow(2.0 / tau, 2 * _deg)
                           : 1.0 / 2.0;
+
   if (_deg < get_dim() + 1)
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
 }
