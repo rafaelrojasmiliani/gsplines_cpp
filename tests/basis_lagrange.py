@@ -123,8 +123,6 @@ class MyTest(unittest.TestCase):
             waypoints, basis_lagrange, [(3, 1)], exec_time)
         curve_2 = optimal_sobolev_norm(
             waypoints, basis_legendre, [(3, 1)], exec_time)
-        import pdb
-        pdb.set_trace()
         # curve_1 = op
         show_piecewisefunction(curve_1, 5, 0.001)
         show_piecewisefunction(curve_2, 5, 0.001)

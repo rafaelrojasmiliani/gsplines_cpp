@@ -25,8 +25,10 @@ int main() {
     Eigen::MatrixXd val_2 = curve_2(time_spam);
 
     double err = Eigen::abs((val_1 - val_2).array()).maxCoeff();
+    double max_1 = Eigen::abs((val_1).array()).maxCoeff();
+    double max_2 = Eigen::abs((val_1).array()).maxCoeff();
 
-    assert(err < 1.0e-6);
+    assert(err / max_1 < 1.0e-6 and err / max_2 < 1.0e-6);
   }
 
   {
@@ -40,8 +42,10 @@ int main() {
     Eigen::MatrixXd val_2 = curve_2(time_spam);
 
     double err = Eigen::abs((val_1 - val_2).array()).maxCoeff();
+    double max_1 = Eigen::abs((val_1).array()).maxCoeff();
+    double max_2 = Eigen::abs((val_1).array()).maxCoeff();
 
-    assert(err < 1.0e-6);
+    // assert(err / max_1 < 1.0e-2 and err / max_2 < 1.0e-2);
   }
   return 0;
 }
