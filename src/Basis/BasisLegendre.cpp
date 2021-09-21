@@ -174,8 +174,8 @@ Eigen::MatrixXd BasisLegendre::derivative_matrix_impl(std::size_t _deg) const {
   result.transposeInPlace();
   for (std::size_t i = 2; i <= _deg; i++)
     result *= dm;
-  printf("deg = %zu", _deg);
-  std::cout << "deriv matrix \n " << result << "----\n";
+  // printf("deg = %zu", _deg);
+  // std::cout << "deriv matrix \n " << result << "----\n";
   return result;
 }
 } // namespace basis

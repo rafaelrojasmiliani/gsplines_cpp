@@ -71,38 +71,34 @@ void BasisLagrange::eval_derivative_on_window(
   eval_on_window(_s, _tau, _buff);
   if (_deg == 0)
     return;
-  double term = 2.0 / _tau;
-  if (_deg == 1) {
-    _buff = derivative_matrix_.transpose() * _buff * term;
-    return;
-  }
+  double term = std::pow(2.0 / _tau, _deg);
+  /*
+    deriv_buff_1_.noalias() = derivative_matrix_;
+    deriv_buff_2_.noalias() = derivative_matrix_;
 
-  deriv_buff_1_.noalias() = derivative_matrix_;
-  deriv_buff_2_.noalias() = derivative_matrix_;
+    const Eigen::VectorXd &x = domain_points_;
 
-  const Eigen::VectorXd &x = domain_points_;
+    for (std::size_t uick = 2; uick <= _deg; uick++) {
+      term *= term;
+      for (std::size_t uici = 0; uici < get_dim(); uici++) {
+        deriv_buff_1_(uici, uici) = 0.0;
+        for (std::size_t uicj = 0; uicj < get_dim(); uicj++) {
+          if (uici != uicj) {
+            double wj = barycentric_weights_(uicj);
+            double wi = barycentric_weights_(uici);
 
-  for (std::size_t uick = 2; uick <= _deg; uick++) {
-    term *= term;
-    for (std::size_t uici = 0; uici < get_dim(); uici++) {
-      deriv_buff_1_(uici, uici) = 0.0;
-      for (std::size_t uicj = 0; uicj < get_dim(); uicj++) {
-        if (uici != uicj) {
-          double wj = barycentric_weights_(uicj);
-          double wi = barycentric_weights_(uici);
+            deriv_buff_1_(uici, uicj) = (((double)uick) / (x(uici) - x(uicj))) *
+                                        ((wj / wi * deriv_buff_2_(uici, uici)) -
+                                         deriv_buff_2_(uici, uicj));
 
-          deriv_buff_1_(uici, uicj) = (((double)uick) / (x(uici) - x(uicj))) *
-                                      ((wj / wi * deriv_buff_2_(uici, uici)) -
-                                       deriv_buff_2_(uici, uicj));
-
-          deriv_buff_1_(uici, uici) =
-              deriv_buff_1_(uici, uici) - deriv_buff_1_(uici, uicj);
+            deriv_buff_1_(uici, uici) =
+                deriv_buff_1_(uici, uici) - deriv_buff_1_(uici, uicj);
+          }
         }
       }
-    }
-    deriv_buff_2_.noalias() = deriv_buff_1_;
-  }
-  _buff = deriv_buff_1_.transpose() * _buff * term;
+      deriv_buff_2_.noalias() = deriv_buff_1_;
+    }*/
+  _buff = get_derivative_matrix(_deg).transpose() * _buff * term;
 }
 
 void BasisLagrange::eval_derivative_wrt_tau_on_window(

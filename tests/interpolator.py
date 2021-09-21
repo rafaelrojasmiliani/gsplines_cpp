@@ -9,12 +9,14 @@ import matplotlib.pyplot as plt
 import time
 try:
     from gsplines.basis import BasisLegendre
+    from gsplines.basis import BasisLagrange
     from gsplines import Interpolator
 except ImportError:
     MOD_PATH = pathlib.Path(__file__).parent.absolute()
     MOD_PATH_PYGSPLINES = pathlib.Path(MOD_PATH, '..', 'build')
     sys.path.append(str(MOD_PATH_PYGSPLINES))
     from gsplines.basis import BasisLegendre
+    from gsplines.basis import BasisLagrange
     from gsplines import Interpolator
 
 
@@ -50,7 +52,6 @@ def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title=''):
         top=0.95,
         wspace=0.25,
         hspace=0.15)
-    plt.show()
 
 
 class MyTest(unittest.TestCase):
@@ -62,17 +63,25 @@ class MyTest(unittest.TestCase):
     # @debug_on()
     def compute_gspline_test(self):
         """ Test the computation of an interpolating gpline """
-        basis = BasisLegendre(6)
+        basis_dim = 8
+        basis = BasisLegendre(basis_dim)
         dim = 6  # np.random.randint(1, 10)
         intervals = np.random.randint(3, 6)
         waypoints = np.random.rand(intervals+1, dim)
         interval_lengths = 1.0 + np.random.rand(intervals) * 2.0
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
-#        inter.print_interpolating_matrix()
-#        inter.print_interpolating_vector()
 
         show_piecewisefunction(res, 5, 0.10, waypoints)
+
+        nodes = np.array([np.cos((2*k-1)/2/basis_dim*np.pi)
+                          for k in range(1, basis_dim+1)])
+
+        basis = BasisLagrange(nodes)
+        inter = Interpolator(dim, intervals, basis)
+        res = inter.interpolate(interval_lengths, waypoints)
+        show_piecewisefunction(res, 5, 0.10, waypoints)
+        plt.show()
 
 #    #@debug_on()
 #    def interpolation_test_computation_time(self):

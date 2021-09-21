@@ -120,9 +120,9 @@ class MyTest(unittest.TestCase):
         basis_lagrange = BasisLagrange(nodes)
         basis_legendre = BasisLegendre(n_nodes)
         curve_1 = optimal_sobolev_norm(
-            waypoints, basis_lagrange, [(1, 1)], exec_time)
+            waypoints, basis_lagrange, [(3, 1)], exec_time)
         curve_2 = optimal_sobolev_norm(
-            waypoints, basis_legendre, [(1, 1)], exec_time)
+            waypoints, basis_legendre, [(3, 1)], exec_time)
         import pdb
         pdb.set_trace()
         # curve_1 = op

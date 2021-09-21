@@ -2,6 +2,7 @@
 #define BASIS_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -14,7 +15,8 @@ private:
   Basis &operator=(const Basis &);
   const std::string name_;
   Eigen::VectorXd parameters_;
-  std::vector<Eigen::MatrixXd> derivative_matrix_array_;
+
+  mutable std::vector<Eigen::MatrixXd> derivative_matrix_array_;
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
@@ -51,7 +53,7 @@ public:
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd> _buff) const = 0;
 
-  const Eigen::MatrixXd &get_derivative_matrix(std::size_t _deg = 1) {
+  const Eigen::MatrixXd &get_derivative_matrix(std::size_t _deg = 1) const {
     std::size_t current_deriv_calc = derivative_matrix_array_.size();
     if (current_deriv_calc <= _deg) {
       while (current_deriv_calc != _deg + 1) {
@@ -60,7 +62,7 @@ public:
       }
     }
     return derivative_matrix_array_[_deg];
-  };
+  }
 
   virtual void add_derivative_matrix(double tau, std::size_t _deg,
                                      Eigen::Ref<Eigen::MatrixXd> _mat) = 0;
