@@ -77,9 +77,10 @@ public:
 
   virtual Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const = 0;
   /*
-  virtual Eigen::MatrixXd l2_matrix() const = 0;
-  virtual Eigen::MatrixXd left_continuity_block(std::size_t _deg) const = 0;
-  virtual Eigen::MatrixXd right_continuity_block(std::size_t _deg) const = 0;
+  const Eigen::MatrixXd& get_sobolev_matrix(std::size_t _deg);
+  virtual Eigen::MatrixXd sobolev_matrix_impl(std::size_t _deg) const = 0;
+  const Eigen::MatrixXd& left_continuity_block(std::size_t _deg);
+  const Eigen::MatrixXd& right_continuity_block(std::size_t _deg);
   */
 };
 
