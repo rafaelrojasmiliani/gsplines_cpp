@@ -12,16 +12,16 @@ GSpline *GSpline::deriv_impl(std::size_t _deg) const {
   int codom_coor;
   int i0;
 
-  for (der_coor = 1; der_coor <= _deg; der_coor++) {
+  if (_deg > 0) {
     for (interval_coor = 0; interval_coor < number_of_intervals_;
          interval_coor++) {
       for (codom_coor = 0; codom_coor < get_codom_dim(); codom_coor++) {
         i0 = interval_coor * basis_->get_dim() * get_codom_dim() +
              basis_->get_dim() * codom_coor;
         result_coeff.segment(i0, basis_->get_dim()) =
-            basis_->get_derivative_matrix() *
-            result_coeff.segment(i0, basis_->get_dim()) * 2 /
-            domain_interval_lengths_(interval_coor);
+            basis_->get_derivative_matrix(_deg) *
+            result_coeff.segment(i0, basis_->get_dim()) *
+            std::pow(2 / domain_interval_lengths_(interval_coor), _deg);
       }
     }
   }

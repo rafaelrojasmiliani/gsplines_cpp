@@ -53,6 +53,11 @@ public:
     PYBIND11_OVERRIDE_PURE(void, Basis, add_derivative_matrix_deriv_wrt_tau,
                            _tau, _deg, _mat);
   }
+  Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const override {
+
+    PYBIND11_OVERRIDE_PURE(Eigen::MatrixXd, Basis, derivative_matrix_impl,
+                           _deg);
+  }
   std::unique_ptr<Basis> clone() const override { return nullptr; }
   std::unique_ptr<Basis> move_clone() override { return nullptr; }
 };

@@ -14,21 +14,28 @@ private:
   Basis &operator=(const Basis &);
   const std::string name_;
   Eigen::VectorXd parameters_;
+  std::vector<Eigen::MatrixXd> derivative_matrix_array_;
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
 
 public:
   Basis(std::size_t _dim, const std::string &_name)
-      : dim_(_dim), derivative_matrix_(dim_, dim_), name_(_name) {}
+      : dim_(_dim), derivative_matrix_(dim_, dim_), name_(_name) {
+
+    derivative_matrix_array_.push_back(
+        Eigen::MatrixXd::Identity(get_dim(), get_dim()));
+  }
   Basis(const Basis &that)
       : dim_(that.get_dim()), derivative_matrix_(that.derivative_matrix_),
-        name_(that.name_) {}
+        name_(that.name_),
+        derivative_matrix_array_(that.derivative_matrix_array_) {}
 
   Basis(Basis &&that)
       : dim_(that.get_dim()),
         derivative_matrix_(std::move(that.derivative_matrix_)),
-        name_(that.name_) {}
+        name_(that.name_),
+        derivative_matrix_array_(std::move(that.derivative_matrix_array_)) {}
 
   virtual ~Basis() = default;
   std::size_t get_dim() const { return dim_; }
@@ -44,7 +51,16 @@ public:
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd> _buff) const = 0;
 
-  const Eigen::MatrixXd &get_derivative_matrix() { return derivative_matrix_; };
+  const Eigen::MatrixXd &get_derivative_matrix(std::size_t _deg = 1) {
+    std::size_t current_deriv_calc = derivative_matrix_array_.size();
+    if (current_deriv_calc <= _deg) {
+      while (current_deriv_calc != _deg + 1) {
+        derivative_matrix_array_.push_back(derivative_matrix_impl(_deg));
+        current_deriv_calc++;
+      }
+    }
+    return derivative_matrix_array_[_deg];
+  };
 
   virtual void add_derivative_matrix(double tau, std::size_t _deg,
                                      Eigen::Ref<Eigen::MatrixXd> _mat) = 0;
@@ -57,9 +73,9 @@ public:
 
   const std::string &get_name() const { return name_; };
 
+  virtual Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const = 0;
   /*
   virtual Eigen::MatrixXd l2_matrix() const = 0;
-  virtual Eigen::MatrixXd derivative_matrix(std::size_t _deg) const = 0;
   virtual Eigen::MatrixXd left_continuity_block(std::size_t _deg) const = 0;
   virtual Eigen::MatrixXd right_continuity_block(std::size_t _deg) const = 0;
   */

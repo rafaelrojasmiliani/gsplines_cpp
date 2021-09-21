@@ -27,6 +27,7 @@ BasisLegendre::BasisLegendre(std::size_t _dim)
                                           dmat.transpose());
     dmat *= derivative_matrix_;
   }
+  // get_derivative_matrix(get_dim());
 }
 
 BasisLegendre::BasisLegendre(const BasisLegendre &that)
@@ -162,5 +163,20 @@ Eigen::MatrixXd BasisLegendre::derivative_matrix(std::size_t _dim) {
   return result;
 }
 
+Eigen::MatrixXd BasisLegendre::derivative_matrix_impl(std::size_t _deg) const {
+
+  if (_deg == 0) {
+    return Eigen::MatrixXd::Identity(get_dim(), get_dim());
+  }
+  Eigen::MatrixXd result(derivative_matrix(get_dim()));
+  Eigen::MatrixXd dm(derivative_matrix(get_dim()));
+  dm.transposeInPlace();
+  result.transposeInPlace();
+  for (std::size_t i = 2; i <= _deg; i++)
+    result *= dm;
+  printf("deg = %zu", _deg);
+  std::cout << "deriv matrix \n " << result << "----\n";
+  return result;
+}
 } // namespace basis
 } // namespace gsplines

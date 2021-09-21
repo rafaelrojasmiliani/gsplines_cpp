@@ -48,6 +48,7 @@ BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
                                           dmat.transpose());
     dmat = derivative_matrix(domain_points_, i + 1);
   }
+  // get_derivative_matrix(get_dim());
 }
 
 BasisLagrange::BasisLagrange(const BasisLagrange &that)
@@ -276,6 +277,13 @@ Eigen::MatrixXd BasisLagrange::change_interpolation_points(
   }
 
   return std::move(result);
+}
+
+Eigen::MatrixXd BasisLagrange::derivative_matrix_impl(std::size_t _deg) const {
+  if (_deg == 0) {
+    return Eigen::MatrixXd::Identity(get_dim(), get_dim());
+  }
+  return derivative_matrix(domain_points_, _deg);
 }
 } // namespace basis
 } // namespace gsplines

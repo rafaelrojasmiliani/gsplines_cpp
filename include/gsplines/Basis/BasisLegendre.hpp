@@ -42,6 +42,7 @@ public:
   };
 
   static Eigen::MatrixXd derivative_matrix(std::size_t _dim);
+  Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const override;
 };
 
 } // namespace basis

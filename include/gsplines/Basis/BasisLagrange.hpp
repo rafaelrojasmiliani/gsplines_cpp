@@ -34,8 +34,6 @@ public:
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd> _buff) const override;
 
-  const Eigen::MatrixXd &get_derivative_matrix(double _tau, std::size_t _deg);
-
   void add_derivative_matrix(double tau, std::size_t _deg,
                              Eigen::Ref<Eigen::MatrixXd> _mat) override;
 
@@ -60,6 +58,8 @@ public:
   static Eigen::MatrixXd
   change_interpolation_points(Eigen::Ref<const Eigen::VectorXd> _old_points,
                               Eigen::Ref<const Eigen::VectorXd> _new_points);
+
+  Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const override;
 };
 
 } // namespace basis
