@@ -23,19 +23,22 @@ public:
   /* Inherit the constructors */
   using Basis::Basis;
   void eval_on_window(double _s, double _tau,
-                      Eigen::Ref<Eigen::VectorXd> _buff) const override {
+                      Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>>
+                          _buff) const override {
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_on_window, _s, _tau, _buff);
   }
   void
   eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
-                            Eigen::Ref<Eigen::VectorXd> _buff) const override {
+                            Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>>
+                                _buff) const override {
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_derivative_on_window, _s, _tau,
                            _deg, _buff);
   }
 
   void eval_derivative_wrt_tau_on_window(
       double _s, double _tau, unsigned int _deg,
-      Eigen::Ref<Eigen::VectorXd> _buff) const override {
+      Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff)
+      const override {
 
     PYBIND11_OVERRIDE_PURE(void, Basis, eval_derivative_wrt_tau_on_window, _s,
                            _tau, _deg, _buff);

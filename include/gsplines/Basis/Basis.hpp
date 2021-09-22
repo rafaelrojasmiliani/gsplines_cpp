@@ -42,16 +42,17 @@ public:
   virtual ~Basis() = default;
   std::size_t get_dim() const { return dim_; }
 
-  virtual void eval_on_window(double _s, double _tau,
-                              Eigen::Ref<Eigen::VectorXd> _buff) const = 0;
+  virtual void eval_on_window(
+      double _s, double _tau,
+      Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
-  virtual void
-  eval_derivative_on_window(double _s, double _tau, unsigned int _deg,
-                            Eigen::Ref<Eigen::VectorXd> _buff) const = 0;
+  virtual void eval_derivative_on_window(
+      double _s, double _tau, unsigned int _deg,
+      Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
   virtual void eval_derivative_wrt_tau_on_window(
       double _s, double _tau, unsigned int _deg,
-      Eigen::Ref<Eigen::VectorXd> _buff) const = 0;
+      Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
   const Eigen::MatrixXd &get_derivative_matrix(std::size_t _deg = 1) const {
     std::size_t current_deriv_calc = derivative_matrix_array_.size();

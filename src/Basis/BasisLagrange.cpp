@@ -66,7 +66,7 @@ BasisLagrange::BasisLagrange(BasisLagrange &&that)
 
 void BasisLagrange::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
-    Eigen::Ref<Eigen::VectorXd> _buff) const {
+    Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
   eval_on_window(_s, _tau, _buff);
   if (_deg == 0)
@@ -103,14 +103,15 @@ void BasisLagrange::eval_derivative_on_window(
 
 void BasisLagrange::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
-    Eigen::Ref<Eigen::VectorXd> _buff) const {
+    Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
   eval_derivative_on_window(_s, _tau, _deg, _buff);
   _buff *= -0.5 * _deg * (2.0 / _tau);
 }
 
-void BasisLagrange::eval_on_window(double _s, double _tau,
-                                   Eigen::Ref<Eigen::VectorXd> _buff) const {
+void BasisLagrange::eval_on_window(
+    double _s, double _tau,
+    Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
   /*  David A. Kopriva
    *  Implementing Spectral
