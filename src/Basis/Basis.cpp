@@ -99,9 +99,11 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
                                  [_deriv_order];
 
   Eigen::SparseMatrix<double, Eigen::RowMajor> &mat =
-      continuity_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order];
+      continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
+                                     [_deriv_order];
+
   // in our case all the rows of the matrix have at more than one non-zero cell
-  // By this reason the outer idex coincieds with the cols
+  // By this reason the outer index coincieds with the cols
   for (std::size_t k = _codom_dim * (_number_of_intervals - 1);
        k < mat.outerSize(); ++k) {
     std::size_t deg = k / _codom_dim * (_number_of_intervals - 1);
@@ -115,8 +117,8 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     }
   }
 
-  return continuity_matrix_buff_[_number_of_intervals][_codom_dim]
-                                [_deriv_order];
+  return continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
+                                        [_deriv_order];
 }
 } // namespace basis
 } // namespace gsplines
