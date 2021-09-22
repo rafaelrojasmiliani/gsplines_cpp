@@ -2,7 +2,9 @@
 #define BASIS_H
 #include <cstddef>
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/SparseCore>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -17,6 +19,20 @@ private:
   Eigen::VectorXd parameters_;
 
   mutable std::vector<Eigen::MatrixXd> derivative_matrix_array_;
+
+  mutable std::map<
+      std::size_t,
+      std::map<
+          std::size_t,
+          std::map<std::size_t, Eigen::SparseMatrix<double, Eigen::RowMajor>>>>
+      continuity_matrix_buff_;
+
+  mutable std::map<
+      std::size_t,
+      std::map<
+          std::size_t,
+          std::map<std::size_t, Eigen::SparseMatrix<double, Eigen::RowMajor>>>>
+      continuity_matrix_dynamic_buff_;
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
@@ -77,12 +93,17 @@ public:
   const std::string &get_name() const { return name_; };
 
   virtual Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const = 0;
+
   /*
   const Eigen::MatrixXd& get_sobolev_matrix(std::size_t _deg);
   virtual Eigen::MatrixXd sobolev_matrix_impl(std::size_t _deg) const = 0;
   const Eigen::MatrixXd& left_continuity_block(std::size_t _deg);
   const Eigen::MatrixXd& right_continuity_block(std::size_t _deg);
   */
+  const Eigen::SparseMatrix<double, Eigen::RowMajor> &
+  continuity_matrix(std::size_t _number_of_intervals, std::size_t _codom_dim,
+                    std::size_t _deriv_order,
+                    Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const;
 };
 
 std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);

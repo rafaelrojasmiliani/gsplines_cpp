@@ -182,21 +182,19 @@ void Interpolator::fill_position_block(unsigned int i0, unsigned int j0,
 void Interpolator::fill_continuity_derivative_block(
     unsigned int _i0, unsigned int _j0, bool _minus,
     Eigen::SparseMatrix<double> &_mat) {
-  unsigned int i, j;
-  unsigned int codom_coor;
-  unsigned int basis_coor;
-  unsigned int der_coor;
   double mutiplier;
   if (_minus) {
     mutiplier = -1.0;
   } else {
     mutiplier = 1.0;
   }
-  for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
-    for (basis_coor = 0; basis_coor < basis_->get_dim(); basis_coor++) {
-      for (der_coor = 0; der_coor < basis_->get_dim() - 2; der_coor++) {
-        i = _i0 + codom_coor * (basis_->get_dim() - 2) + der_coor;
-        j = _j0 + basis_->get_dim() * codom_coor + basis_coor;
+  for (std::size_t codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
+    for (std::size_t basis_coor = 0; basis_coor < basis_->get_dim();
+         basis_coor++) {
+      for (std::size_t der_coor = 0; der_coor < basis_->get_dim() - 2;
+           der_coor++) {
+        std::size_t i = _i0 + codom_coor * (basis_->get_dim() - 2) + der_coor;
+        std::size_t j = _j0 + basis_->get_dim() * codom_coor + basis_coor;
         _mat.coeffRef(i, j) =
             mutiplier * derivative_buffer_tranposed_(basis_coor, der_coor);
       }
