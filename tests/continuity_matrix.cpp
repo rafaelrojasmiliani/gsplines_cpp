@@ -11,7 +11,7 @@ int main() {
   std::size_t codom_dim = 8;
   double exect_time = number_of_intervals;
 
-  std::size_t basis_dim = 4;
+  std::size_t basis_dim = 6;
 
   Eigen::VectorXd glp =
       gsplines::collocation::legendre_gauss_lobatto_points(basis_dim);
@@ -40,6 +40,7 @@ int main() {
       basis_lagrange.continuity_matrix(number_of_intervals, codom_dim, 1, tau) *
       curve_1.get_coefficients();
   double val = Eigen::abs(res.array()).maxCoeff();
+  std::cout << val << "\n";
   assert(val < 1.0e-9);
 
   return 0;

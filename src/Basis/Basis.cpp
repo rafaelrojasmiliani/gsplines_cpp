@@ -114,6 +114,9 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
       it.valueRef() *= _res(interval);
       assert(it.col() == it.index());
       assert(it.row() == k);
+      std::cout << "row " << it.row() << " col " << it.col() << " index "
+                << it.index() << " outer idx " << k << " interval " << interval
+                << " deg " << deg << " val " << it.value() << std::endl;
     }
   }
 
