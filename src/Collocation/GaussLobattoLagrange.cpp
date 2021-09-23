@@ -39,7 +39,7 @@ GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
         i0 = interval_coor * get_basis_dim() * get_codom_dim() +
              get_basis_dim() * codom_coor;
         result_coeff.segment(i0, get_basis_dim()) =
-            get_derivative_matrix_block(interval_coor).transpose() *
+            get_basis().get_derivative_matrix_block(_deg) *
             result_coeff.segment(i0, get_basis_dim());
       }
     }

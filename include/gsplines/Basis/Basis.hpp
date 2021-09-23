@@ -70,7 +70,8 @@ public:
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
-  const Eigen::MatrixXd &get_derivative_matrix(std::size_t _deg = 1) const {
+  const Eigen::MatrixXd &
+  get_derivative_matrix_block(std::size_t _deg = 1) const {
     std::size_t current_deriv_calc = derivative_matrix_array_.size();
     if (current_deriv_calc <= _deg) {
       while (current_deriv_calc != _deg + 1) {

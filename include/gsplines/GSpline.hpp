@@ -61,11 +61,6 @@ public:
 
   // Eigen::VectorXd &get_coefficients() { return coefficients_; }
 
-  Eigen::MatrixXd get_derivative_matrix_block(std::size_t _interval) const {
-    return basis_->get_derivative_matrix() * 2 /
-           domain_interval_lengths_(_interval);
-  }
-
   const Eigen::VectorXd &get_interval_lengths() const {
     return domain_interval_lengths_;
   }
@@ -77,6 +72,8 @@ public:
   std::size_t get_basis_dim() const { return basis_->get_dim(); }
 
   GSpline linear_scaling_new_execution_time(double _new_exec_time) const;
+
+  const basis::Basis &get_basis() const { return *basis_; }
 
 protected:
   virtual GSpline *deriv_impl(std::size_t _deg = 1) const override;

@@ -37,10 +37,9 @@ int main() {
   Eigen::MatrixXd val_2 = curve_2(time_spam);
 
   Eigen::VectorXd res =
-      basis_lagrange.continuity_matrix(number_of_intervals, codom_dim, 1, tau) *
+      basis_lagrange.continuity_matrix(number_of_intervals, codom_dim, 4, tau) *
       curve_1.get_coefficients();
   double val = Eigen::abs(res.array()).maxCoeff();
-  std::cout << val << "\n";
   assert(val < 1.0e-9);
 
   return 0;

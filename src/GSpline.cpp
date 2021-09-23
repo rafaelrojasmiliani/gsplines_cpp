@@ -19,7 +19,7 @@ GSpline *GSpline::deriv_impl(std::size_t _deg) const {
         i0 = interval_coor * basis_->get_dim() * get_codom_dim() +
              basis_->get_dim() * codom_coor;
         result_coeff.segment(i0, basis_->get_dim()) =
-            basis_->get_derivative_matrix(_deg) *
+            basis_->get_derivative_matrix_block(_deg) *
             result_coeff.segment(i0, basis_->get_dim()) *
             std::pow(2 / domain_interval_lengths_(interval_coor), _deg);
       }

@@ -92,31 +92,44 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     std::chrono::steady_clock::time_point end =
         std::chrono::steady_clock::now();
   }
+  /*
+    continuity_matrix_dynamic_buff_
+        [_number_of_intervals][_codom_dim][_deriv_order] =
+            continuity_matrix_buff_[_number_of_intervals][_codom_dim]
+                                   [_deriv_order];
+                                   */
 
-  continuity_matrix_dynamic_buff_
-      [_number_of_intervals][_codom_dim][_deriv_order] =
-          continuity_matrix_buff_[_number_of_intervals][_codom_dim]
-                                 [_deriv_order];
-
-  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat =
+  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_dest =
       continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                      [_deriv_order];
+  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_src =
+      continuity_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order];
 
   // in our case all the rows of the matrix have at more than one non-zero cell
   // By this reason the outer index coincieds with the cols
   for (std::size_t k = _codom_dim * (_number_of_intervals - 1);
-       k < mat.outerSize(); ++k) {
-    std::size_t deg = k / _codom_dim * (_number_of_intervals - 1);
+       k < mat_dest.outerSize(); ++k) {
+
+    std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
+
     Eigen::VectorXd _res = Eigen::pow(2.0 / _interval_lengths.array(), deg);
-    for (Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(mat, k);
-         it; ++it) {
-      std::size_t interval = it.col() / (get_dim() * _codom_dim);
-      it.valueRef() *= _res(interval);
-      assert(it.col() == it.index());
-      assert(it.row() == k);
-      std::cout << "row " << it.row() << " col " << it.col() << " index "
-                << it.index() << " outer idx " << k << " interval " << interval
-                << " deg " << deg << " val " << it.value() << std::endl;
+
+    Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_dest(
+        mat_dest, k);
+    Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_src(mat_src,
+                                                                       k);
+    for (/*already initialized*/; it_dest; ++it_dest, ++it_src) {
+      std::size_t interval = it_dest.col() / (get_dim() * _codom_dim);
+      it_dest.valueRef() = it_src.value() * _res(interval);
+      assert(it_dest.col() == it_dest.index());
+      assert(it_dest.row() == k);
+      /*
+      std::cout << "row " << it_dest.row() << " col " << it_dest.col() << "
+      index "
+                << it_dest.index() << " outer idx " << k << " interval " <<
+      interval
+                << " deg " << deg << " val " << it_dest.value() << std::endl;
+                */
     }
   }
 

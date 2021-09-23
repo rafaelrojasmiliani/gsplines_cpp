@@ -98,7 +98,7 @@ void BasisLagrange::eval_derivative_on_window(
       }
       deriv_buff_2_.noalias() = deriv_buff_1_;
     }*/
-  _buff = get_derivative_matrix(_deg).transpose() * _buff * term;
+  _buff = get_derivative_matrix_block(_deg).transpose() * _buff * term;
 }
 
 void BasisLagrange::eval_derivative_wrt_tau_on_window(
