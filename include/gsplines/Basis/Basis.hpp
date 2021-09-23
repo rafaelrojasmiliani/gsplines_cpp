@@ -34,6 +34,20 @@ private:
           std::map<std::size_t, Eigen::SparseMatrix<double, Eigen::RowMajor>>>>
       continuity_matrix_dynamic_buff_;
 
+  mutable std::map<
+      std::size_t,
+      std::map<
+          std::size_t,
+          std::map<std::size_t, Eigen::SparseMatrix<double, Eigen::RowMajor>>>>
+      derivative_matrix_buff_;
+
+  mutable std::map<
+      std::size_t,
+      std::map<
+          std::size_t,
+          std::map<std::size_t, Eigen::SparseMatrix<double, Eigen::RowMajor>>>>
+      derivative_matrix_dynamic_buff_;
+
 protected:
   Eigen::MatrixXd derivative_matrix_;
 
@@ -105,6 +119,11 @@ public:
   continuity_matrix(std::size_t _number_of_intervals, std::size_t _codom_dim,
                     std::size_t _deriv_order,
                     Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const;
+
+  const Eigen::SparseMatrix<double, Eigen::RowMajor> &gspline_derivative_matrix(
+      std::size_t _number_of_intervals, std::size_t _codom_dim,
+      std::size_t _deriv_order,
+      Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const;
 };
 
 std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);

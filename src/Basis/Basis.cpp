@@ -112,7 +112,8 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
 
     std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
 
-    Eigen::VectorXd _res = Eigen::pow(2.0 / _interval_lengths.array(), deg);
+    Eigen::VectorXd deriv_factor =
+        Eigen::pow(2.0 / _interval_lengths.array(), deg);
 
     Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_dest(
         mat_dest, k);
@@ -120,7 +121,7 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
                                                                        k);
     for (/*already initialized*/; it_dest; ++it_dest, ++it_src) {
       std::size_t interval = it_dest.col() / (get_dim() * _codom_dim);
-      it_dest.valueRef() = it_src.value() * _res(interval);
+      it_dest.valueRef() = it_src.value() * deriv_factor(interval);
       assert(it_dest.col() == it_dest.index());
       assert(it_dest.row() == k);
       /*
@@ -134,6 +135,71 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
   }
 
   return continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
+                                        [_deriv_order];
+}
+
+const Eigen::SparseMatrix<double, Eigen::RowMajor> &
+Basis::gspline_derivative_matrix(
+    std::size_t _number_of_intervals, std::size_t _codom_dim,
+    std::size_t _deriv_order,
+    Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const {
+
+  std::size_t matrix_size = _number_of_intervals * _codom_dim * get_dim();
+
+  if (not(derivative_matrix_buff_.count(_number_of_intervals) and
+          derivative_matrix_buff_[_number_of_intervals].count(_codom_dim) and
+          derivative_matrix_buff_[_number_of_intervals][_codom_dim].count(
+              _deriv_order))) {
+
+    Eigen::SparseMatrix<double, Eigen::RowMajor> result(matrix_size,
+                                                        matrix_size);
+
+    const Eigen::MatrixXd &dmat = get_derivative_matrix_block(_deriv_order);
+    for (std::size_t block = 0; block < _number_of_intervals * _codom_dim;
+         block++) {
+      std::size_t i0 = block * get_dim();
+      for (std::size_t i = 0; i < get_dim(); i++) {
+        for (std::size_t j = 0; j < get_dim(); j++) {
+          result.insert(i0 + i, i0 + j) = dmat(i, j);
+        }
+      }
+    }
+
+    derivative_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order] =
+        result;
+
+    derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
+                                   [_deriv_order] = std::move(result);
+    std::chrono::steady_clock::time_point end =
+        std::chrono::steady_clock::now();
+  }
+
+  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_dest =
+      derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
+                                     [_deriv_order];
+
+  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_src =
+      derivative_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order];
+
+  Eigen::VectorXd deriv_factor =
+      Eigen::pow(2.0 / _interval_lengths.array(), _deriv_order);
+
+  for (std::size_t k = 0; k < mat_dest.outerSize(); ++k) {
+
+    std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
+
+    Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_dest(
+        mat_dest, k);
+
+    Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_src(mat_src,
+                                                                       k);
+    for (/*already initialized*/; it_dest; ++it_dest, ++it_src) {
+      std::size_t interval = it_dest.col() / (get_dim() * _codom_dim);
+      it_dest.valueRef() = it_src.value() * deriv_factor(interval);
+    }
+  }
+
+  return derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                         [_deriv_order];
 }
 } // namespace basis
