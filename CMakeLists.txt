@@ -3,7 +3,9 @@ include(CTest)
 find_program(CTEST_MEMORYCHECK_COMMAND dsfsdf)
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_RELEASE
+    "-O3 -DNDEBUG -funroll-loops -march=native  -mfpmath=sse  -fopenmp")
+# set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 # project( gplines++ VERSION 0.0.1 DESCRIPTION "Generalized Splines in c++")
 set(CMAKE_CXX_STANDARD 14)
@@ -36,7 +38,8 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionGenericOperations.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionBase.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp
-  ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoPointsWeights.cpp)
+  ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoPointsWeights.cpp
+  ${PROJECT_SOURCE_DIR}/src/Manifolds/MatrixExponential.cpp)
 
 target_link_libraries(gsplines ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES})
 target_include_directories(

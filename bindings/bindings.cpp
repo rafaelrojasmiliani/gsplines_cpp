@@ -5,6 +5,7 @@
 #include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Manifolds/MatrixExponential.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
 
 PYBIND11_MODULE(gsplines, gsplines_module) {
@@ -372,4 +373,82 @@ PYBIND11_MODULE(gsplines, gsplines_module) {
   functional_analysis_submodule.def(
       "l2_norm", &gsplines::functional_analysis::l2_norm, py::arg("_in"),
       py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+
+  py::module manifolds_submodule = gsplines_module.def_submodule("manifolds");
+
+  py::class_<gsplines::manifolds::MatrixExponential>(manifolds_submodule,
+                                                     "MatrixExponential")
+      .def(py::init<std::size_t>())
+      .def("diff_pade3",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat,
+              const py::EigenDRef<const Eigen::MatrixXd> _direction,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_1,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_2,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_3,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_4) {
+             Eigen::MatrixXd a(_mat), b(_mat), c(_mat), d(_mat);
+             _self.diff_pade3(_mat, _direction, a, b, c, d);
+             _buffer_1 = a;
+             _buffer_2 = b;
+             _buffer_3 = c;
+             _buffer_4 = d;
+           })
+      .def("diff_pade5",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat,
+              const py::EigenDRef<const Eigen::MatrixXd> _direction,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_1,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_2,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_3,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_4) {
+             Eigen::MatrixXd a(_mat), b(_mat), c(_mat), d(_mat);
+             _self.diff_pade5(_mat, _direction, a, b, c, d);
+             _buffer_1 = a;
+             _buffer_2 = b;
+             _buffer_3 = c;
+             _buffer_4 = d;
+           })
+      .def("diff_pade7",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat,
+              const py::EigenDRef<const Eigen::MatrixXd> _direction,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_1,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_2,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_3,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_4) {
+             Eigen::MatrixXd a(_mat), b(_mat), c(_mat), d(_mat);
+             _self.diff_pade7(_mat, _direction, a, b, c, d);
+             _buffer_1 = a;
+             _buffer_2 = b;
+             _buffer_3 = c;
+             _buffer_4 = d;
+           })
+      .def("diff_pade9",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat,
+              const py::EigenDRef<const Eigen::MatrixXd> _direction,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_1,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_2,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_3,
+              py::EigenDRef<Eigen::MatrixXd> _buffer_4) {
+             Eigen::MatrixXd a(_mat), b(_mat), c(_mat), d(_mat);
+             _self.diff_pade9(_mat, _direction, a, b, c, d);
+             _buffer_1 = a;
+             _buffer_2 = b;
+             _buffer_3 = c;
+             _buffer_4 = d;
+           })
+      .def("__call__",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat) {
+             return _self(_mat);
+           })
+      .def("gataux_derivative",
+           [](gsplines::manifolds::MatrixExponential &_self,
+              const py::EigenDRef<const Eigen::MatrixXd> _mat,
+              const py::EigenDRef<const Eigen::MatrixXd> _direction) {
+             return _self.gataux_derivative(_mat, _direction);
+           });
+  // const py::EigenDRef<const Eigen::MatrixXd> _waypoints
 }
