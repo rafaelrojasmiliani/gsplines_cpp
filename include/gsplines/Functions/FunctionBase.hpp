@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <eigen3/Eigen/Core>
+#include <gsplines/Functions/Domain.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -10,13 +11,19 @@
 namespace gsplines {
 namespace functions {
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 class FunctionExpression;
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 class DotProduct;
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 class FunctionBase {
 private:
   std::size_t codom_dim_;
   std::pair<double, double> window_;
-  std::pair<double, double> domain_;
+  Domain<DDIM> domain_;
   const std::string name_;
 
 public:

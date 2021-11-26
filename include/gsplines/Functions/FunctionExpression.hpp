@@ -17,9 +17,12 @@ namespace gsplines {
 namespace functions {
 class Function;
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 class FunctionExpression
-    : public FunctionInheritanceHelper<FunctionExpression, FunctionBase,
-                                       FunctionExpression> {
+    : public FunctionInheritanceHelper<FunctionExpression<Domain, DDIM, DIM>,
+                                       FunctionBase<Domain, DDIM, DIM>,
+                                       FunctionExpression<Domain, DDIM, DIM>> {
 
 public:
   enum Type {
@@ -32,16 +35,19 @@ public:
     EMPTY
   };
 
-  std::list<std::unique_ptr<FunctionBase>> function_array_;
+  typedef FunctionBase<Domain, DDIM, DIM> FunctionBaseType;
+  typedef FunctionExpression<Domain, DDIM, DIM> FunctionExpressionType;
+
+  std::list<std::unique_ptr<FunctionBaseType>> function_array_;
 
 private:
   typedef void(Eval_Function_Type)(
-      const std::list<std::unique_ptr<FunctionBase>> &,
+      const std::list<std::unique_ptr<FunctionBaseType>> &,
       const Eigen::Ref<const Eigen::VectorXd> &,
       Eigen::Ref<Eigen::MatrixXd> _result);
 
   typedef FunctionExpression *(Deriv_Function_Type)(
-      const std::list<std::unique_ptr<FunctionBase>> &, std::size_t);
+      const std::list<std::unique_ptr<FunctionBaseType>> &, std::size_t);
 
   std::function<Eval_Function_Type> eval_operation_;
   std::function<Deriv_Function_Type> deriv_operation_;
@@ -58,15 +64,15 @@ private:
 public:
   FunctionExpression(
       std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
-      const std::list<std::unique_ptr<FunctionBase>> &_function_array,
+      const std::list<std::unique_ptr<FunctionBaseType>> &_function_array,
       const std::string &_name = "FunctionExpression");
 
   FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim);
 
-  FunctionExpression(std::pair<double, double> _domain, std::size_t _codom_dim,
-                     Type _type,
-                     std::list<std::unique_ptr<FunctionBase>> &&_function_array,
-                     const std::string &_name = "FunctionExpression");
+  FunctionExpression(
+      std::pair<double, double> _domain, std::size_t _codom_dim, Type _type,
+      std::list<std::unique_ptr<FunctionBaseType>> &&_function_array,
+      const std::string &_name = "FunctionExpression");
 
   FunctionExpression(const FunctionExpression &that);
   FunctionExpression(FunctionExpression &&that);
@@ -87,40 +93,51 @@ public:
 
   const Type &get_type() { return type_; }
 
-  virtual FunctionExpression operator+(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator+(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator+(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator+(FunctionExpression &&that) &&;
+  virtual FunctionExpressionType
+  operator+(const FunctionExpressionType &that) const &;
+  virtual FunctionExpressionType
+  operator+(FunctionExpressionType &&that) const &;
+  virtual FunctionExpressionType
+  operator+(const FunctionExpressionType &that) &&;
+  virtual FunctionExpressionType operator+(FunctionExpressionType &&that) &&;
 
-  virtual FunctionExpression operator-(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator-(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator-(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator-(FunctionExpression &&that) &&;
-  virtual FunctionExpression operator-() const &;
-  virtual FunctionExpression operator-() &&;
+  virtual FunctionExpressionType
+  operator-(const FunctionExpressionType &that) const &;
+  virtual FunctionExpressionType
+  operator-(FunctionExpressionType &&that) const &;
+  virtual FunctionExpressionType
+  operator-(const FunctionExpressionType &that) &&;
+  virtual FunctionExpressionType operator-(FunctionExpressionType &&that) &&;
+  virtual FunctionExpressionType operator-() const &;
+  virtual FunctionExpressionType operator-() &&;
 
-  virtual FunctionExpression operator*(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator*(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator*(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator*(FunctionExpression &&that) &&;
+  virtual FunctionExpressionType
+  operator*(const FunctionExpressionType &that) const &;
+  virtual FunctionExpressionType
+  operator*(FunctionExpressionType &&that) const &;
+  virtual FunctionExpressionType
+  operator*(const FunctionExpressionType &that) &&;
+  virtual FunctionExpressionType operator*(FunctionExpressionType &&that) &&;
 
-  virtual FunctionExpression compose(const FunctionExpression &that) const &;
-  virtual FunctionExpression compose(FunctionExpression &&that) const &;
+  virtual FunctionExpressionType
+  compose(const FunctionExpressionType &that) const &;
+  virtual FunctionExpressionType compose(FunctionExpressionType &&that) const &;
 
-  virtual FunctionExpression compose(const FunctionExpression &that) &&;
-  virtual FunctionExpression compose(FunctionExpression &&that) &&;
+  virtual FunctionExpressionType compose(const FunctionExpressionType &that) &&;
+  virtual FunctionExpressionType compose(FunctionExpressionType &&that) &&;
 
-  virtual FunctionExpression concat(const FunctionExpression &that) const &;
-  virtual FunctionExpression concat(FunctionExpression &&that) const &;
+  virtual FunctionExpressionType
+  concat(const FunctionExpressionType &that) const &;
+  virtual FunctionExpressionType concat(FunctionExpressionType &&that) const &;
 
-  virtual FunctionExpression concat(const FunctionExpression &that) &&;
-  virtual FunctionExpression concat(FunctionExpression &&that) &&;
+  virtual FunctionExpressionType concat(const FunctionExpressionType &that) &&;
+  virtual FunctionExpressionType concat(FunctionExpressionType &&that) &&;
 
-  void operator+=(FunctionExpression &&that);
-  void operator+=(const FunctionExpression &that);
+  void operator+=(FunctionExpressionType &&that);
+  void operator+=(const FunctionExpressionType &that);
 
-  void operator*=(FunctionExpression &&that);
-  void operator*=(const FunctionExpression &that);
+  void operator*=(FunctionExpressionType &&that);
+  void operator*=(const FunctionExpressionType &that);
 
   virtual void print(std::size_t _indent = 0) const override;
 
@@ -132,93 +149,125 @@ public:
 
   virtual ~FunctionExpression() = default;
 
-  std::unique_ptr<FunctionExpression> deriv(std::size_t _deg = 1) const {
-    return std::unique_ptr<FunctionExpression>(this->deriv_impl(_deg));
+  std::unique_ptr<FunctionExpressionType> deriv(std::size_t _deg = 1) const {
+    return std::unique_ptr<FunctionExpressionType>(this->deriv_impl(_deg));
   }
 
 protected:
   //
-  virtual FunctionExpression *deriv_impl(std::size_t _deg = 1) const override {
-    FunctionExpression *result = deriv_operation_(function_array_, _deg);
+  virtual FunctionExpressionType *
+  deriv_impl(std::size_t _deg = 1) const override {
+    FunctionExpressionType *result = deriv_operation_(function_array_, _deg);
     assert(result != nullptr);
     return result;
   }
 
 public:
-  static std::list<std::unique_ptr<FunctionBase>>
-  const_const_operation_handler(const FunctionExpression &_first,
-                                const FunctionExpression &_second,
-                                FunctionExpression::Type _opt_type);
+  static std::list<std::unique_ptr<FunctionBaseType>>
+  const_const_operation_handler(const FunctionExpressionType &_first,
+                                const FunctionExpressionType &_second,
+                                FunctionExpressionType::Type _opt_type);
 
-  static std::list<std::unique_ptr<FunctionBase>>
-  const_nonconst_operation_handler(const FunctionExpression &_first,
-                                   FunctionExpression &&_second,
-                                   FunctionExpression::Type _opt_type);
+  static std::list<std::unique_ptr<FunctionBaseType>>
+  const_nonconst_operation_handler(const FunctionExpressionType &_first,
+                                   FunctionExpressionType &&_second,
+                                   FunctionExpressionType::Type _opt_type);
 
-  static std::list<std::unique_ptr<FunctionBase>>
-  nonconst_const_operation_handler(FunctionExpression &&_first,
-                                   const FunctionExpression &_second,
-                                   FunctionExpression::Type _opt_type);
+  static std::list<std::unique_ptr<FunctionBaseType>>
+  nonconst_const_operation_handler(FunctionExpressionType &&_first,
+                                   const FunctionExpressionType &_second,
+                                   FunctionExpressionType::Type _opt_type);
 
-  static std::list<std::unique_ptr<FunctionBase>>
-  nonconst_nonconst_operation_handler(FunctionExpression &&_first,
-                                      FunctionExpression &&_second,
-                                      FunctionExpression::Type _opt_type);
+  static std::list<std::unique_ptr<FunctionBaseType>>
+  nonconst_nonconst_operation_handler(FunctionExpressionType &&_first,
+                                      FunctionExpressionType &&_second,
+                                      FunctionExpressionType::Type _opt_type);
 };
 
-FunctionExpression operator*(double, const FunctionExpression &);
-FunctionExpression operator*(double, FunctionExpression &&);
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
+FunctionExpression<Domain, DDIM, DIM>
+operator*(double, const FunctionExpression<Domain, DDIM, DIM> &);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
+FunctionExpression<Domain, DDIM, DIM>
+operator*(double, FunctionExpression<Domain, DDIM, DIM> &&);
+
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_sum_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_mul_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_compose_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_concat_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 void eval_negative_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     const Eigen::Ref<const Eigen::VectorXd> _domain_points,
     Eigen::Ref<Eigen::MatrixXd> _result);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_unique_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_sum_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_mul_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_compose_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_concat_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
 
+template <template <std::size_t> typename Domain, std::size_t DDIM,
+          std::size_t DIM>
 FunctionExpression *deriv_negative_functions(
     const std::list<std::unique_ptr<FunctionBase>> &_function_array,
     std::size_t _deg);
