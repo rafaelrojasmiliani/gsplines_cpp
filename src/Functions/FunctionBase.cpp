@@ -87,5 +87,114 @@ FunctionExpression FunctionBase::derivate(std::size_t _deg) const {
                             FunctionExpression::Type::UNIQUE,
                             std::move(result_array));
 }
+
+// ----------------
+// Sum of functions
+// ----------------
+FunctionExpression
+FunctionBase::operator+(const FunctionExpression &that) const & {
+  return FunctionExpression(*this) + that;
+}
+
+FunctionExpression FunctionBase::operator+(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) + std::move(that);
+}
+
+FunctionExpression FunctionBase::operator+(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) + that;
+}
+
+FunctionExpression FunctionBase::operator+(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) + std::move(that);
+}
+
+// ----------------
+// Substraction of functions
+// ----------------
+FunctionExpression
+FunctionBase::operator-(const FunctionExpression &that) const & {
+
+  return FunctionExpression(*this) - that;
+}
+
+FunctionExpression FunctionBase::operator-(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) - std::move(that);
+}
+
+FunctionExpression FunctionBase::operator-(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) - that;
+}
+
+FunctionExpression FunctionBase::operator-(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) - std::move(that);
+}
+
+// ----------------
+// Negative functions
+// ----------------
+FunctionExpression FunctionBase::operator-() const & {
+  return -FunctionExpression(*this);
+}
+
+FunctionExpression FunctionBase::operator-() && {
+  return -FunctionExpression(std::move(*this));
+}
+
+// ----------------
+// Multiplication
+// ----------------
+FunctionExpression
+FunctionBase::operator*(const FunctionExpression &that) const & {
+  return FunctionExpression(*this) * that;
+}
+
+FunctionExpression FunctionBase::operator*(FunctionExpression &&that) const & {
+  return FunctionExpression(*this) * std::move(that);
+}
+
+FunctionExpression FunctionBase::operator*(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)) * that;
+}
+
+FunctionExpression FunctionBase::operator*(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)) * std::move(that);
+}
+
+// ----------------
+// Composition
+// ----------------
+FunctionExpression
+FunctionBase::compose(const FunctionExpression &that) const & {
+  return FunctionExpression(*this).compose(that);
+}
+FunctionExpression FunctionBase::compose(FunctionExpression &&that) const & {
+  return FunctionExpression(*this).compose(std::move(that));
+}
+
+FunctionExpression FunctionBase::compose(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)).compose(that);
+}
+FunctionExpression FunctionBase::compose(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)).compose(std::move(that));
+}
+
+// ----------------
+// Concatenation
+// ----------------
+FunctionExpression
+FunctionBase::concat(const FunctionExpression &that) const & {
+  return FunctionExpression(*this).concat(that);
+}
+
+FunctionExpression FunctionBase::concat(FunctionExpression &&that) const & {
+  return FunctionExpression(*this).concat(std::move(that));
+}
+
+FunctionExpression FunctionBase::concat(const FunctionExpression &that) && {
+  return FunctionExpression(std::move(*this)).concat(that);
+}
+FunctionExpression FunctionBase::concat(FunctionExpression &&that) && {
+  return FunctionExpression(std::move(*this)).concat(std::move(that));
+}
 } // namespace functions
 } // namespace gsplines

@@ -71,8 +71,8 @@ public:
   FunctionExpression(const FunctionExpression &that);
   FunctionExpression(FunctionExpression &&that);
 
-  FunctionExpression(const Function &that);
-  FunctionExpression(Function &&that);
+  FunctionExpression(const FunctionBase &that);
+  FunctionExpression(FunctionBase &&that);
 
   virtual void
   value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,

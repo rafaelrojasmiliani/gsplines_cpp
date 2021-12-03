@@ -89,6 +89,35 @@ public:
   FunctionExpression to_expression() const &;
   FunctionExpression to_expression() &&;
 
+  virtual FunctionExpression operator+(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator+(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator+(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator+(FunctionExpression &&that) &&;
+
+  virtual FunctionExpression operator-(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator-(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator-(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator-(FunctionExpression &&that) &&;
+  virtual FunctionExpression operator-() const &;
+  virtual FunctionExpression operator-() &&;
+
+  virtual FunctionExpression operator*(const FunctionExpression &that) const &;
+  virtual FunctionExpression operator*(FunctionExpression &&that) const &;
+  virtual FunctionExpression operator*(const FunctionExpression &that) &&;
+  virtual FunctionExpression operator*(FunctionExpression &&that) &&;
+
+  virtual FunctionExpression compose(const FunctionExpression &that) const &;
+  virtual FunctionExpression compose(FunctionExpression &&that) const &;
+
+  virtual FunctionExpression compose(const FunctionExpression &that) &&;
+  virtual FunctionExpression compose(FunctionExpression &&that) &&;
+
+  virtual FunctionExpression concat(const FunctionExpression &that) const &;
+  virtual FunctionExpression concat(FunctionExpression &&that) const &;
+
+  virtual FunctionExpression concat(const FunctionExpression &that) &&;
+  virtual FunctionExpression concat(FunctionExpression &&that) &&;
+
 protected:
   void set_domain(double _t0, double _t1) {
     domain_.first = _t0;

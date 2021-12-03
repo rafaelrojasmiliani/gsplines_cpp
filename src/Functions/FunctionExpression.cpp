@@ -78,13 +78,13 @@ FunctionExpression::FunctionExpression(FunctionExpression &&that)
   num_call_move_constructor_++;
 }
 
-FunctionExpression::FunctionExpression(const Function &_that)
+FunctionExpression::FunctionExpression(const FunctionBase &_that)
     : FunctionExpression(_that.get_domain(), _that.get_codom_dim(), UNIQUE,
                          {}) {
   function_array_.push_back(_that.clone());
   num_call_copy_constructor_++;
 }
-FunctionExpression::FunctionExpression(Function &&_that)
+FunctionExpression::FunctionExpression(FunctionBase &&_that)
     : FunctionExpression(_that.get_domain(), _that.get_codom_dim(), UNIQUE,
                          {}) {
 
