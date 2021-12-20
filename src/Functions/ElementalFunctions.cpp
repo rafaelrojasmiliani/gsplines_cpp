@@ -48,8 +48,14 @@ void DomainLinearDilation::value_impl(
   _result.noalias() = dilation_factor_ * _domain_points;
 };
 
-ConstFunction *DomainLinearDilation::deriv_impl(std::size_t _deg) const {
-  return new ConstFunction(get_domain(), get_codom_dim(), dilation_factor_);
+FunctionExpression *DomainLinearDilation::deriv_impl(std::size_t _deg) const {
+  if (_deg == 0)
+    return new FunctionExpression(*this);
+  if (_deg == 1)
+    return new FunctionExpression(
+        ConstFunction(get_domain(), get_codom_dim(), dilation_factor_));
+  return new FunctionExpression(
+      ConstFunction(get_domain(), get_codom_dim(), 0.0));
 }
 // Identity
 Identity::Identity(std::pair<double, double> _domain)

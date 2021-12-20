@@ -15,6 +15,9 @@ namespace gsplines {
 namespace functions {
 
 class DomainLinearDilation;
+// ----------------------------
+// Const Function
+// ---------------------------
 
 class ConstFunction
     : public FunctionInheritanceHelper<ConstFunction, Function, ConstFunction> {
@@ -37,10 +40,12 @@ public:
 protected:
   ConstFunction *deriv_impl(std::size_t _deg = 1) const override;
 };
-
+// ----------------------------
+// Domain Linear Dilation
+// ---------------------------
 class DomainLinearDilation
     : public FunctionInheritanceHelper<DomainLinearDilation, Function,
-                                       ConstFunction> {
+                                       FunctionExpression> {
 private:
   double dilation_factor_;
 
@@ -54,9 +59,12 @@ public:
                   Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
 protected:
-  virtual ConstFunction *deriv_impl(std::size_t _deg) const override;
+  virtual FunctionExpression *deriv_impl(std::size_t _deg) const override;
 };
 
+// ----------------------------
+// Identity
+// ---------------------------
 class Identity : public DomainLinearDilation {
 
 public:
@@ -68,6 +76,9 @@ public:
                   Eigen::Ref<Eigen::MatrixXd> _result) const override;
 };
 
+// ----------------------------
+// Exponential
+// ---------------------------
 class Exponential
     : public FunctionInheritanceHelper<Exponential, Function, Exponential> {
 public:
@@ -82,6 +93,9 @@ protected:
   virtual Exponential *deriv_impl(std::size_t _deg) const override;
 };
 
+// ----------------------------
+// Cos
+// ---------------------------
 class Cos
     : public FunctionInheritanceHelper<Cos, Function, FunctionExpression> {
 public:
