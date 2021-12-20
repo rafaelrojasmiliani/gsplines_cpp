@@ -42,22 +42,24 @@ optimal_sobolev_norm(const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
   nlp.AddVariableSet(variable);
   nlp.AddConstraintSet(constraints);
   nlp.AddCostSet(cost_function);
-  nlp.PrintCurrent();
+  // nlp.PrintCurrent();
 
   // 3. Instantiate ipopt solver
   ifopt::IpoptSolver ipopt;
   // 3.1 Customize the solver
   ipopt.SetOption("linear_solver", "mumps");
   ipopt.SetOption("jacobian_approximation", "exact");
-  ipopt.SetOption("derivative_test", "first-order");
+  ipopt.SetOption("fast_step_computation", "yes");
+  // ipopt.SetOption("derivative_test", "first-order");
   ipopt.SetOption("hessian_approximation", "limited-memory");
   ipopt.SetOption("jac_c_constant", "yes");
+  ipopt.SetOption("print_level", 0);
 
   // 4. Ask the solver to solve the problem
   ipopt.Solve(nlp);
   // 5. Retrive problem solution
   Eigen::VectorXd tauv = nlp.GetOptVariables()->GetValues();
-  std::cout << tauv << '\n';
+  // std::cout << tauv << '\n';
   // 6. Return solution
   return inter.interpolate(tauv, _waypoints);
 }
