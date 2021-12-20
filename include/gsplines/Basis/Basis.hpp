@@ -90,7 +90,8 @@ public:
     std::size_t current_deriv_calc = derivative_matrix_array_.size();
     if (current_deriv_calc <= _deg) {
       while (current_deriv_calc != _deg + 1) {
-        derivative_matrix_array_.push_back(derivative_matrix_impl(_deg));
+        derivative_matrix_array_.push_back(
+            derivative_matrix_impl(current_deriv_calc));
         current_deriv_calc++;
       }
     }
