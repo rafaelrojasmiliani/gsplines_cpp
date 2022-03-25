@@ -16,7 +16,7 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
           _domain, _codom_dim, _n_intervals,
           ::gsplines::basis::BasisLagrange(
               legendre_gauss_lobatto_points(_n_glp)),
-          Eigen::VectorXd::Zero(_n_glp * _n_intervals * _codom_dim),
+          _coefficents,
           (_domain.second - _domain.first) *
               Eigen::VectorXd::Ones(_n_glp * _n_intervals * _codom_dim)),
       value_at_nodes_((_n_glp - 1) * (_n_intervals - 1) + _n_glp, _codom_dim) {
@@ -85,8 +85,8 @@ gauss_lobatto_lagrange_approximtion(::gsplines::functions::FunctionBase &_in,
   for (std::size_t interval = 0; interval < _n_intervals; interval++) {
 
     double local_left_bound = left_bound + interval * local_interval_length;
-    double local_right_bound =
-        left_bound + (interval + 1) * local_interval_length;
+    // double local_right_bound =
+    //    left_bound + (interval + 1) * local_interval_length;
 
     Eigen::VectorXd local_points =
         (glp.array() + 1.0) * local_interval_length / 2.0 + local_left_bound;
@@ -94,7 +94,7 @@ gauss_lobatto_lagrange_approximtion(::gsplines::functions::FunctionBase &_in,
     _in.value(local_points, local_value);
 
     std::size_t i0 = interval * _n_glp * codom_dim;
-    std::size_t i1 = (interval + 1) * _n_glp * codom_dim;
+    // std::size_t i1 = (interval + 1) * _n_glp * codom_dim;
 
     result_coeff.segment(i0, _n_glp * codom_dim) =
         Eigen::Map<Eigen::VectorXd>(local_value.data(), local_value.size());

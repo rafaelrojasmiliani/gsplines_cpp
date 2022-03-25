@@ -53,21 +53,20 @@ protected:
 
 public:
   Basis(std::size_t _dim, const std::string &_name)
-      : dim_(_dim), derivative_matrix_(dim_, dim_), name_(_name) {
+      : dim_(_dim), name_(_name), derivative_matrix_(dim_, dim_) {
 
     derivative_matrix_array_.push_back(
         Eigen::MatrixXd::Identity(get_dim(), get_dim()));
   }
   Basis(const Basis &that)
-      : dim_(that.get_dim()), derivative_matrix_(that.derivative_matrix_),
-        name_(that.name_),
-        derivative_matrix_array_(that.derivative_matrix_array_) {}
+      : dim_(that.get_dim()), name_(that.name_),
+        derivative_matrix_array_(that.derivative_matrix_array_),
+        derivative_matrix_(that.derivative_matrix_) {}
 
   Basis(Basis &&that)
-      : dim_(that.get_dim()),
-        derivative_matrix_(std::move(that.derivative_matrix_)),
-        name_(that.name_),
-        derivative_matrix_array_(std::move(that.derivative_matrix_array_)) {}
+      : dim_(that.get_dim()), name_(that.name_),
+        derivative_matrix_array_(std::move(that.derivative_matrix_array_)),
+        derivative_matrix_(std::move(that.derivative_matrix_)) {}
 
   virtual ~Basis() = default;
   std::size_t get_dim() const { return dim_; }

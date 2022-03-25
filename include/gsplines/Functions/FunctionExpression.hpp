@@ -87,34 +87,47 @@ public:
 
   const Type &get_type() { return type_; }
 
-  virtual FunctionExpression operator+(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator+(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator+(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator+(FunctionExpression &&that) &&;
+  virtual FunctionExpression
+  operator+(const FunctionExpression &that) const & override;
+  virtual FunctionExpression
+  operator+(FunctionExpression &&that) const & override;
+  virtual FunctionExpression operator+(const FunctionExpression &that) &&
+      override;
+  virtual FunctionExpression operator+(FunctionExpression &&that) && override;
 
-  virtual FunctionExpression operator-(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator-(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator-(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator-(FunctionExpression &&that) &&;
-  virtual FunctionExpression operator-() const &;
-  virtual FunctionExpression operator-() &&;
+  virtual FunctionExpression
+  operator-(const FunctionExpression &that) const & override;
+  virtual FunctionExpression
+  operator-(FunctionExpression &&that) const & override;
+  virtual FunctionExpression operator-(const FunctionExpression &that) &&
+      override;
+  virtual FunctionExpression operator-(FunctionExpression &&that) && override;
+  virtual FunctionExpression operator-() const & override;
+  virtual FunctionExpression operator-() && override;
 
-  virtual FunctionExpression operator*(const FunctionExpression &that) const &;
-  virtual FunctionExpression operator*(FunctionExpression &&that) const &;
-  virtual FunctionExpression operator*(const FunctionExpression &that) &&;
-  virtual FunctionExpression operator*(FunctionExpression &&that) &&;
+  virtual FunctionExpression
+  operator*(const FunctionExpression &that) const & override;
+  virtual FunctionExpression
+  operator*(FunctionExpression &&that) const & override;
+  virtual FunctionExpression operator*(const FunctionExpression &that) &&
+      override;
+  virtual FunctionExpression operator*(FunctionExpression &&that) && override;
 
-  virtual FunctionExpression compose(const FunctionExpression &that) const &;
-  virtual FunctionExpression compose(FunctionExpression &&that) const &;
+  virtual FunctionExpression
+  compose(const FunctionExpression &that) const & override;
+  virtual FunctionExpression
+  compose(FunctionExpression &&that) const & override;
 
-  virtual FunctionExpression compose(const FunctionExpression &that) &&;
-  virtual FunctionExpression compose(FunctionExpression &&that) &&;
+  virtual FunctionExpression compose(const FunctionExpression &that) &&
+      override;
+  virtual FunctionExpression compose(FunctionExpression &&that) && override;
 
-  virtual FunctionExpression concat(const FunctionExpression &that) const &;
-  virtual FunctionExpression concat(FunctionExpression &&that) const &;
+  virtual FunctionExpression
+  concat(const FunctionExpression &that) const & override;
+  virtual FunctionExpression concat(FunctionExpression &&that) const & override;
 
-  virtual FunctionExpression concat(const FunctionExpression &that) &&;
-  virtual FunctionExpression concat(FunctionExpression &&that) &&;
+  virtual FunctionExpression concat(const FunctionExpression &that) && override;
+  virtual FunctionExpression concat(FunctionExpression &&that) && override;
 
   void operator+=(FunctionExpression &&that);
   void operator+=(const FunctionExpression &that);

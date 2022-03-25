@@ -71,7 +71,7 @@ public:
   operator()(const Eigen::Ref<const Eigen::VectorXd> _domain_points) const {
     Eigen::MatrixXd result(_domain_points.size(), get_codom_dim());
     value_impl(_domain_points, result);
-    return std::move(result);
+    return result;
   }
 
   Eigen::MatrixXd
