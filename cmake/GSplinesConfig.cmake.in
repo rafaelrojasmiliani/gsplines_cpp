@@ -1,0 +1,9 @@
+get_filename_component(Franka_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+if(NOT TARGET GSplines)
+  include("${Franka_CMAKE_DIR}/GSplinesTargets.cmake")
+endif()
+
+set(gsplines_LIBRARIES gsplines)
+get_target_property(gsplines_INCLUDE_DIRS GSplines
+                    INTERFACE_INCLUDE_DIRECTORIES)

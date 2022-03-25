@@ -1,19 +1,17 @@
-project(gsplines)
-include(CTest)
-find_program(CTEST_MEMORYCHECK_COMMAND dsfsdf)
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+project(gsplines VERSION "0.0.1")
+include(CTest)
+find_program(CTEST_MEMORYCHECK_COMMAND valgrind)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS_RELEASE
-    "-O3 -DNDEBUG -funroll-loops   -mfpmath=sse  -fopenmp")
-# project( gplines++ VERSION 0.0.1 DESCRIPTION "Generalized Splines in c++")
-set(CMAKE_CXX_STANDARD 14)
+# -mfpmath avx2
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -funroll-loops -mfpmath=sse ")
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(PYTHON_VERSION
     3.6
     CACHE STRING "Build bindings for Python version")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # include ifopt with custon ROS installation
-set(ifopt_DIR /opt/ros/noetic/share/ifopt/cmake)
 find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
@@ -40,9 +38,16 @@ add_library(
 
 target_link_libraries(gsplines ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES})
 target_include_directories(
-  gsplines PUBLIC ${PROJECT_SOURCE_DIR}/include ${Eigen3_INCLUDE_DIRS}
-                  ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
-# set_target_properties(gsplines PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib)
+  gsplines
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include> ${Eigen3_INCLUDE_DIRS}
+         ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
+set_target_properties(
+  gsplines
+  PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON
+             VERSION ${gsplines_VERSION}
+             SOVERSION ${gsplines_VERSION_MAJOR}.${gsplines_VERSION_MINOR}
+             EXPORT_NAME GSplines)
 
 link_directories(${PROJECT_SOURCE_DIR}/build)
 
@@ -70,3 +75,53 @@ if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
       ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
       ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json)
 endif()
+
+include(GNUInstallDirs)
+set(INSTALL_CMAKE_CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/GSplines)
+
+install(
+  TARGETS gsplines
+  EXPORT GSplinesTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+export(EXPORT GSplinesTargets
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/GSplinesTargets.cmake)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfigVersion.cmake
+  COMPATIBILITY SameMajorVersion)
+configure_package_config_file(
+  cmake/GSplinesConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfig.cmake
+  INSTALL_DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfigVersion.cmake
+        DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
+install(EXPORT GSplinesTargets DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
+
+# Packaging
+set(CPACK_PACKAGE_VENDOR "Rafael A. Rojas")
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_VERSION ${gsplines_VERSION})
+set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
+
+# Debian
+find_program(DPKG_PROG dpkg DOC "'dpkg' executable")
+if(DPKG_PROG)
+  execute_process(
+    COMMAND ${DPKG_PROG} --print-architecture
+    OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  # Change system name to use the correct architecture in file name
+  set(CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
+endif()
+# Debian versions require a dash
+set(CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}-1)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Rafael A. Rojas")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "coinor-libipopt-dev")
+
+include(CPack)
