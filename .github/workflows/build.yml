@@ -16,6 +16,11 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Git Sumbodule Update
+        run: |
+          git pull --recurse-submodules
+          git submodule update --remote --recursive
+
       - name: Build pdf and push
         run: |
           mkdir build
