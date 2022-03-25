@@ -16,13 +16,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Git Sumbodule Update
+      - name: Git Sumbodule Update ad build
         run: |
           git pull --recurse-submodules
           git submodule update --remote --recursive
-
-      - name: Build pdf and push
-        run: |
           mkdir build
           cd build
           cmake ..
