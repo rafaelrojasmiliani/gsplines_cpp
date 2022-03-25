@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
 
       - name: Git Sumbodule Update ad build
         run: |
-          git pull --recurse-submodules
-          git submodule update --remote --recursive
           mkdir build
           cd build
           cmake ..
