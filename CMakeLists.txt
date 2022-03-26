@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(gsplines VERSION "0.0.1")
 include(CTest)
 find_program(CTEST_MEMORYCHECK_COMMAND valgrind)
@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -funroll-loops -mfpmath=sse ")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_INSTALL_PREFIX /usr)
 set(PYTHON_VERSION
     3.6
     CACHE STRING "Build bindings for Python version")
@@ -61,7 +62,7 @@ target_include_directories(pygsplines PUBLIC include /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES}
                                         gsplines)
 
-set_target_properties(pygsplines PROPERTIES OUTPUT_NAME gsplines)
+#set_target_properties(pygsplines PROPERTIES OUTPUT_NAME pygsplines)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   enable_testing()
@@ -84,6 +85,15 @@ install(
   EXPORT GSplinesTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
+execute_process(
+    COMMAND "${PYTHON_EXECUTABLE}" -c "import site; print(site.getsitepackages()[0])"
+    OUTPUT_VARIABLE PYTHON_INSTALL_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+install(TARGETS pygsplines DESTINATION ${PYTHON_INSTALL_PATH})
+
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 export(EXPORT GSplinesTargets

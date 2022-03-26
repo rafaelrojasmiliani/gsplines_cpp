@@ -30,7 +30,7 @@ main(){
     docker pull rafa606/cpp-vim
     docker run -it --rm \
         ${DOCKER_VIDEO_OPTIONS} \
-        --volume $(pwd)/../:/workspace/src/tutorial: \
+        --volume $(pwd)/../:/workspace: \
         --entrypoint="/bin/bash" \
         --privileged \
         "rafa606/cpp-vim" -c "addgroup --gid ${mygid} ${mygroup} --force-badname;  adduser --gecos \"\" --disabled-password  --uid ${myuid} --gid ${mygid} ${myuser} --force-badname ; usermod -a -G video ${myuser}; echo ${myuser} ALL=\(ALL\) NOPASSWD:ALL >> /etc/sudoers; sudo -EHu ${myuser}  bash"

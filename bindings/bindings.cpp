@@ -7,7 +7,7 @@
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
 
-PYBIND11_MODULE(gsplines, gsplines_module) {
+PYBIND11_MODULE(pygsplines, gsplines_module) {
   gsplines_module.doc() = "Generalized Splines Library with Optimization tools";
 
   py::module basis_submodule = gsplines_module.def_submodule("basis");
