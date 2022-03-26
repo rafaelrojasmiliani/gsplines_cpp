@@ -15,8 +15,7 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 2
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+          submodules: recursive
 
       - name: Git Sumbodule Update ad build
         run: |
