@@ -2,7 +2,7 @@
 Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
 - Piecewise polynomial curves representation
-- Automatic **exact** (and fast) differentiation
+- Automatic **exact** (and fast) differentiation of generalized splines
 - Algebraic operations: inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 - Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
@@ -93,7 +93,17 @@ From the formalization of the optimization problem, we derive that a flexible an
 In fact, note that the input of any gradient-based optimizer is the expression (6)  and its derivatives. 
 This library provides a template class to represent the basis <img src="https://render.githubusercontent.com/render/math?math=B_i(t)"> and a series of procedures which utilizes these basis as an input and then generate (0), (6) and their derivatives.
 
-This library provides the class `gsplines::basis::Basis` which represent an arbitrary set of linearly independent functions and the class `gsplines::GSpline` which implements the definition <img src="https://render.githubusercontent.com/render/math?math=\star">
+This library provides the class `gsplines::basis::Basis` which represent an arbitrary set of linearly independent functions and the class `gsplines::GSpline` which implements the definition <img src="https://render.githubusercontent.com/render/math?math=\star">.
+In addition this library provides the class `gsplines::functions::FunctionBase` and `gsplines::functions::FunctionExpression` that allows to define arbitrary curves in <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}^n"> with the possibility of performing algebraic operations and derivation.
+
+## Arbitrary function definition and algebraic operations
+
+The abstract class `gsplines::functions::FunctionBase` represents objects that can be evaluated at points of <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}">. This class is declared [here](include/gsplines/functions/FunctionBase.hpp)
+
+
+The class `gsplines::functions::FunctionExpression` inherits from `gsplines::functions::FunctionBase` and contain an array of pointers to `gsplines::functions::FunctionBase` called `function_array_`. The evaluation operator of `gsplines::functions::FunctionExpression` evaluate the desired algebraic operation between the functions in `function_array_`.
+This architecture allow to implement complex algebraic expressions by recursively calling the evaluation of each function in `function_array_`.
+
 
 # Requirements
 
