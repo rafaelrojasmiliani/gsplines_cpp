@@ -24,6 +24,20 @@ path = minimum_jerk_path(waypoints)
 
 #get the minimum jerk trajectory with execution time of 10.0 seconds
 trajectory  = path.linear_scaling_new_execution_time(10.0)
+
+# Evaluate your trajectory
+trajectory_points = trajectory([0.0, 5.0, 10.0]) # matrix, rows are points
+
+# Get the derivative 
+trajectory_derivative = trajectory.derivate()
+# Get the jerk
+trajectory_jerk = trajectory.derivate(3)
+# Evaluate the jerk at points
+trajectory_jerk_at_points = trajectory_jerk([0.0, 5.0, 10.0])
+
+
+# Algebraic operations
+expression = trajectory + trajectory_jerk + 4*trajectory_derivative
 ```
 
 # Definition
