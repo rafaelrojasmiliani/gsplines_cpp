@@ -9,11 +9,11 @@ Library to represent and formulate motion and trajectory planning problmes with 
 # Motivation
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k">
 - **Formal Definition**
-    1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N+1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i+1})">.
+    1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N %2B 1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i %2B 1})">.
     2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. 
     3. Let <img src="https://render.githubusercontent.com/render/math?math=s_i:I_i\longrightarrow I_0"> given by
     <p align="center">
-    <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i+1}-t_i} - 1">
+    <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i %2B 1}-t_i} - 1">
     </p>
 
     4. Let <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}_i^j \in\mathbb{R}^n">.
