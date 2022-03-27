@@ -1,16 +1,17 @@
 # General Splines Library
-Library to represent and formulate motion and trajectory planning problmes with generalized splines.
+Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
 - Piecewise polynomial curves representation
 - Automatic **exact** (and fast) differentiation
 - Algebraic operations: inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
+- Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
 
 # Motivation
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k">
 - **Formal Definition**
     1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N %2B 1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i %2B 1})">.
-    2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. 
+    2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_i:I_0\longrightarrow \mathbb{R}">. 
     3. Let <img src="https://render.githubusercontent.com/render/math?math=s_i:I_i\longrightarrow I_0"> given by
     <p align="center">
     <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i %2B 1}-t_i} - 1">
@@ -20,7 +21,7 @@ Library to represent and formulate motion and trajectory planning problmes with 
 
     5. A **generalized spline** from <img src="https://render.githubusercontent.com/render/math?math=J"> into <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}^n"> is a curve given by
     <p align="center">
-    <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j B_k \circ s_j(t) \text{ if } t\in I_j">
+    <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j B_k \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)">
     </p>
 
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
@@ -92,20 +93,12 @@ From the formalization of the optimization problem, we derive that a flexible an
 In fact, note that the input of any gradient-based optimizer is the expression (6)  and its derivatives. 
 This library provides a template class to represent the basis <img src="https://render.githubusercontent.com/render/math?math=B_i(t)"> and a series of procedures which utilizes these basis as an input and then generate (0), (6) and their derivatives.
 
-## Implemented basis
-Up to now we have implemented tree types of basis
-- Basis for the minimum jerk problems, called `cBasis0010`, because their optimize the L2-norm of the jerk
-<p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=\Large I=\int_0^T  \left\|\frac{\mathsf{d}^3\mathbf{q}}{\mathsf{d} t^3 }\right\|^2 d t">
-</p>
-
-- Basis for the weighed speed-jerk problems, called `cBasis1010`, because their optimize convex combination of the L2-norm of the speed and the L2 norm of the jerk
-<p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=\Large I=\int_0^T \alpha  \left\|\frac{\mathsf{d}\mathbf{q}}{\mathsf{d} t }\right\|^2 %2B (\alpha-1)\left\|\frac{\mathsf{d}^3\mathbf{q}}{\mathsf{d} t^3 }\right\|^2 d t">
-</p>
+This library provides the class `gsplines::basis::Basis` which represent an arbitrary set of linearly independent functions and the class `gsplines::GSpline` which implements the definition <img src="https://render.githubusercontent.com/render/math?math=\star">
 
 # Requirements
 
-- numpy
-- scipy
-- matplotlib
+- `numpy`
+- `scipy`
+- `matplotlib`
+- `coinor-libipopt-dev`
+- `if-opt`
