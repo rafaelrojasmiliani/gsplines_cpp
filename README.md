@@ -10,11 +10,10 @@ Library to represent and formulate motion and trajectory planning problmes with 
 - **Definition** *generalized spline*:
     1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N+1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i+1})">.
     2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=f_1, f_2, ... ,f_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. 
-    3. a
-
-<p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i+1}-t_i} - 1">
-</p>
+    3. Let <img src="https://render.githubusercontent.com/render/math?math=s_i:I_i\longrightarrow I_0"> given by
+    <p align="center">
+    <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i+1}-t_i} - 1">
+    </p>
 
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
 In other words, if we desire to optimize a motion which pass trough a sequence of positions we will meet with generalized splines.
