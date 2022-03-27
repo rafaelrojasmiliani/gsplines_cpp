@@ -19,8 +19,11 @@ dim = 7  # number of joint of the robot
 waypoint_number = 4 # number of waypoints
 waypoints = np.random.rand(waypoint_number, dim) # random waypoints
 
-trajectory = minimum_jerk_path(waypoints)
+# get the minimum jerk path inn [0, 1]
+path = minimum_jerk_path(waypoints)
 
+#get the minimum jerk trajectory with execution time of 10.0 seconds
+trajectory  = path.linear_scaling_new_execution_time(10.0)
 ```
 
 # Definition
