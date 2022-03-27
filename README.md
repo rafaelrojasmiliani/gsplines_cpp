@@ -7,7 +7,7 @@ Library to represent and formulate motion and trajectory planning problems with 
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 - Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
 
-# Motivation
+# Definition
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k">
 - **Formal Definition**
     1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N %2B 1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i %2B 1})">.
@@ -24,6 +24,7 @@ Library to represent and formulate motion and trajectory planning problems with 
     <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j B_k \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)">
     </p>
 
+# Motivation
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
 In other words, if we desire to optimize a motion which pass trough a sequence of positions we will meet with generalized splines.
 
@@ -98,7 +99,7 @@ In addition this library provides the class `gsplines::functions::FunctionBase` 
 
 ## Arbitrary function definition and algebraic operations
 
-The abstract class `gsplines::functions::FunctionBase` represents objects that can be evaluated at points of <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}">. This class is declared [here](include/gsplines/functions/FunctionBase.hpp)
+The abstract class [`gsplines::functions::FunctionBase`](https://github.com/rafaelrojasmiliani/gsplines_cpp/blob/master/include/gsplines/Functions/FunctionBase.hpp) represents objects that can be evaluated at points of some interval of <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}">. To inherit from this class the auxiliary template class [`gsplines::functions::FunctionInheritanceHelper`](https://github.com/rafaelrojasmiliani/gsplines_cpp/blob/master/include/gsplines/Functions/FunctionInheritanceHelper.hpp) allows to define a custom function which <img src="https://render.githubusercontent.com/render/math?math=k">-derivative is implemented as another class using the [Curiously recurring template pattern](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern). For example, the exponential and other elementary functions are [declared here](https://github.com/rafaelrojasmiliani/gsplines_cpp/blob/fa7395af1719a9c560eba15ff4bc68584da2c7e7/include/gsplines/Functions/ElementalFunctions.hpp#L82).
 
 
 The class `gsplines::functions::FunctionExpression` inherits from `gsplines::functions::FunctionBase` and contain an array of pointers to `gsplines::functions::FunctionBase` called `function_array_`. The evaluation operator of `gsplines::functions::FunctionExpression` evaluate the desired algebraic operation between the functions in `function_array_`.
