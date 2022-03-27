@@ -7,7 +7,8 @@ Library to represent and formulate motion and trajectory planning problmes with 
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 
 # Motivation
-- **Definition** *generalized spline*:
+- **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions. 
+- **Formal Definition**
     1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N+1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i+1})">.
     2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=f_1, f_2, ... ,f_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. 
     3. Let <img src="https://render.githubusercontent.com/render/math?math=s_i:I_i\longrightarrow I_0"> given by
@@ -19,7 +20,7 @@ Library to represent and formulate motion and trajectory planning problmes with 
 
     5. A **generalized spline** from <img src="https://render.githubusercontent.com/render/math?math=J"> into <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}^n"> is a curve given by
     <p align="center">
-    <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j f_k \circ s_j(t) \text{ if } j\in I_j">
+    <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j f_k \circ s_j(t) \text{ if } t\in I_j">
     </p>
 
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
