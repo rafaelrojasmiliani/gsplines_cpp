@@ -145,7 +145,8 @@ This architecture allow to implement complex algebraic expressions by recursivel
 - `scipy`
 - `matplotlib`
 - `coinor-libipopt-dev`
-- `if-opt`
+- `ros-noetic-ifopt`
+- `libeigen3-dev`
 
 # Publications
 
