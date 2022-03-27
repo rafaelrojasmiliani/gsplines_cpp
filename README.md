@@ -7,9 +7,11 @@ Library to represent and formulate motion and trajectory planning problmes with 
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 
 # Motivation
-- **Definition** *generalized spline*: Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=f_1, f_2, ... ,f_k"> be <img src="https://render.githubusercontent.com/render/math?k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. Let <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> be <img src="https://render.githubusercontent.com/render/math?N"> disjoint intervals that are a partition of
+- **Definition** *generalized spline*:
+    1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N+1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i+1})">.
+    2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=f_1, f_2, ... ,f_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=f_i:I_0\longrightarrow \mathbb{R}">. 
+    3. a
 
-Let <img src="https://render.githubusercontent.com/render/math?J=[0, T]"> and <img src="https://render.githubusercontent.com/render/math?t_i\in J">
 <p align="center">
 <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i+1}-t_i} - 1">
 </p>
