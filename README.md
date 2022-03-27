@@ -113,3 +113,60 @@ This architecture allow to implement complex algebraic expressions by recursivel
 - `matplotlib`
 - `coinor-libipopt-dev`
 - `if-opt`
+
+# Publications
+
+- Rojas, Rafael A., et al. "A variational approach to minimum-jerk trajectories for psychological safety in collaborative assembly stations." IEEE Robotics and Automation Letters 4.2 (2019): 823-829.
+```
+@article{rojas2019variational,
+  title={A variational approach to minimum-jerk trajectories for psychological safety in collaborative assembly stations},
+  author={Rojas, Rafael A and Garcia, Manuel A Ruiz and Wehrle, Erich and Vidoni, Renato},
+  journal={IEEE Robotics and Automation Letters},
+  volume={4},
+  number={2},
+  pages={823--829},
+  year={2019},
+  publisher={IEEE}
+}
+```
+
+- Rojas, Rafael A., et al. "Combining safety and speed in collaborative assembly systems–An approach to time optimal trajectories for collaborative robots." Procedia CIRP 97 (2021): 308-312.
+```
+@article{rojas2021combining,
+  title={Combining safety and speed in collaborative assembly systems--An approach to time optimal trajectories for collaborative robots},
+  author={Rojas, Rafael A and Garcia, Manuel A Ruiz and Gualtieri, Luca and Rauch, Erwin},
+  journal={Procedia CIRP},
+  volume={97},
+  pages={308--312},
+  year={2021},
+  publisher={Elsevier}
+}
+```
+
+- Rojas, Rafael A., and Renato Vidoni. "Designing fast and smooth trajectories in collaborative workstations." IEEE Robotics and Automation Letters 6.2 (2021): 1700-1706.
+```
+@article{rojas2021designing,
+  title={Designing fast and smooth trajectories in collaborative workstations},
+  author={Rojas, Rafael A and Vidoni, Renato},
+  journal={IEEE Robotics and Automation Letters},
+  volume={6},
+  number={2},
+  pages={1700--1706},
+  year={2021},
+  publisher={IEEE}
+}
+```
+
+- Rojas, Rafael A., Erich Wehrle, and Renato Vidoni. "A multicriteria motion planning approach for combining smoothness and speed in collaborative assembly systems." Applied Sciences 10.15 (2020): 5086.
+```
+@article{rojas2020multicriteria,
+  title={A multicriteria motion planning approach for combining smoothness and speed in collaborative assembly systems},
+  author={Rojas, Rafael A and Wehrle, Erich and Vidoni, Renato},
+  journal={Applied Sciences},
+  volume={10},
+  number={15},
+  pages={5086},
+  year={2020},
+  publisher={Multidisciplinary Digital Publishing Institute}
+}
+```
