@@ -6,6 +6,22 @@ Library to represent and formulate motion and trajectory planning problems with 
 - Algebraic operations: inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 - Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
+- ROS implementation [here](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
+- MoveIt implementation [here](https://github.com/rafaelrojasmiliani/gsplines_moveit)
+
+# Examples
+
+Get your minimum jerk trajectory passing through random waypoints
+```PYTHON
+import numpy as np
+from gsplines.optimization import minimum_jerk_path
+dim = 7  # number of joint of the robot
+waypoint_number = 4 # number of waypoints
+waypoints = np.random.rand(waypoint_number, dim) # random waypoints
+
+trajectory = minimum_jerk_path(waypoints)
+
+```
 
 # Definition
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k">
