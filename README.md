@@ -14,6 +14,7 @@ Library to represent and formulate motion and trajectory planning problmes with 
     <p align="center">
     <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i+1}-t_i} - 1">
     </p>
+
     4. Let <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}_i^j \in\mathbb{R}^n">.
 
     5. A **generalized spline** from <img src="https://render.githubusercontent.com/render/math?math=J"> into <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}^n"> is a curve given by
