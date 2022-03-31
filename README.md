@@ -2,7 +2,7 @@
 Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
 - Piecewise polynomial curves representation
-- Automatic **exact** (and fast) differentiation of generalized splines
+- Automatic **exact** (and fast) differentiation of generalized splines implemented
 - Algebraic operations: inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 - Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
@@ -28,7 +28,7 @@ trajectory  = path.linear_scaling_new_execution_time(10.0)
 # Evaluate your trajectory
 trajectory_points = trajectory([0.0, 5.0, 10.0]) # matrix, rows are points
 
-# Get the derivative 
+# Get the derivative
 trajectory_derivative = trajectory.derivate()
 # Get the jerk
 trajectory_jerk = trajectory.derivate(3)
@@ -44,7 +44,7 @@ expression = trajectory + trajectory_jerk + 4*trajectory_derivative
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k">
 - **Formal Definition**
     1. Let <img src="https://render.githubusercontent.com/render/math?math=J=[0, T]"> and consider the partition of  <img src="https://render.githubusercontent.com/render/math?math=J"> given by  <img src="https://render.githubusercontent.com/render/math?math=N %2B 1"> points <img src="https://render.githubusercontent.com/render/math?math=t_i\in J">, i.e. <img src="https://render.githubusercontent.com/render/math?math=I_1, I_2, ... ,I_N"> with <img src="https://render.githubusercontent.com/render/math?math=I_i=[t_i, t_{i %2B 1})">.
-    2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_i:I_0\longrightarrow \mathbb{R}">. 
+    2. Let <img src="https://render.githubusercontent.com/render/math?math=I_0=[-1,1]"> and <img src="https://render.githubusercontent.com/render/math?math=B_1, B_2, ... ,B_k"> be <img src="https://render.githubusercontent.com/render/math?math=k"> linearly independent functions <img src="https://render.githubusercontent.com/render/math?math=B_i:I_0\longrightarrow \mathbb{R}">.
     3. Let <img src="https://render.githubusercontent.com/render/math?math=s_i:I_i\longrightarrow I_0"> given by
     <p align="center">
     <img src="https://render.githubusercontent.com/render/math?math=s_i(t)= 2\frac{t-t_i}{t_{i %2B 1}-t_i} - 1">
@@ -70,7 +70,7 @@ Moreover, such a relation is synthesised in the expression of the type
 
 where <img src="https://render.githubusercontent.com/render/math?math=\mathbf{A}(\boldsymbol\tau)"> is a matrix which depends on the time intervals <img src="https://render.githubusercontent.com/render/math?math=\boldsymbol\tau">, <img src="https://render.githubusercontent.com/render/math?math=\mathbf{b}(\mathbf{w})"> is a column vector which depends on the waypoints <img src="https://render.githubusercontent.com/render/math?math=\mathbf{w}">, the speed, and possible higher order derivatives at the boundaries, and <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}"> is a column vector which represents uniquely the curve at each interval.
 
-The main challenge to build into a computer a trajectory optimization problems with waypoint constraints is to compute the derivatives of <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}"> with respect to <img src="https://render.githubusercontent.com/render/math?math=\mathbf{\tau}">. 
+The main challenge to build into a computer a trajectory optimization problems with waypoint constraints is to compute the derivatives of <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}"> with respect to <img src="https://render.githubusercontent.com/render/math?math=\mathbf{\tau}">.
 
 This library provides a uniform and simple interface to formulate gradient-based optimization problems for waypoint-constrained trajectory planning. The library leverage on the representation (0) to compute the "derivatives of the splines" with respect to the time intervals (and possibly the waypoints) as the corresponding derivatives of <img src="https://render.githubusercontent.com/render/math?math=\mathbf{y}">
 
@@ -124,7 +124,7 @@ Finally we can substitute (0) in (5) to obtain the representation of (1) subject
 
 From the formalization of the optimization problem, we derive that a flexible and uniform methodology for the construction of the problem of optimizing (1) consists in designing an abstract representation of the basis <img src="https://render.githubusercontent.com/render/math?math=B_i(t)"> in (4) capable of building in an automatic fashion the constraint (0), the cost function (5) and their derivatives.
 
-In fact, note that the input of any gradient-based optimizer is the expression (6)  and its derivatives. 
+In fact, note that the input of any gradient-based optimizer is the expression (6)  and its derivatives.
 This library provides a template class to represent the basis <img src="https://render.githubusercontent.com/render/math?math=B_i(t)"> and a series of procedures which utilizes these basis as an input and then generate (0), (6) and their derivatives.
 
 This library provides the class `gsplines::basis::Basis` which represent an arbitrary set of linearly independent functions and the class `gsplines::GSpline` which implements the definition <img src="https://render.githubusercontent.com/render/math?math=\star">.
