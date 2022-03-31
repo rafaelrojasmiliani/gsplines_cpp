@@ -11,10 +11,13 @@
 
 namespace gsplines {
 namespace basis {
+/** Represent a set of function used to build a GSpline */
 class Basis {
 private:
-  size_t dim_;
+  /* Avoid copy basis **/
   Basis &operator=(const Basis &);
+
+  size_t dim_;
   const std::string name_;
   Eigen::VectorXd parameters_;
 
@@ -52,12 +55,20 @@ protected:
   Eigen::MatrixXd derivative_matrix_;
 
 public:
+  /**
+   * @brief Constructor
+   *
+   * @param _dim Dimension of the base (number of functions that constitute the
+   * base)
+   * @param _name name of the base: Any label
+   */
   Basis(std::size_t _dim, const std::string &_name)
       : dim_(_dim), name_(_name), derivative_matrix_(dim_, dim_) {
 
     derivative_matrix_array_.push_back(
         Eigen::MatrixXd::Identity(get_dim(), get_dim()));
   }
+
   Basis(const Basis &that)
       : dim_(that.get_dim()), name_(that.name_),
         derivative_matrix_array_(that.derivative_matrix_array_),
@@ -69,16 +80,49 @@ public:
         derivative_matrix_(std::move(that.derivative_matrix_)) {}
 
   virtual ~Basis() = default;
+  /**
+   * @brief Get the dimension of the base, i.e. the number of functions that
+   * constitute the base
+   */
   std::size_t get_dim() const { return dim_; }
 
+  /**
+   * @brief Evaluates the basis functions in the window (windows is the canonic
+   * interval, [-1, 1])
+   *
+   * @param _s Value inside the window [-1, 1]
+   * @param _tau scaling factor, actual length of the interval in the GSpline
+   * [t_i, t_{i+2})
+   * @param _buff Buffer where the output is stored.
+   */
   virtual void eval_on_window(
       double _s, double _tau,
       Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
+  /**
+   * @brief Evaluates the derivative of the basis functions in the window
+   * (windows is the canonic interval, [-1, 1])
+   *
+   * @param _s Value inside the window [-1, 1]
+   * @param _tau scaling factor, actual length of the interval in the GSpline
+   * [t_i, t_{i+2})
+   * @param _deg degree of the derivative
+   * @param _buff Buffer where the output is stored.
+   */
   virtual void eval_derivative_on_window(
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;
 
+  /**
+   * @brief Evaluate the derivative of the basis with respect to tau, the actual
+   * interval length inside the gspline
+   *
+   * @param _s Value inside the window [-1, 1]
+   * @param _tau scaling factor, actual length of the interval in the GSpline
+   * [t_i, t_{i+2})
+   * @param _deg degree of the derivative
+   * @param _buff Buffer where the output is stored.
+   */
   virtual void eval_derivative_wrt_tau_on_window(
       double _s, double _tau, unsigned int _deg,
       Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const = 0;

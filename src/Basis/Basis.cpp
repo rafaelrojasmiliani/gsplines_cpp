@@ -31,8 +31,6 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     // for each derivative degree, this fills
     // (_number_of_intervals-1)*_codom_dim rows
 
-    std::chrono::steady_clock::time_point begin =
-        std::chrono::steady_clock::now();
     Eigen::SparseMatrix<double, Eigen::RowMajor> result(
         (_number_of_intervals - 1) * _codom_dim * (_deriv_order + 1),
         _number_of_intervals * _codom_dim * get_dim());
@@ -89,8 +87,6 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
 
     continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                    [_deriv_order] = std::move(result);
-    std::chrono::steady_clock::time_point end =
-        std::chrono::steady_clock::now();
   }
   /*
     continuity_matrix_dynamic_buff_
@@ -107,7 +103,7 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
 
   // in our case all the rows of the matrix have at more than one non-zero cell
   // By this reason the outer index coincieds with the cols
-  for (std::size_t k = _codom_dim * (_number_of_intervals - 1);
+  for (long k = _codom_dim * (_number_of_intervals - 1);
        k < mat_dest.outerSize(); ++k) {
 
     std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
@@ -170,8 +166,8 @@ Basis::gspline_derivative_matrix(
 
     derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                    [_deriv_order] = std::move(result);
-    std::chrono::steady_clock::time_point end =
-        std::chrono::steady_clock::now();
+    // std::chrono::steady_clock::time_point end =
+    //    std::chrono::steady_clock::now();
   }
 
   Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_dest =
@@ -184,9 +180,9 @@ Basis::gspline_derivative_matrix(
   Eigen::VectorXd deriv_factor =
       Eigen::pow(2.0 / _interval_lengths.array(), _deriv_order);
 
-  for (std::size_t k = 0; k < mat_dest.outerSize(); ++k) {
+  for (long k = 0; k < mat_dest.outerSize(); ++k) {
 
-    std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
+    // std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
 
     Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_dest(
         mat_dest, k);
