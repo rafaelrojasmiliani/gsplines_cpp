@@ -1,5 +1,7 @@
 #include <cmath>
 #include <gsplines/Functions/ElementalFunctions.hpp>
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 using namespace gsplines::functions;
 
@@ -18,16 +20,16 @@ void compare_assert(Eigen::MatrixXd &_m_nom, Eigen::MatrixXd &_m_test) {
   // std::cout << _m_test << "\n----\n";
   // std::cout << (_m_nom - _m_test).rowwise().norm() << "\n----\n";
   if (_m_nom.array().abs().maxCoeff() < 1.0e-9) {
-    assert((_m_nom - _m_test).rowwise().norm().maxCoeff() < 1.0e-9);
+    EXPECT_TRUE((_m_nom - _m_test).rowwise().norm().maxCoeff() < 1.0e-9);
   } else {
     double err = (_m_nom - _m_test).rowwise().norm().maxCoeff() /
                  _m_nom.rowwise().norm().maxCoeff();
 
-    assert(err < 1.0e-9);
+    EXPECT_TRUE(err < 1.0e-9);
   }
 }
 
-int main() {
+TEST(FunctionCont, Value) {
 
   Eigen::VectorXd pol_coeff(6);
   pol_coeff << ti, Ts, 0.0, -6.0 * Ts + 10.0 * sf - 10.0 * ti,
@@ -58,11 +60,9 @@ int main() {
     FunctionExpression piece_2 = pol_t.derivate(i);
 
     Eigen::MatrixXd interval_1_p1 = piece_1(interval_1);
-    printf("--------------------- calling piece 2 ------------------\n");
     Eigen::MatrixXd interval_2_p2 = piece_2(interval_2);
 
     Eigen::MatrixXd interval_1_pw = piecewise(interval_1);
-    printf("--------------------- calling pw in 2 ------------------\n");
     Eigen::MatrixXd interval_2_pw = piecewise(interval_2);
 
     compare_assert(interval_1_pw, interval_1_p1);
@@ -80,6 +80,12 @@ int main() {
 
   printf("------------\n");
 
-  assert((g.derivate().value(time_span) - g_dot(time_span)).norm() < 1.0e-9);*/
-  return 0;
+  EXPECT_TRUE((g.derivate().value(time_span) - g_dot(time_span)).norm()
+  < 1.0e-9);*/
+}
+
+int main(int argc, char **argv) {
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

@@ -1,5 +1,6 @@
+include(GoogleTest)
 link_directories(${PROJECT_SOURCE_DIR}/build)
-link_libraries(${GSL_LIBRARIES} ${Eigen3_LIBRARIES} gsplines)
+link_libraries(${GSL_LIBRARIES} ${Eigen3_LIBRARIES} gsplines gtest pthread)
 include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
                     ${Eigen3_LIBRARIES})
 
@@ -12,7 +13,7 @@ foreach(file_path ${test_list})
   get_filename_component(barename ${file_path} NAME)
   string(REPLACE ".cpp" "" new_name ${barename})
   add_executable(${new_name} ${file_path})
-  add_test(${new_name} ${new_name} Debug)
+  gtest_discover_tests(${new_name})
 endforeach()
 
 foreach(file_path ${test_py_list})

@@ -1,10 +1,12 @@
 #include <cmath>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 using namespace gsplines::functions;
 
-int main() {
+TEST(Function, Composition) {
   Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
   Sin sin({-1.0, 1.0});
   Cos cos({-1.0, 1.0});
@@ -18,13 +20,14 @@ int main() {
 
   f.print();
   f.derivate().print();
-  assert((f(time_span) - Eigen::cos(2 * time_span.array()).matrix()).norm() <
-         1.0e-9);
+  EXPECT_TRUE(
+      (f(time_span) - Eigen::cos(2 * time_span.array()).matrix()).norm() <
+      1.0e-9);
   identity.value(time_span);
 
-  assert((f.derivate().value(time_span) -
-          -2 * Eigen::sin(2 * time_span.array()).matrix())
-             .norm() < 1.0e-9);
+  EXPECT_TRUE((f.derivate().value(time_span) -
+               -2 * Eigen::sin(2 * time_span.array()).matrix())
+                  .norm() < 1.0e-9);
 
   FunctionExpression g =
       (sin + identity + sin.compose(sin)).compose(sin).compose(cos);
@@ -35,6 +38,11 @@ int main() {
           .compose(cos) *
       cos.compose(cos) * (-sin);
 
-  assert((g.derivate().value(time_span) - g_dot(time_span)).norm() < 1.0e-9);
-  return 0;
+  EXPECT_TRUE((g.derivate().value(time_span) - g_dot(time_span)).norm() <
+              1.0e-9);
+}
+int main(int argc, char **argv) {
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

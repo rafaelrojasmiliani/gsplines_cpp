@@ -4,8 +4,10 @@
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 
-int main() {
+TEST(ContinuityMatrix, Value) {
 
   std::size_t number_of_intervals = 12;
   std::size_t codom_dim = 8;
@@ -40,7 +42,10 @@ int main() {
       basis_lagrange.continuity_matrix(number_of_intervals, codom_dim, 4, tau) *
       curve_1.get_coefficients();
   double val = Eigen::abs(res.array()).maxCoeff();
-  assert(val < 1.0e-9);
+  gsplines::tools::approx_equal(val, 0.0, 1.0e-9);
+}
+int main(int argc, char **argv) {
 
-  return 0;
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

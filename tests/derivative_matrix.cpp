@@ -4,8 +4,10 @@
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 
-int main() {
+TEST(DerivativeMatrix, Value) {
 
   std::size_t number_of_intervals = 12;
   std::size_t codom_dim = 8;
@@ -44,10 +46,13 @@ int main() {
                                 number_of_intervals, codom_dim, deg, tau) *
                                 curve_2.get_coefficients();
     double val = Eigen::abs(err_1.array()).maxCoeff();
-    assert(val < 1.0e-9);
+    EXPECT_TRUE(gsplines::tools::approx_equal(val, 1.0e-9, 1.0e-9));
     val = Eigen::abs(err_2.array()).maxCoeff();
-    assert(val < 1.0e-9);
+    EXPECT_TRUE(gsplines::tools::approx_equal(val, 1.0e-9, 1.0e-9));
   }
+}
+int main(int argc, char **argv) {
 
-  return 0;
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

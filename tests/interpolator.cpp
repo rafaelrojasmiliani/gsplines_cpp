@@ -5,9 +5,11 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 #include <random>
 
-int main() {
+TEST(Interpolator, Value) {
 
   for (std::size_t i = 1; i < 3; i++) {
     gsplines::basis::BasisLegendre basis(4);
@@ -17,8 +19,6 @@ int main() {
     Eigen::MatrixXd wp = Eigen::MatrixXd::Random(intervals + 1, dim);
     gsplines::Interpolator inter(dim, intervals, basis);
     Eigen::VectorXd tauv(intervals);
-    printf("--------- fillinf vector ------------ %zu %zu\n", 2u * i,
-           basis.get_dim());
     inter.fill_interpolating_vector(wp);
 
     gsplines::GSpline res = inter.interpolate(tau, wp);
@@ -30,4 +30,9 @@ int main() {
       bp(m);
     }*/
   }
+}
+int main(int argc, char **argv) {
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

@@ -1,10 +1,12 @@
 
 #include <cmath>
 #include <gsplines/Functions/ElementalFunctions.hpp>
+#include <gsplines/Tools.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 using namespace gsplines::functions;
 
-int main() {
+TEST(Functions, Value) {
   const std::pair<double, double> base_domain{-1.0, 1.0};
   Exponential exp(base_domain);
   Sin sin(base_domain);
@@ -18,7 +20,7 @@ int main() {
     for (int _ = 0; _ < 100; _++) {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
-      assert(
+      EXPECT_TRUE(
           (exp(time_span) + sin(time_span) + cos(time_span) - f_nom(time_span))
               .norm() < 1.0e-9);
 
@@ -26,14 +28,13 @@ int main() {
 
       f_dot.print();
 
-      assert(
+      EXPECT_TRUE(
           (f_dot(time_span) - exp(time_span) - cos(time_span) + sin(time_span))
               .norm() < 1.0e-9);
     }
   }
 
   {
-    printf("mmm+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
     FunctionExpression f_nom = (exp * sin);
 
     FunctionExpression f_d_nom = (exp * cos) + (exp * sin);
@@ -42,26 +43,13 @@ int main() {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
       f_nom.print();
-      assert(((exp(time_span).array() * sin(time_span).array()).matrix() -
-              f_nom(time_span))
-                 .norm() < 1.0e-9);
+      EXPECT_TRUE(((exp(time_span).array() * sin(time_span).array()).matrix() -
+                   f_nom(time_span))
+                      .norm() < 1.0e-9);
 
       FunctionExpression f_dot = f_nom.derivate();
 
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      f_d_nom.print();
-      f_dot.print();
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evalueation of f_dot\n\n");
-      std::cout << f_dot(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evaluation of f_d_nom \n\n");
-      std::cout << f_d_nom(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
-      assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
-      printf("------------ assertion paased\n\n");
-      fflush(stdout);
+      EXPECT_TRUE((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
     }
   }
 
@@ -73,27 +61,13 @@ int main() {
     for (int _ = 0; _ < 100; _++) {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
-      assert(((exp(time_span) + sin(time_span) + cos(time_span)).matrix() -
-              f_nom(time_span))
-                 .norm() < 1.0e-9);
+      EXPECT_TRUE(((exp(time_span) + sin(time_span) + cos(time_span)).matrix() -
+                   f_nom(time_span))
+                      .norm() < 1.0e-9);
 
       FunctionExpression f_dot = f_nom.derivate();
 
-      f_dot.print();
-
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      f_d_nom.print();
-      f_dot.print();
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evalueation of f_dot\n\n");
-      std::cout << f_dot(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evaluation of f_d_nom \n\n");
-      std::cout << f_d_nom(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
-      fflush(stdout);
-      assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
+      EXPECT_TRUE((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
     }
   }
 
@@ -106,30 +80,21 @@ int main() {
     for (int _ = 0; _ < 100; _++) {
       Eigen::VectorXd time_span = Eigen::VectorXd::Random(5);
 
-      assert((((exp(time_span) + sin(time_span) + cos(time_span)).array() *
-               cos(time_span).array())
-                  .matrix() -
-              f_nom(time_span))
-                 .norm() < 1.0e-9);
-      printf("--------------------iiiiiiiiiiiiiiiiiiiii\n");
+      EXPECT_TRUE((((exp(time_span) + sin(time_span) + cos(time_span)).array() *
+                    cos(time_span).array())
+                       .matrix() -
+                   f_nom(time_span))
+                      .norm() < 1.0e-9);
 
       FunctionExpression f_dot = f_nom.derivate();
 
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      f_d_nom.print();
-      f_dot.print();
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evalueation of f_dot\n\n");
-      std::cout << f_dot(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      printf("Evaluation of f_d_nom \n\n");
-      std::cout << f_d_nom(time_span) << "<< \n";
-      printf("+++++++++++++++++ ########## ------------ ++++++++++++ \n\n");
-      std::cout << (f_dot(time_span) - f_d_nom(time_span)).norm() << "<< \n";
-      fflush(stdout);
-      assert((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
+      EXPECT_TRUE((f_dot(time_span) - f_d_nom(time_span)).norm() < 1.0e-9);
     }
   }
+}
 
-  return 0;
+int main(int argc, char **argv) {
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

@@ -22,6 +22,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Basis/Basis.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
+  ${PROJECT_SOURCE_DIR}/src/Tools.cpp
   ${PROJECT_SOURCE_DIR}/src/FunctionalAnalysis/Sobolev.cpp
   ${PROJECT_SOURCE_DIR}/src/FunctionalAnalysis/Integral.cpp
   ${PROJECT_SOURCE_DIR}/src/Optimization/ipopt_interface.cpp
@@ -62,7 +63,7 @@ target_include_directories(pygsplines PUBLIC include /usr/include/eigen3)
 target_link_libraries(pygsplines PUBLIC ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES}
                                         gsplines)
 
-#set_target_properties(pygsplines PROPERTIES OUTPUT_NAME pygsplines)
+# set_target_properties(pygsplines PROPERTIES OUTPUT_NAME pygsplines)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   enable_testing()
@@ -86,11 +87,11 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-
 execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c "import site; print(site.getsitepackages()[0])"
-    OUTPUT_VARIABLE PYTHON_INSTALL_PATH
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  COMMAND "${PYTHON_EXECUTABLE}" -c
+          "import site; print(site.getsitepackages()[0])"
+  OUTPUT_VARIABLE PYTHON_INSTALL_PATH
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 install(DIRECTORY python/ DESTINATION ${PYTHON_INSTALL_PATH})
 install(TARGETS pygsplines DESTINATION ${PYTHON_INSTALL_PATH}/gsplines)
@@ -133,6 +134,7 @@ endif()
 # Debian versions require a dash
 set(CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}-1)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Rafael A. Rojas")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "coinor-libipopt-dev, ros-noetic-ifopt, libeigen3-dev")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+    "coinor-libipopt-dev, ros-noetic-ifopt, libeigen3-dev")
 
 include(CPack)
