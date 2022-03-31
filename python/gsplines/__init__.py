@@ -1,4 +1,10 @@
-from .pygsplines import *
+try:
+    from . import pygsplines
+except ImportError:
+    import pygsplines
+
+
+from pygsplines import *
 import sys
 import inspect
 

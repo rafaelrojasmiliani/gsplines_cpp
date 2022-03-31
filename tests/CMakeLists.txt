@@ -26,7 +26,9 @@ foreach(file_path ${test_py_list})
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
   set_tests_properties(
     ${new_name}
-    PROPERTIES ENVIRONMENT
-               PYTHONPATH=${PROJECT_SOURCE_DIR}/build:$ENV{PYTHONPATH})
+    PROPERTIES
+      ENVIRONMENT
+      PYTHONPATH=${PROJECT_SOURCE_DIR}/python:${PROJECT_SOURCE_DIR}/build:$ENV{PYTHONPATH}
+  )
 
 endforeach()
