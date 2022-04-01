@@ -34,6 +34,8 @@ public:
   approximate(::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
               std::size_t _n_intervals);
 
+  std::size_t get_nglp() const { return get_basis_dim(); }
+
 protected:
   GaussLobattoLagrangeSpline *deriv_impl(std::size_t _deg = 1) const override;
 };
