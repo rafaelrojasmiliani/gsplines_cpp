@@ -7,10 +7,13 @@ bool approx_equal(double _lhs, double _rhs, double _tol) {
 
   double err = std::fabs(_lhs - _rhs);
 
-  if (_lhs < _tol or _rhs < _tol) {
+  double lhs_abs = std::fabs(_lhs);
+  double rhs_abs = std::fabs(_rhs);
+
+  if (lhs_abs < _tol or rhs_abs < _tol) {
     return err < _tol;
   }
-  return err / _lhs < _tol and err / _rhs < _tol;
+  return err < lhs_abs * _tol and err < rhs_abs * _tol;
 }
 
 bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,
