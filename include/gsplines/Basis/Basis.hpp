@@ -19,7 +19,6 @@ private:
 
   size_t dim_;
   const std::string name_;
-  Eigen::VectorXd parameters_;
 
   mutable std::vector<Eigen::MatrixXd> derivative_matrix_array_;
 
@@ -53,6 +52,8 @@ private:
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
+  Eigen::VectorXd parameters_;
+  Eigen::VectorXi parameters_int_;
 
 public:
   /**
@@ -169,6 +170,8 @@ public:
       std::size_t _number_of_intervals, std::size_t _codom_dim,
       std::size_t _deriv_order,
       Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const;
+
+  bool operator==(const Basis &_that);
 };
 
 std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);

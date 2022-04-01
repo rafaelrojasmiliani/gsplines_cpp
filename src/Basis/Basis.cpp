@@ -2,6 +2,7 @@
 #include <gsplines/Basis/Basis.hpp>
 #include <gsplines/Basis/BasisLagrange.hpp>
 #include <gsplines/Basis/BasisLegendre.hpp>
+#include <gsplines/Tools.hpp>
 #include <iostream>
 #include <math.h>
 namespace gsplines {
@@ -197,6 +198,18 @@ Basis::gspline_derivative_matrix(
 
   return derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                         [_deriv_order];
+}
+
+bool Basis::operator==(const Basis &_that) {
+
+  if (get_name() != _that.get_name())
+    return false;
+  if (parameters_int_.size() != _that.parameters_int_.size() or
+      parameters_.size() != _that.parameters_.size())
+    return false;
+
+  return (parameters_int_.array() == _that.parameters_int_.array()).all() and
+         gsplines::tools::approx_equal(parameters_, _that.parameters_, 1.0e-6);
 }
 } // namespace basis
 } // namespace gsplines
