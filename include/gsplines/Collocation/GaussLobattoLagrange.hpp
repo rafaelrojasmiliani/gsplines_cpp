@@ -26,12 +26,21 @@ public:
   virtual ~GaussLobattoLagrangeSpline() = default;
   const Eigen::MatrixXd &value_at_nodes() const { return value_at_nodes_; };
 
+  static GaussLobattoLagrangeSpline identity(std::pair<double, double> _domain,
+                                             std::size_t _n_glp,
+                                             std::size_t _n_intervals);
+
+  static GaussLobattoLagrangeSpline
+  approximate(::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
+              std::size_t _n_intervals);
+
 protected:
   GaussLobattoLagrangeSpline *deriv_impl(std::size_t _deg = 1) const override;
 };
 
 double integral(::gsplines::functions::FunctionBase &_diffeo,
                 ::gsplines::functions::FunctionBase &_path);
+
 } // namespace collocation
 } // namespace gsplines
 

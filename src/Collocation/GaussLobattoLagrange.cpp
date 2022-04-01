@@ -65,10 +65,9 @@ GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
                                         get_intervals_num());
 }
 
-GaussLobattoLagrangeSpline
-gauss_lobatto_lagrange_approximtion(::gsplines::functions::FunctionBase &_in,
-                                    std::size_t _n_glp,
-                                    std::size_t _n_intervals) {
+GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
+    ::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
+    std::size_t _n_intervals) {
 
   Eigen::VectorXd result_coeff(_in.get_codom_dim() * _n_glp * _n_intervals);
   Eigen::MatrixXd local_value(_n_glp, _in.get_codom_dim());
@@ -101,6 +100,15 @@ gauss_lobatto_lagrange_approximtion(::gsplines::functions::FunctionBase &_in,
   }
   return GaussLobattoLagrangeSpline(_in.get_domain(), codom_dim, result_coeff,
                                     _n_glp, _n_intervals);
+}
+
+GaussLobattoLagrangeSpline
+GaussLobattoLagrangeSpline::identity(std::pair<double, double> _domain,
+                                     std::size_t _n_glp,
+                                     std::size_t _n_intervals) {
+
+  ::gsplines::functions::Identity id(_domain);
+  return approximate(id, _n_glp, _n_intervals);
 }
 
 double integral(::gsplines::functions::FunctionBase &_diffeo,
