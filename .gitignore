@@ -1,4 +1,5 @@
 .*.swp
+.*.swo
 .testtimes
 __pycache__
 *.pyc
@@ -14,4 +15,3 @@ compile_commands.json
 tests/CMakeCache.txt
 tests/CMakeFiles/*
 tests/Testing/*
-
