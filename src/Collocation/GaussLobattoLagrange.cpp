@@ -14,9 +14,7 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     std::size_t _n_intervals)
     : FunctionInheritanceHelper(
           _domain, _codom_dim, _n_intervals,
-          ::gsplines::basis::BasisLagrange(
-              legendre_gauss_lobatto_points(_n_glp)),
-          _coefficents,
+          ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp), _coefficents,
           (_domain.second - _domain.first) *
               Eigen::VectorXd::Ones(_n_glp * _n_intervals * _codom_dim)),
       value_at_nodes_((_n_glp - 1) * (_n_intervals - 1) + _n_glp, _codom_dim) {
@@ -66,7 +64,7 @@ GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
 }
 
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
-    ::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
+    const ::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
     std::size_t _n_intervals) {
 
   Eigen::VectorXd result_coeff(_in.get_codom_dim() * _n_glp * _n_intervals);

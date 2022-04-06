@@ -65,6 +65,11 @@ public:
   Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const override;
 };
 
+class BasisLagrangeGaussLobatto : public BasisLagrange {
+public:
+  BasisLagrangeGaussLobatto(std::size_t _dim);
+};
+
 } // namespace basis
 } // namespace gsplines
 #endif /* BASISLAGRANGE_H */

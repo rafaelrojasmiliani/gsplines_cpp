@@ -110,7 +110,7 @@ void BasisLagrange::eval_derivative_wrt_tau_on_window(
 }
 
 void BasisLagrange::eval_on_window(
-    double _s, double _tau,
+    double _s, double /*_tau*/,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
   /*  David A. Kopriva
@@ -162,8 +162,8 @@ BasisLagrange::barycentric_weights(Eigen::Ref<const Eigen::VectorXd> _points) {
    *  Algorithm 30: BarycentricWeights: Weights for Lagrange Interpolation*/
   Eigen::VectorXd result(Eigen::VectorXd::Ones(_points.size()));
 
-  for (std::size_t uicj = 1; uicj < _points.size(); uicj++) {
-    for (std::size_t uick = 0; uick < uicj; uick++) {
+  for (long uicj = 1; uicj < _points.size(); uicj++) {
+    for (long uick = 0; uick < uicj; uick++) {
       result(uick) = result(uick) * (_points(uick) - _points(uicj));
       result(uicj) = result(uicj) * (_points(uicj) - _points(uick));
     }
@@ -171,7 +171,7 @@ BasisLagrange::barycentric_weights(Eigen::Ref<const Eigen::VectorXd> _points) {
 
   result = (1.0 / result.array()).matrix();
 
-  return std::move(result);
+  return result;
 }
 
 Eigen::MatrixXd
@@ -186,9 +186,9 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points) {
 
   Eigen::VectorXd bw = barycentric_weights(_points);
 
-  for (std::size_t uici = 0; uici < _points.size(); uici++) {
+  for (long uici = 0; uici < _points.size(); uici++) {
     result(uici, uici) = 0;
-    for (std::size_t uicj = 0; uicj < _points.size(); uicj++)
+    for (long uicj = 0; uicj < _points.size(); uicj++)
       if (uici != uicj) {
         result(uici, uicj) =
             bw(uicj) / bw(uici) * 1.0 / (_points(uici) - _points(uicj));
@@ -196,7 +196,7 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points) {
       }
   }
 
-  return std::move(result);
+  return result;
 }
 
 Eigen::MatrixXd
@@ -219,9 +219,9 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
   const Eigen::VectorXd bw = barycentric_weights(_points);
 
   for (std::size_t uick = 2; uick <= _deg; uick++) {
-    for (std::size_t uici = 0; uici < _points.size(); uici++) {
+    for (long uici = 0; uici < _points.size(); uici++) {
       result(uici, uici) = 0;
-      for (std::size_t uicj = 0; uicj < _points.size(); uicj++) {
+      for (long uicj = 0; uicj < _points.size(); uicj++) {
         if (uici != uicj) {
           result(uici, uicj) =
               static_cast<double>(uick) / (_points(uici) - _points(uicj)) *
@@ -233,7 +233,7 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
     buff.noalias() = result;
   }
 
-  return std::move(result);
+  return result;
 }
 
 Eigen::MatrixXd BasisLagrange::change_interpolation_points(
@@ -273,7 +273,7 @@ Eigen::MatrixXd BasisLagrange::change_interpolation_points(
     }
   }
 
-  return std::move(result);
+  return result;
 }
 
 Eigen::MatrixXd BasisLagrange::derivative_matrix_impl(std::size_t _deg) const {
@@ -282,5 +282,9 @@ Eigen::MatrixXd BasisLagrange::derivative_matrix_impl(std::size_t _deg) const {
   }
   return derivative_matrix(domain_points_, _deg);
 }
+
+BasisLagrangeGaussLobatto::BasisLagrangeGaussLobatto(std::size_t _dim)
+    : BasisLagrange(
+          gsplines::collocation::legendre_gauss_lobatto_points(_dim)) {}
 } // namespace basis
 } // namespace gsplines
