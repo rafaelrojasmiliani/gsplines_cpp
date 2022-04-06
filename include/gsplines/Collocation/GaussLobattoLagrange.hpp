@@ -44,11 +44,13 @@ public:
 
   public:
     template <typename... Ts> LinearOperator(Ts &&... _args) : mat_(_args...) {}
+
     const T &to_matrix() const { return mat_; }
-    template <typename M, typename Q>
-    inline Q operator*(const LinearOperator<M> &_rhs) {
-      return to_matrix() * _rhs.to_matrix();
+
+    template <typename M> inline auto operator*(const LinearOperator<M> &_rhs) {
+      return LinearOperator(to_matrix() * _rhs.to_matrix());
     }
+
     GaussLobattoLagrangeSpline
     operator*(const GaussLobattoLagrangeSpline &_in) {
       return GaussLobattoLagrangeSpline(_in.get_domain(), _in.get_codom_dim(),
@@ -65,7 +67,7 @@ public:
 
   public:
     Derivative(std::size_t _codom_dim, std::size_t _n_glp,
-               std::size_t _n_intervals)
+               std::size_t _n_intervals, const Eigen::VectorXd &_int_lengs)
         : LinearOperator(_n_glp * _n_intervals * _codom_dim,
                          _n_glp * _n_intervals * _codom_dim),
           basis_(_n_glp) {
@@ -77,12 +79,16 @@ public:
             for (std::size_t j = 0; j < _n_glp; j++) {
               mat_.block(uic_inter * uic_dim * _n_glp,
                          uic_inter * uic_dim * _n_glp, _n_glp, _n_glp)
-                  .coeffRef(i, j) = d_mat(i, j);
+                  .coeffRef(i, j) = d_mat(i, j) / _int_lengs(uic_inter);
             }
           }
         }
       }
     }
+    Derivative(const GaussLobattoLagrangeSpline &_that)
+        : Derivative(_that.get_codom_dim(), _that.get_basis().get_dim(),
+                     _that.get_number_of_intervals(),
+                     _that.get_interval_lengths()) {}
   };
 
   class TransposeLeftMultiplication
@@ -113,6 +119,7 @@ protected:
 double integral(::gsplines::functions::FunctionBase &_diffeo,
                 ::gsplines::functions::FunctionBase &_path);
 
+using GLLSpline = GaussLobattoLagrangeSpline;
 } // namespace collocation
 } // namespace gsplines
 
