@@ -108,17 +108,17 @@ public:
       const Eigen::VectorXd &vec = _that.get_coefficients();
       std::size_t total_size = n_glp * n_inter * codom_dim;
       // ---
-      for (std::size_t uic_time = 0; uic_time < total_size; uic_time += 1) {
+      for (std::size_t uic_interval = 0; uic_interval < total_size;
+           uic_interval++) {
         for (std::size_t uic_coor = 0; uic_coor < codom_dim; uic_coor++) {
-          mat_.coeffRef(uic_time, 0) =
-              vec(uic_time / n_inter + uic_coor * n_glp);
-        }
-      }
-      for (std::size_t i = 0;
-           i < _that.get_number_of_intervals() * _that.get_basis().get_dim();
-           i++) {
-        for (std::size_t j = 0; j < _that.get_codom_dim(); j++) {
-          mat_.coeffRef(i, j * n_glp) = vec(j * n_glp);
+          std::size_t i0 = uic_interval * n_glp;
+          std::size_t j0 = uic_coor * n_glp;
+
+          for (std::size_t i = 0; i < n_glp; i++) {
+
+            mat_.block(i0, j0, n_glp, n_glp).coeffRef(i, i) =
+                vec(uic_interval * n_glp * codom_dim + uic_coor * n_glp + i);
+          }
         }
       }
     }
