@@ -10,13 +10,13 @@ namespace gsplines {
 namespace collocation {
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     std::pair<double, double> _domain, std::size_t _codom_dim,
-    const Eigen::Ref<const Eigen::VectorXd> _coefficents, std::size_t _n_glp,
-    std::size_t _n_intervals)
+    std::size_t _n_intervals, std::size_t _n_glp,
+    const Eigen::Ref<const Eigen::VectorXd> _coefficents,
+    const Eigen::Ref<const Eigen::VectorXd> _tauv)
     : FunctionInheritanceHelper(
           _domain, _codom_dim, _n_intervals,
           ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp), _coefficents,
-          (_domain.second - _domain.first) *
-              Eigen::VectorXd::Ones(_n_glp * _n_intervals * _codom_dim)),
+          _tauv),
       value_at_nodes_((_n_glp - 1) * (_n_intervals - 1) + _n_glp, _codom_dim) {
 
   Eigen::MatrixXd mat = Eigen::Map<const Eigen::MatrixXd>(
@@ -58,9 +58,9 @@ GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
     }
   }
 
-  return new GaussLobattoLagrangeSpline(get_domain(), get_codom_dim(),
-                                        result_coeff, get_basis_dim(),
-                                        get_intervals_num());
+  return new GaussLobattoLagrangeSpline(
+      get_domain(), get_codom_dim(), get_intervals_num(), get_basis().get_dim(),
+      result_coeff, get_interval_lengths());
 }
 
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
@@ -96,8 +96,13 @@ GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
     result_coeff.segment(i0, _n_glp * codom_dim) =
         Eigen::Map<Eigen::VectorXd>(local_value.data(), local_value.size());
   }
-  return GaussLobattoLagrangeSpline(_in.get_domain(), codom_dim, result_coeff,
-                                    _n_glp, _n_intervals);
+  return GaussLobattoLagrangeSpline(
+      _in.get_domain(), codom_dim, _n_intervals, _n_glp, result_coeff,
+      Eigen::VectorXd::Ones(_n_intervals) * local_interval_length);
+  /*
+  return new GaussLobattoLagrangeSpline(
+      get_domain(), get_codom_dim(), get_intervals_num(), get_basis().get_dim(),
+      result_coeff, get_interval_lengths());*/
 }
 
 GaussLobattoLagrangeSpline

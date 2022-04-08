@@ -34,18 +34,18 @@ TEST(BasisLagrange, Value_Properties) {
     for (int j = 0; j < 30; j++) {
       basis_lagrange.eval_on_window(real_dist(mt), 1.0, buff);
       double res = buff.sum();
-      EXPECT_TRUE(tools::approx_equal(res, 1.0, 1.0e-7))
+      EXPECT_TRUE(tools::approx_equal(res, 1.0, 5.0e-5))
           << "value " << std::to_string(res);
     }
     // Test P2
     for (std::size_t j = 0; j < dim; j++) {
       basis_lagrange.eval_on_window(points(j), 1.0, buff);
-      EXPECT_TRUE(tools::approx_equal(buff(j), 1.0, 1.0e-7))
+      EXPECT_TRUE(tools::approx_equal(buff(j), 1.0, 5.0e-5))
           << "value " << std::to_string(buff(j));
 
       for (std::size_t k = 0; k < dim; k++)
         if (k != j)
-          EXPECT_TRUE(tools::approx_equal(buff(k), 0.0, 1.0e-7))
+          EXPECT_TRUE(tools::approx_equal(buff(k), 0.0, 5.0e-5))
               << "value " << std::to_string(buff(k));
     }
   }
@@ -60,9 +60,9 @@ TEST(BasisLagrange, GSpline_Value) {
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> real_dist(0.0, 1.0);
-  std::uniform_int_distribution<std::size_t> uint_dist(3, 10);
+  std::uniform_int_distribution<std::size_t> uint_dist(2, 5);
 
-  std::size_t dim = uint_dist(mt);
+  std::size_t dim = 2 * uint_dist(mt);
   std::size_t codom_dim = uint_dist(mt);
   std::size_t n_intervals = uint_dist(mt);
 
@@ -86,7 +86,7 @@ TEST(BasisLagrange, GSpline_Value) {
     gsplines::GSpline curve_2 =
         gsplines::interpolate(tau, waypoints, basis_lagrange);
     Eigen::MatrixXd val_2 = curve_2(time_spam);
-    EXPECT_TRUE(gsplines::tools::approx_equal(val_1, val_2, 1.0e-6));
+    EXPECT_TRUE(gsplines::tools::approx_equal(val_1, val_2, 5.0e-5));
   }
   /*
     {

@@ -17,12 +17,12 @@ BasisLegendre::BasisLegendre(std::size_t _dim)
 
   Eigen::MatrixXd l2normbase_matrix(get_dim(), get_dim());
   l2normbase_matrix.setZero();
-  for (int i = 0; i < _dim; i++) {
+  for (std::size_t i = 0; i < _dim; i++) {
     l2normbase_matrix(i, i) = 2.0 / (2.0 * i + 1.0);
   }
 
   derivative_matrices_buffer_.push_back(l2normbase_matrix);
-  for (int i = 1; i < _dim + 1; i++) {
+  for (std::size_t i = 1; i < _dim + 1; i++) {
     derivative_matrices_buffer_.push_back(dmat * l2normbase_matrix *
                                           dmat.transpose());
     dmat *= derivative_matrix_;
@@ -46,6 +46,8 @@ void BasisLegendre::eval_derivative_on_window(
   double term = 0;
   double aux = 0;
   double mutiplier = 1.0;
+  _buff.setZero();
+  buff_next.setZero();
   _buff(0) = 1.0;
   _buff(1) = _s;
   for (unsigned int i = 1; i < get_dim() - 1; i++) {
@@ -54,11 +56,11 @@ void BasisLegendre::eval_derivative_on_window(
         ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
   }
   aux = 1.0;
-  for (int d = 1; d <= _deg; d++) {
+  for (std::size_t d = 1; d <= _deg; d++) {
     buff_next(d - 1) = 0.0;
     buff_next(d) = aux;
 
-    for (int i = d; i < get_dim() - 1; i++) {
+    for (std::size_t i = d; i < get_dim() - 1; i++) {
       term =
           (2.0 * (double)i + 1.0) * ((double)d * _buff(i) + _s * buff_next(i));
       buff_next(i + 1) =
@@ -80,11 +82,12 @@ void BasisLegendre::eval_derivative_wrt_tau_on_window(
 }
 
 void BasisLegendre::eval_on_window(
-    double _s, double _tau,
+    double _s, double /*_tau*/,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
+  _buff.setZero();
   _buff(0) = 1.0;
   _buff(1) = _s;
-  for (int i = 1; i < get_dim() - 1; i++) {
+  for (std::size_t i = 1; i < get_dim() - 1; i++) {
     _buff(i + 1) =
         1.0 / ((double)i + 1.0) *
         ((2.0 * (double)i + 1.0) * _s * _buff(i) - (double)i * _buff(i - 1));
@@ -99,8 +102,8 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
   _dmat = Eigen::MatrixXd::Zero(_dim, _dim);
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (int i = 1; i < _dim; i++) {       // for on i
-    for (int j = 0; j < _dim - 1; j++) { // for on j
+  for (std::size_t i = 1; i < _dim; i++) {       // for on i
+    for (std::size_t j = 0; j < _dim - 1; j++) { // for on j
       if (i == j + 1) {
         _dmat(i, j) = ((double)i) / alpha(i - 1);
       } else if (i > j + 1) {
@@ -143,8 +146,8 @@ Eigen::MatrixXd BasisLegendre::derivative_matrix(std::size_t _dim) {
 
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (int i = 1; i < _dim; i++) {       // for on i
-    for (int j = 0; j < _dim - 1; j++) { // for on j
+  for (std::size_t i = 1; i < _dim; i++) {       // for on i
+    for (std::size_t j = 0; j < _dim - 1; j++) { // for on j
       if (i == j + 1) {
         result(i, j) = ((double)i) / alpha(i - 1);
       } else if (i > j + 1) {

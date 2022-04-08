@@ -19,8 +19,9 @@ private:
 public:
   GaussLobattoLagrangeSpline(
       std::pair<double, double> _domain, std::size_t _codom_dim,
-      const Eigen::Ref<const Eigen::VectorXd> _coefficents, std::size_t _n_glp,
-      std::size_t _n_intervals);
+      std::size_t _n_intervals, std::size_t _n_glp,
+      const Eigen::Ref<const Eigen::VectorXd> _coefficents,
+      const Eigen::Ref<const Eigen::VectorXd> _tauv);
   GaussLobattoLagrangeSpline(const GaussLobattoLagrangeSpline &_that);
   GaussLobattoLagrangeSpline(GaussLobattoLagrangeSpline &&_that);
   GaussLobattoLagrangeSpline &
@@ -63,8 +64,9 @@ public:
                               _in.get_number_of_intervals() /
                               _in.get_basis().get_dim();
       return GaussLobattoLagrangeSpline(
-          _in.get_domain(), codom_dim, to_matrix() * _in.get_coefficients(),
-          _in.get_basis().get_dim(), _in.get_intervals_num());
+          _in.get_domain(), codom_dim, _in.get_intervals_num(),
+          _in.get_basis().get_dim(), to_matrix() * _in.get_coefficients(),
+          _in.get_interval_lengths());
     }
   };
 

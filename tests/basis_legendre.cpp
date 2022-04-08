@@ -5,13 +5,15 @@
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
 
+/* Test that the Legendre polynomials respect the recursive relation */
 TEST(BasisLegendre, Value) {
 
   for (int i = 3; i < 17; i++) {
 
     gsplines::basis::BasisLegendre basis(i);
     Eigen::VectorXd buff(i);
-    for (const double &t : {-0.9, -0.5, -0.33, 0.0, 0.33, 0.5, 0.9}) {
+    for (const double &t :
+         {-1.0, -0.9, -0.5, -0.33, 0.0, 0.33, 0.5, 0.9, 1.0}) {
       basis.eval_on_window(t, 2, buff);
       for (int n = 2; n < i - 1; n++) {
         double lhs = (n + 1.0) * buff(n + 1);
@@ -23,6 +25,8 @@ TEST(BasisLegendre, Value) {
   }
 }
 
+/* Test that the derivtaive of the Legendre polynomials respect the recursive
+ * relation */
 TEST(BasisLegendre, Derivative) {
 
   for (int i = 3; i < 17; i++) {
@@ -31,7 +35,8 @@ TEST(BasisLegendre, Derivative) {
     Eigen::VectorXd buff(i);
     Eigen::VectorXd buff_d1(i);
     Eigen::VectorXd buff_d2(i);
-    for (const double &t : {-0.9, -0.5, -0.33, 0.0, 0.33, 0.5, 0.9}) {
+    for (const double &t :
+         {-1.0, -0.9, -0.5, -0.33, 0.0, 0.33, 0.5, 0.9, 1.0}) {
       basis.eval_derivative_on_window(t, 2, 0, buff);
       basis.eval_derivative_on_window(t, 2, 1, buff_d1);
       basis.eval_derivative_on_window(t, 2, 2, buff_d2);

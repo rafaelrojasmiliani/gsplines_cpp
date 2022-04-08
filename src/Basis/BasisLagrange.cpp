@@ -77,8 +77,6 @@ void BasisLagrange::eval_derivative_on_window(
     return;
   double term = std::pow(2.0 / _tau, _deg);
   /*
-    deriv_buff_1_.noalias() = derivative_matrix_;
-    deriv_buff_2_.noalias() = derivative_matrix_;
 
     const Eigen::VectorXd &x = domain_points_;
 
