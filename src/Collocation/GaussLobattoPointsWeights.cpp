@@ -132,5 +132,29 @@ Eigen::VectorXd legendre_gauss_lobatto_weights(std::size_t _n) {
   std::tie(std::ignore, result) = legendre_gauss_lobatto_points_and_weights(_n);
   return result;
 }
+
+Eigen::VectorXd
+legendre_gauss_lobatto_points(std::tuple<double, double> _domain,
+                              std::size_t _nglp, std::size_t _n_intervals) {
+
+  Eigen::VectorXd glp = legendre_gauss_lobatto_points(_nglp);
+
+  double left_bound;
+  double right_bound;
+  std::tie(left_bound, right_bound) = _domain;
+
+  Eigen::VectorXd result(_nglp * _n_intervals);
+
+  double local_interval_length = (right_bound - left_bound) / _n_intervals;
+
+  for (std::size_t interval = 0; interval < _n_intervals; interval++) {
+
+    double local_left_bound = left_bound + interval * local_interval_length;
+
+    result.segment(interval * _nglp, _nglp) =
+        (glp.array() + 1.0) * local_interval_length / 2.0 + local_left_bound;
+  }
+  return result;
+}
 } // namespace collocation
 } // namespace gsplines

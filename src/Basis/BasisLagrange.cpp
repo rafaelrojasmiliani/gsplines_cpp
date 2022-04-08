@@ -51,6 +51,10 @@ BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
   // get_derivative_matrix(get_dim());
 }
 
+BasisLagrange::BasisLagrange(const std::vector<double> &_domain_points)
+    : BasisLagrange(Eigen::Map<const Eigen::VectorXd>(_domain_points.data(),
+                                                      _domain_points.size())) {}
+
 BasisLagrange::BasisLagrange(const BasisLagrange &that)
     : Basis(that), domain_points_(that.domain_points_),
       barycentric_weights_(that.barycentric_weights_),

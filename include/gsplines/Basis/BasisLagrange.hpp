@@ -17,7 +17,8 @@ private:
   mutable Eigen::MatrixXd deriv_buff_2_;
 
 public:
-  BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points);
+  explicit BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points);
+  explicit BasisLagrange(const std::vector<double> &_domain_points);
   BasisLagrange(const BasisLagrange &that);
   BasisLagrange(BasisLagrange &&that);
 

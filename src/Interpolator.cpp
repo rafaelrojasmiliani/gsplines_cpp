@@ -244,6 +244,10 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     Eigen::Ref<const Eigen::VectorXd> _coeff,
     Eigen::Ref<const Eigen::VectorXd> _interval_lengths, std::size_t _tau_idx) {
 
+  if ((_interval_lengths.array() < 1.0e-6).any()) {
+    throw std::invalid_argument(
+        "get_coeff_derivative_wrt_tau: Interval lenghts cannot be negative !");
+  }
   if (_interval_lengths.size() != num_intervals_ or _tau_idx < 0 or
       _tau_idx >= num_intervals_) {
     fprintf(stderr, "Cannot compute derivative of coefficients wrt tau ");
@@ -331,14 +335,22 @@ const Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
     const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
     const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
 
+  if ((_interval_lengths.array() < 1.0e-6).any()) {
+    throw std::invalid_argument(" Interval lenghts cannot be negative !");
+  }
   // 1. fill the interpolating matrix
   fill_interpolating_matrix(_interval_lengths);
   // 2. fill the interpolating vector
   fill_interpolating_vector(_waypoints);
   // 3. Solve the interpolation problem
+  std::cout << "---- pre to solve \n";
   Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
+  std::cout << " problem size \n"
+            << interpolating_matrix_.rows() << " x "
+            << interpolating_matrix_.cols() << "\n---\n";
   solver.compute(interpolating_matrix_);
   sol_buffer_ = solver.solve(interpolating_vector_);
+  std::cout << "---- post to solve \n";
   // 4. Return the interpolating function
   return sol_buffer_;
 }

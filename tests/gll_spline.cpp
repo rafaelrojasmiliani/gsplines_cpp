@@ -55,11 +55,24 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
 
   collocation::GLLSpline q_test = q1_t * dmat * q2;
 
-  std::cout << q2.derivate().get_coefficients().transpose() << "\n";
-  std::cout << q1.get_coefficients().transpose() << "\n-----\n";
-  std::cout << q_test.get_coefficients().transpose() << "\n";
-  std::cout << q_nom.get_coefficients().transpose() << "\n";
+  std::cout << collocation::legendre_gauss_lobatto_points(q2.get_domain(), nglp,
+                                                          n_inter)
+                   .transpose()
+            << "\n----- \n\n";
+  /*
+    std::cout << q2.derivate()(collocation::legendre_gauss_lobatto_points(
+                     q2.get_domain(), nglp, n_inter))
+              << "  .\n";
+    std::cout << q2.derivate().get_coefficients().transpose() << "\n-----\n";
+  */
 
+  std::cout << q1(collocation::legendre_gauss_lobatto_points(q2.get_domain(),
+                                                             nglp, n_inter))
+            << "  .\n\n";
+  std::cout << q1.get_coefficients().transpose() << "\n-----\n";
+  /*std::cout << q_test.get_coefficients().transpose() << "\n";
+  std::cout << q_nom.get_coefficients().transpose() << "\n";
+*/
   EXPECT_TRUE(tools::approx_equal(q_nom, q_test, 1.0e-9));
 }
 
