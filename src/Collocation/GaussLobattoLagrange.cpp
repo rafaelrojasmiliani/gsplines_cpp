@@ -41,26 +41,14 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
 GaussLobattoLagrangeSpline *
 GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
 
-  Eigen::VectorXd result_coeff(get_coefficients());
-  int i0;
+  GSpline *aux = GSpline::deriv_impl(_deg);
 
-  for (std::size_t der_coor = 1; der_coor <= _deg; der_coor++) {
-    for (std::size_t interval_coor = 0; interval_coor < get_intervals_num();
-         interval_coor++) {
-      for (std::size_t codom_coor = 0; codom_coor < get_codom_dim();
-           codom_coor++) {
-        i0 = interval_coor * get_basis_dim() * get_codom_dim() +
-             get_basis_dim() * codom_coor;
-        result_coeff.segment(i0, get_basis_dim()) =
-            get_basis().get_derivative_matrix_block(_deg) *
-            result_coeff.segment(i0, get_basis_dim());
-      }
-    }
-  }
-
-  return new GaussLobattoLagrangeSpline(
+  GLLSpline *result = new GaussLobattoLagrangeSpline(
       get_domain(), get_codom_dim(), get_intervals_num(), get_basis().get_dim(),
-      result_coeff, get_interval_lengths());
+      aux->get_coefficients(), get_interval_lengths());
+
+  delete aux;
+  return result;
 }
 
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(

@@ -7,13 +7,21 @@
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
 
+#include <random>
+
 using namespace gsplines;
 TEST(GLLSpline, Derivative_Operator) {
 
-  std::size_t dim = 8;
-  std::size_t nglp = 10;
-  std::size_t n_inter = 10;
-  std::size_t wpn = 5;
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  std::uniform_real_distribution<double> real_dist(0.0, 1.0);
+  std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
+
+  std::size_t dim = uint_dist(mt);
+  std::size_t nglp = 2 * uint_dist(mt);
+  std::size_t n_inter = uint_dist(mt);
+  std::size_t wpn = uint_dist(mt);
+
   collocation::GLLSpline q1 =
       collocation::GaussLobattoLagrangeSpline::approximate(
           optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
@@ -29,10 +37,16 @@ TEST(GLLSpline, Derivative_Operator) {
 
 TEST(GLLSpline, Transpose_Left_Multiplication) {
 
-  std::size_t dim = 2;
-  std::size_t nglp = 3;
-  std::size_t n_inter = 2;
-  std::size_t wpn = 2;
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  std::uniform_real_distribution<double> real_dist(0.0, 1.0);
+  std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
+
+  std::size_t dim = uint_dist(mt);
+  std::size_t nglp = 2 * uint_dist(mt);
+  std::size_t n_inter = uint_dist(mt);
+  std::size_t wpn = uint_dist(mt);
+
   collocation::GLLSpline q1 =
       collocation::GaussLobattoLagrangeSpline::approximate(
           optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
@@ -44,36 +58,22 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
           nglp, n_inter);
 
   collocation::GLLSpline q_nom =
-      collocation::GaussLobattoLagrangeSpline::approximate(
-          q1.dot(q2.derivate()), nglp, n_inter);
+      collocation::GaussLobattoLagrangeSpline::approximate(q1.dot(q2), nglp,
+                                                           n_inter);
 
   collocation::GLLSpline::TransposeLeftMultiplication q1_t(q1);
 
-  collocation::GLLSpline::Derivative dmat(q1);
+  collocation::GLLSpline q_test = q1_t * q2;
 
-  collocation::GLLSpline::LinearOperator m = q1_t * dmat;
-
-  collocation::GLLSpline q_test = q1_t * dmat * q2;
-
-  std::cout << collocation::legendre_gauss_lobatto_points(q2.get_domain(), nglp,
-                                                          n_inter)
-                   .transpose()
-            << "\n----- \n\n";
-  /*
-    std::cout << q2.derivate()(collocation::legendre_gauss_lobatto_points(
-                     q2.get_domain(), nglp, n_inter))
-              << "  .\n";
-    std::cout << q2.derivate().get_coefficients().transpose() << "\n-----\n";
-  */
-
-  std::cout << q1(collocation::legendre_gauss_lobatto_points(q2.get_domain(),
-                                                             nglp, n_inter))
-            << "  .\n\n";
-  std::cout << q1.get_coefficients().transpose() << "\n-----\n";
-  /*std::cout << q_test.get_coefficients().transpose() << "\n";
-  std::cout << q_nom.get_coefficients().transpose() << "\n";
-*/
-  EXPECT_TRUE(tools::approx_equal(q_nom, q_test, 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(q_nom, q_test, 1.0e-9))
+      << "\n Nom:\n"
+      << q_nom.get_coefficients().transpose() << "\n Test:\n"
+      << q_test.get_coefficients().transpose() << "\n"
+      << "Error: "
+      << (q_nom.get_coefficients() - q_test.get_coefficients())
+             .array()
+             .abs()
+             .maxCoeff();
 }
 
 int main(int argc, char **argv) {

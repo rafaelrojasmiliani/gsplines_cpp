@@ -89,7 +89,7 @@ public:
         for (std::size_t i = 0; i < _n_glp; i++) {
           for (std::size_t j = 0; j < _n_glp; j++) {
             mat_.block(uici, uici, _n_glp, _n_glp).coeffRef(i, j) =
-                d_mat(i, j) / _int_lengs(0);
+                2 * d_mat(i, j) / _int_lengs(0);
           }
         }
       }
@@ -124,7 +124,6 @@ public:
           std::size_t i0 = uic_interval * n_glp;
           std::size_t j0 = uic_coor * n_glp + uic_interval * n_glp * codom_dim;
 
-          std::cout << "------- " << i0 << "  " << j0 << '\n';
           for (std::size_t i = 0; i < n_glp; i++) {
 
             mat_.coeffRef(i0 + i, j0 + i) =
@@ -132,8 +131,6 @@ public:
           }
         }
       }
-      std::cout << "------- \n" << mat_.toDense() << "\n ---\n";
-      std::cout << "------- \n" << vec.transpose() << "\n ---\n";
       mat_.makeCompressed();
     }
   };
