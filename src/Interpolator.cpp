@@ -11,6 +11,10 @@ Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
       matrix_size_(_basis.get_dim() * _codom_dim * _num_intervals),
       boundary_buffer_tranposed_(_basis.get_dim(), _basis.get_dim() / 2) {
 
+  if (basis_->get_dim() % 2 != 0) {
+    throw std::invalid_argument(
+        "Interpolator: The dimension of the basis must be pair");
+  }
   interpolating_matrix_.resize(matrix_size_, matrix_size_);
   interpolating_vector_.resize(matrix_size_);
   interpolating_vector_.setZero();
@@ -26,7 +30,7 @@ Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
       Eigen::VectorXi::Constant(matrix_size_, nnz_per_col));
   interpolating_matrix_.makeCompressed();
 
-  for (int i = 0; i < _num_intervals; i++) {
+  for (std::size_t i = 0; i < _num_intervals; i++) {
     {
       Eigen::SparseMatrix<double> mat;
       interpolation_matrix_ders_.push_back(mat);
@@ -46,7 +50,7 @@ void Interpolator::fill_interpolating_matrix(
   unsigned int i0 = 0;
   unsigned int j0 = 0;
 
-  if (_interval_lengths.size() != num_intervals_) {
+  if (_interval_lengths.size() != (long)num_intervals_) {
     fprintf(stderr, "Cannot fill matrix. Vector of interval lenghts is not of "
                     "the requred dimention");
     return;
@@ -159,12 +163,18 @@ GSpline Interpolator::interpolate(
 }
 
 void Interpolator::print_interpolating_matrix() {
-  Eigen::IOFormat CleanFmt(14, 0, ", ", "\n", "[", "]");
+  Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "],");
   std::cout << Eigen::MatrixXd(interpolating_matrix_).format(CleanFmt) << '\n';
 }
 
+void Interpolator::print_info() {
+  printf("codom dim = %zu\n", codom_dim_);
+  printf("interval number = %zu\n", num_intervals_);
+  printf("basis dim = %zu\n", basis_->get_dim());
+}
+
 void Interpolator::print_interpolating_vector() {
-  Eigen::IOFormat CleanFmt(14, 1, ", ", "\n", "[", "]");
+  Eigen::IOFormat CleanFmt(14, 1, ", ", "\n", "[", "],");
   std::cout << Eigen::MatrixXd(interpolating_vector_).format(CleanFmt) << '\n';
 }
 void Interpolator::fill_position_block(unsigned int i0, unsigned int j0,
@@ -248,7 +258,7 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     throw std::invalid_argument(
         "get_coeff_derivative_wrt_tau: Interval lenghts cannot be negative !");
   }
-  if (_interval_lengths.size() != num_intervals_ or _tau_idx < 0 or
+  if (_interval_lengths.size() != (long)num_intervals_ or _tau_idx < 0 or
       _tau_idx >= num_intervals_) {
     fprintf(stderr, "Cannot compute derivative of coefficients wrt tau ");
     return coefficients_vector_;
@@ -343,14 +353,16 @@ const Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
   // 2. fill the interpolating vector
   fill_interpolating_vector(_waypoints);
   // 3. Solve the interpolation problem
-  std::cout << "---- pre to solve \n";
   Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
-  std::cout << " problem size \n"
-            << interpolating_matrix_.rows() << " x "
-            << interpolating_matrix_.cols() << "\n---\n";
   solver.compute(interpolating_matrix_);
+  if (solver.info() != Eigen::ComputationInfo::Success) {
+    std::cerr << solver.lastErrorMessage() << "\n";
+    print_info();
+    std::cout << "interval lengths:\n" << _interval_lengths.transpose() << "\n";
+    print_interpolating_matrix();
+    return sol_buffer_;
+  }
   sol_buffer_ = solver.solve(interpolating_vector_);
-  std::cout << "---- post to solve \n";
   // 4. Return the interpolating function
   return sol_buffer_;
 }

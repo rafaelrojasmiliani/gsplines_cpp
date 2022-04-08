@@ -42,6 +42,8 @@ public:
   void print_interpolating_matrix();
   void print_interpolating_vector();
 
+  void print_info();
+
   void fill_position_block(unsigned int i0, unsigned int j0,
                            Eigen::SparseMatrix<double> &_mat);
   void fill_boundary_derivative_block(unsigned int i0, unsigned int j0,
