@@ -51,12 +51,20 @@ public:
       return LinearOperator(to_matrix() * _rhs.to_matrix());
     }
 
+    template <typename M>
+    inline auto operator*(const Eigen::MatrixBase<M> &_rhs) {
+      return to_matrix() * _rhs;
+    }
+
     GaussLobattoLagrangeSpline
     operator*(const GaussLobattoLagrangeSpline &_in) {
-      return GaussLobattoLagrangeSpline(_in.get_domain(), _in.get_codom_dim(),
-                                        to_matrix() * _in.get_coefficients(),
-                                        _in.get_basis().get_dim(),
-                                        _in.get_intervals_num());
+      Eigen::VectorXd coeff = to_matrix() * _in.get_coefficients();
+      std::size_t codom_dim = to_matrix().rows() /
+                              _in.get_number_of_intervals() /
+                              _in.get_basis().get_dim();
+      return GaussLobattoLagrangeSpline(
+          _in.get_domain(), codom_dim, to_matrix() * _in.get_coefficients(),
+          _in.get_basis().get_dim(), _in.get_intervals_num());
     }
   };
 
@@ -84,6 +92,7 @@ public:
         }
       }
       // ---
+      mat_.makeCompressed();
     }
     Derivative(const GaussLobattoLagrangeSpline &_that)
         : Derivative(_that.get_codom_dim(), _that.get_basis().get_dim(),
@@ -106,21 +115,24 @@ public:
       std::size_t codom_dim = _that.get_codom_dim();
 
       const Eigen::VectorXd &vec = _that.get_coefficients();
-      std::size_t total_size = n_glp * n_inter * codom_dim;
       // ---
-      for (std::size_t uic_interval = 0; uic_interval < total_size;
+      for (std::size_t uic_interval = 0; uic_interval < n_inter;
            uic_interval++) {
         for (std::size_t uic_coor = 0; uic_coor < codom_dim; uic_coor++) {
           std::size_t i0 = uic_interval * n_glp;
-          std::size_t j0 = uic_coor * n_glp;
+          std::size_t j0 = uic_coor * n_glp + uic_interval * n_glp * codom_dim;
 
+          std::cout << "------- " << i0 << "  " << j0 << '\n';
           for (std::size_t i = 0; i < n_glp; i++) {
 
-            mat_.block(i0, j0, n_glp, n_glp).coeffRef(i, i) =
+            mat_.coeffRef(i0 + i, j0 + i) =
                 vec(uic_interval * n_glp * codom_dim + uic_coor * n_glp + i);
           }
         }
       }
+      std::cout << "------- \n" << mat_.toDense() << "\n ---\n";
+      std::cout << "------- \n" << vec.transpose() << "\n ---\n";
+      mat_.makeCompressed();
     }
   };
 

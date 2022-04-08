@@ -29,10 +29,10 @@ TEST(GLLSpline, Derivative_Operator) {
 
 TEST(GLLSpline, Transpose_Left_Multiplication) {
 
-  std::size_t dim = 8;
-  std::size_t nglp = 10;
-  std::size_t n_inter = 10;
-  std::size_t wpn = 5;
+  std::size_t dim = 2;
+  std::size_t nglp = 3;
+  std::size_t n_inter = 2;
+  std::size_t wpn = 2;
   collocation::GLLSpline q1 =
       collocation::GaussLobattoLagrangeSpline::approximate(
           optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
@@ -51,7 +51,14 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
 
   collocation::GLLSpline::Derivative dmat(q1);
 
-  collocation::GLLSpline q_test = q1_t * dmat * q1;
+  collocation::GLLSpline::LinearOperator m = q1_t * dmat;
+
+  collocation::GLLSpline q_test = q1_t * dmat * q2;
+
+  std::cout << q2.derivate().get_coefficients().transpose() << "\n";
+  std::cout << q1.get_coefficients().transpose() << "\n-----\n";
+  std::cout << q_test.get_coefficients().transpose() << "\n";
+  std::cout << q_nom.get_coefficients().transpose() << "\n";
 
   EXPECT_TRUE(tools::approx_equal(q_nom, q_test, 1.0e-9));
 }

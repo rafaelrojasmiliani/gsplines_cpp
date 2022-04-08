@@ -41,8 +41,14 @@ GSpline::GSpline(const GSpline &that)
 
   if (coefficients_.size() !=
       number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
-    printf("Error: The number of coefficients is incorrect\n");
-    fflush(stdout);
+    throw std::invalid_argument(
+        "GSpline instantation Error: The number of coefficients is incorrect "
+        "req base dim: " +
+        std::to_string(basis_->get_dim()) +
+        " req codom dim: " + std::to_string(that.get_codom_dim()) +
+        " req num inter: " + std::to_string(that.get_number_of_intervals()) +
+        ". However, the number of coeff was " +
+        std::to_string(coefficients_.size()));
   }
 }
 
@@ -57,8 +63,14 @@ GSpline::GSpline(GSpline &&that)
 
   if (coefficients_.size() !=
       number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
-    printf("Error: The number of coefficients is incorrect\n");
-    fflush(stdout);
+    throw std::invalid_argument(
+        "GSpline instantation Error: The number of coefficients is incorrect "
+        "req base dim: " +
+        std::to_string(basis_->get_dim()) +
+        " req codom dim: " + std::to_string(that.get_codom_dim()) +
+        " req num inter: " + std::to_string(that.get_number_of_intervals()) +
+        ". However, the number of coeff was " +
+        std::to_string(coefficients_.size()));
   }
 }
 
@@ -74,8 +86,14 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
       basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() != _n_intervals * basis_->get_dim() * _codom_dim) {
-    printf("Error: The number of coefficients is incorrect\n");
-    fflush(stdout);
+    throw std::invalid_argument(
+        "GSpline instantation Error: The number of coefficients is incorrect "
+        "req base dim: " +
+        std::to_string(basis_->get_dim()) +
+        " req codom dim: " + std::to_string(get_codom_dim()) +
+        " req num inter: " + std::to_string(get_number_of_intervals()) +
+        ". However, the number of coeff was " +
+        std::to_string(coefficients_.size()));
   }
   double time_instant = 0.0;
   domain_break_points_(0) = time_instant;
