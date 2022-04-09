@@ -23,12 +23,12 @@ void gsplines_lagrange_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 
 BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
     : Basis(_domain_points.size(),
-            "lagrange_" + std::to_string(_domain_points.size())),
+            "lagrange_" + std::to_string(_domain_points.size()),
+            _domain_points),
       domain_points_(_domain_points),
       barycentric_weights_(barycentric_weights(domain_points_)),
       deriv_buff_1_(derivative_matrix(domain_points_)),
       deriv_buff_2_(derivative_matrix(domain_points_)) {
-
   derivative_matrix_ = derivative_matrix(domain_points_);
 
   Eigen::MatrixXd dmat(derivative_matrix_);
@@ -71,7 +71,6 @@ BasisLagrange::BasisLagrange(BasisLagrange &&that)
 void BasisLagrange::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-
   eval_on_window(_s, _tau, _buff);
   if (_deg == 0)
     return;
@@ -106,7 +105,6 @@ void BasisLagrange::eval_derivative_on_window(
 void BasisLagrange::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-
   eval_derivative_on_window(_s, _tau, _deg, _buff);
   _buff *= -0.5 * _deg * (2.0 / _tau);
 }
@@ -114,7 +112,6 @@ void BasisLagrange::eval_derivative_wrt_tau_on_window(
 void BasisLagrange::eval_on_window(
     double _s, double /*_tau*/,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-
   /*  David A. Kopriva
    *  Implementing Spectral
    *  Methods for Partial
@@ -139,7 +136,6 @@ void BasisLagrange::eval_on_window(
 
 void BasisLagrange::add_derivative_matrix(double tau, std::size_t _deg,
                                           Eigen::Ref<Eigen::MatrixXd> _mat) {
-
   double scale = _deg > 0 ? pow(2.0 / tau, 2 * _deg - 1) : tau / 2.0;
 
   if (_deg < get_dim() + 1)
@@ -148,7 +144,6 @@ void BasisLagrange::add_derivative_matrix(double tau, std::size_t _deg,
 
 void BasisLagrange::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
-
   double scale = _deg > 0 ? -0.5 * (2.0 * _deg - 1.0) * pow(2.0 / tau, 2 * _deg)
                           : 1.0 / 2.0;
   if (_deg < get_dim() + 1)
@@ -241,7 +236,6 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
 Eigen::MatrixXd BasisLagrange::change_interpolation_points(
     Eigen::Ref<const Eigen::VectorXd> _old_points,
     Eigen::Ref<const Eigen::VectorXd> _new_points) {
-
   /*  David A. Kopriva
    *  Implementing Spectral
    *  Methods for Partial

@@ -6,11 +6,22 @@
 #include <gtest/gtest.h>
 
 /* Test that the Legendre polynomials respect the recursive relation */
+using namespace gsplines;
 TEST(BasisLegendre, Value) {
 
   for (int i = 3; i < 17; i++) {
 
-    gsplines::basis::BasisLegendre basis(i);
+    basis::BasisLegendre basis(i);
+
+    EXPECT_TRUE(basis::BasisLegendre(i) == basis::BasisLegendre(i));
+    EXPECT_FALSE(basis::BasisLegendre(i) != basis::BasisLegendre(i));
+
+    for (int j = 3; j < 17; j++) {
+      if (i != j) {
+        EXPECT_FALSE(basis::BasisLegendre(i) == basis::BasisLegendre(j));
+        EXPECT_TRUE(basis::BasisLegendre(i) != basis::BasisLegendre(j));
+      }
+    }
     Eigen::VectorXd buff(i);
     for (const double &t :
          {-1.0, -0.9, -0.5, -0.33, 0.0, 0.33, 0.5, 0.9, 1.0}) {

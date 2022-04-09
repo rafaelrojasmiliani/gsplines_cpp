@@ -13,8 +13,6 @@ class GaussLobattoLagrangeSpline
     : public ::gsplines::functions::FunctionInheritanceHelper<
           GaussLobattoLagrangeSpline, ::gsplines::GSpline,
           GaussLobattoLagrangeSpline> {
-private:
-  Eigen::MatrixXd value_at_nodes_;
 
 public:
   GaussLobattoLagrangeSpline(
@@ -27,7 +25,6 @@ public:
   GaussLobattoLagrangeSpline &
   operator=(const GaussLobattoLagrangeSpline &) = delete;
   virtual ~GaussLobattoLagrangeSpline() = default;
-  const Eigen::MatrixXd &value_at_nodes() const { return value_at_nodes_; };
 
   static GaussLobattoLagrangeSpline identity(std::pair<double, double> _domain,
                                              std::size_t _n_glp,
@@ -48,12 +45,13 @@ public:
 
     const T &to_matrix() const { return mat_; }
 
-    template <typename M> inline auto operator*(const LinearOperator<M> &_rhs) {
+    template <typename M>
+    inline auto operator*(const LinearOperator<M> &_rhs) const {
       return LinearOperator(to_matrix() * _rhs.to_matrix());
     }
 
     template <typename M>
-    inline auto operator*(const Eigen::MatrixBase<M> &_rhs) {
+    inline auto operator*(const Eigen::MatrixBase<M> &_rhs) const {
       return to_matrix() * _rhs;
     }
 
@@ -64,7 +62,7 @@ public:
                               _in.get_number_of_intervals() /
                               _in.get_basis().get_dim();
       return GaussLobattoLagrangeSpline(
-          _in.get_domain(), codom_dim, _in.get_intervals_num(),
+          _in.get_domain(), codom_dim, _in.get_number_of_intervals(),
           _in.get_basis().get_dim(), to_matrix() * _in.get_coefficients(),
           _in.get_interval_lengths());
     }
@@ -108,12 +106,12 @@ public:
   public:
     TransposeLeftMultiplication(const GaussLobattoLagrangeSpline &_that)
         : LinearOperator(
-              _that.get_basis().get_dim() * _that.get_intervals_num(),
-              _that.get_basis().get_dim() * _that.get_intervals_num() *
+              _that.get_basis().get_dim() * _that.get_number_of_intervals(),
+              _that.get_basis().get_dim() * _that.get_number_of_intervals() *
                   _that.get_codom_dim()) {
 
       std::size_t n_glp = _that.get_basis().get_dim();
-      std::size_t n_inter = _that.get_intervals_num();
+      std::size_t n_inter = _that.get_number_of_intervals();
       std::size_t codom_dim = _that.get_codom_dim();
 
       const Eigen::VectorXd &vec = _that.get_coefficients();
@@ -135,8 +133,16 @@ public:
     }
   };
 
+  GaussLobattoLagrangeSpline
+  operator+(const GaussLobattoLagrangeSpline &_rhs) &;
+  GaussLobattoLagrangeSpline
+  operator+(const GaussLobattoLagrangeSpline &_rhs) &&;
+  GaussLobattoLagrangeSpline operator+(GaussLobattoLagrangeSpline &&_rhs) &;
+  GaussLobattoLagrangeSpline operator+(GaussLobattoLagrangeSpline &&_rhs) &&;
+
 protected:
   GaussLobattoLagrangeSpline *deriv_impl(std::size_t _deg = 1) const override;
+  bool compatible(const GaussLobattoLagrangeSpline &_in);
 };
 
 double integral(::gsplines::functions::FunctionBase &_diffeo,

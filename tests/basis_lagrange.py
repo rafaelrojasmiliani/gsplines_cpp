@@ -106,34 +106,34 @@ class MyTest(unittest.TestCase):
 
             self.assertLessEqual(err, 5.0e-6, "deg = {:d}".format(i))
 
-    def plot_optimization(self):
-
-        n_nodes = 6
-        nodes = np.array([np.cos((2*k-1)/2/n_nodes*np.pi)
-                          for k in range(1, n_nodes+1)])
-
-        dim = 7  # np.random.randint(1, 10)
-        intervals = 4
-
-        exec_time = intervals
-        waypoints = np.random.rand(intervals+1, dim)*6.14
-        basis_lagrange = BasisLagrange(nodes)
-        basis_legendre = BasisLegendre(n_nodes)
-        curve_1 = optimal_sobolev_norm(
-            waypoints, basis_lagrange, [(3, 1)], exec_time)
-        curve_2 = optimal_sobolev_norm(
-            waypoints, basis_legendre, [(3, 1)], exec_time)
-        # curve_1 = op
-        show_piecewisefunction(curve_1, 5, 0.001)
-        show_piecewisefunction(curve_2, 5, 0.001)
-        plt.show()
-        pass
+#    def plot_optimization(self):
+#
+#        n_nodes = 6
+#        nodes = np.array([np.cos((2*k-1)/2/n_nodes*np.pi)
+#                          for k in range(1, n_nodes+1)])
+#
+#        dim = 7  # np.random.randint(1, 10)
+#        intervals = 4
+#
+#        exec_time = intervals
+#        waypoints = np.random.rand(intervals+1, dim)*6.14
+#        basis_lagrange = BasisLagrange(nodes)
+#        basis_legendre = BasisLegendre(n_nodes)
+#        curve_1 = optimal_sobolev_norm(
+#            waypoints, basis_lagrange, [(3, 1)], exec_time)
+#        curve_2 = optimal_sobolev_norm(
+#            waypoints, basis_legendre, [(3, 1)], exec_time)
+#        # curve_1 = op
+#        show_piecewisefunction(curve_1, 5, 0.001)
+#        show_piecewisefunction(curve_2, 5, 0.001)
+#        plt.show()
+#        pass
 
     def test(self):
         for _ in range(10):
             self.value()
 
-        self.plot_optimization()
+        # self.plot_optimization()
 
 
 def main():

@@ -19,8 +19,11 @@ bool approx_equal(double _lhs, double _rhs, double _tol) {
 bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,
                   double _tol) {
 
-  if (_lhs.rows() != _rhs.rows() or _lhs.cols() != _rhs.cols())
+  if (_lhs.rows() != _rhs.rows() or _lhs.cols() != _rhs.cols() or
+      _lhs.size() != _rhs.size())
     return false;
+  if (_lhs.size() == 0)
+    return true;
 
   double err = (_lhs - _rhs).array().abs().maxCoeff();
   double lhs_max = (_lhs).array().abs().maxCoeff();

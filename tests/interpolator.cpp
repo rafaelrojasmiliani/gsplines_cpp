@@ -8,28 +8,27 @@
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
 #include <random>
-
+using namespace gsplines;
 TEST(Interpolator, Value) {
 
   for (std::size_t i = 1; i < 3; i++) {
-    gsplines::basis::BasisLegendre basis(4);
+    basis::BasisLegendre basis(4);
     std::size_t dim = 2;
     std::size_t intervals = 4;
-    Eigen::VectorXd tau = Eigen::VectorXd::Random(4);
+    Eigen::VectorXd tau = Eigen::VectorXd::Random(4).array() + 1.2;
     Eigen::MatrixXd wp = Eigen::MatrixXd::Random(intervals + 1, dim);
-    gsplines::Interpolator inter(dim, intervals, basis);
-    Eigen::VectorXd tauv(intervals);
+    Interpolator inter(dim, intervals, basis);
     inter.fill_interpolating_vector(wp);
+    GSpline res = inter.interpolate(tau, wp);
 
-    gsplines::GSpline res = inter.interpolate(tau, wp);
-
-    Eigen::VectorXd bp = res.get_domain_breakpoints();
-
+    Eigen::MatrixXd bp = res.get_waypoints();
+    EXPECT_TRUE(tools::approx_equal(bp, wp, 1.0e-9)) << bp << "\n ---\n" << wp;
     /*
     for (std::size_t m = 0; m < bp.size(); m++) {
       bp(m);
     }*/
   }
+  EXPECT_TRUE(true);
 }
 int main(int argc, char **argv) {
 

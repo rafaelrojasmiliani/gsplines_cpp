@@ -28,6 +28,9 @@ TEST(BasisLagrange, Value_Properties) {
     std::size_t dim = uint_dist(mt);
 
     Eigen::VectorXd points = Eigen::VectorXd::Random(dim);
+    EXPECT_TRUE(basis::BasisLagrange(points) == basis::BasisLagrange(points));
+    EXPECT_TRUE(basis::BasisLagrange(points) !=
+                basis::BasisLagrange(Eigen::VectorXd::Random(dim)));
     gsplines::basis::BasisLagrange basis_lagrange(points);
     Eigen::VectorXd buff(dim);
     // Test P1

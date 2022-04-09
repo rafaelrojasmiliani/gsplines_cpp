@@ -42,7 +42,7 @@ TEST(ContinuityMatrix, Value) {
       basis_lagrange.continuity_matrix(number_of_intervals, codom_dim, 4, tau) *
       curve_1.get_coefficients();
   double val = Eigen::abs(res.array()).maxCoeff();
-  gsplines::tools::approx_equal(val, 0.0, 1.0e-9);
+  EXPECT_TRUE(gsplines::tools::approx_equal(val, 0.0, 1.0e-9));
 }
 int main(int argc, char **argv) {
 

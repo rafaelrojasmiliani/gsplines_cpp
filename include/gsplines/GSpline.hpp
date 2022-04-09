@@ -18,7 +18,6 @@ protected:
   Eigen::VectorXd domain_interval_lengths_;
 
 private:
-  GSpline &operator=(const GSpline &);
   std::unique_ptr<basis::Basis> basis_;
   mutable Eigen::VectorXd basis_buffer_;
   double interval_to_window(double _t, std::size_t _interval) const;
@@ -51,8 +50,6 @@ public:
   virtual ~GSpline() = default;
   const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
 
-  // Eigen::VectorXd &get_coefficients() { return coefficients_; }
-
   const Eigen::VectorXd &get_interval_lengths() const {
     return domain_interval_lengths_;
   }
@@ -68,6 +65,19 @@ public:
   GSpline linear_scaling_new_execution_time(double _new_exec_time) const;
 
   const basis::Basis &get_basis() const { return *basis_; }
+
+  bool compatible(const GSpline &_that) const;
+
+  GSpline operator+(const GSpline &that) const &;
+  GSpline operator+(GSpline &&that) const &;
+  GSpline operator+(const GSpline &that) &&;
+
+  GSpline operator-(const GSpline &that) const &;
+  GSpline operator-(GSpline &&that) const &;
+  GSpline operator-(const GSpline &that) &&;
+  // GSpline operator-(GSpline &&that) &&;
+  // GSpline operator-() const &;
+  // GSpline operator-() &&;
 
 protected:
   virtual GSpline *deriv_impl(std::size_t _deg = 1) const override;

@@ -19,6 +19,8 @@ private:
 
   size_t dim_;
   const std::string name_;
+  Eigen::VectorXd parameters_float_;
+  Eigen::VectorXi parameters_int_;
 
   mutable std::vector<Eigen::MatrixXd> derivative_matrix_array_;
 
@@ -52,8 +54,6 @@ private:
 
 protected:
   Eigen::MatrixXd derivative_matrix_;
-  Eigen::VectorXd parameters_;
-  Eigen::VectorXi parameters_int_;
 
 public:
   /**
@@ -63,8 +63,11 @@ public:
    * base)
    * @param _name name of the base: Any label
    */
-  Basis(std::size_t _dim, const std::string &_name)
-      : dim_(_dim), name_(_name), derivative_matrix_(dim_, dim_) {
+  Basis(std::size_t _dim, const std::string &_name,
+        const Eigen::VectorXd &_parameters_float = Eigen::VectorXd(),
+        const Eigen::VectorXi &_parameters_int = Eigen::VectorXi())
+      : dim_(_dim), name_(_name), parameters_float_(_parameters_float),
+        parameters_int_(_parameters_int), derivative_matrix_(dim_, dim_) {
 
     derivative_matrix_array_.push_back(
         Eigen::MatrixXd::Identity(get_dim(), get_dim()));
@@ -72,11 +75,15 @@ public:
 
   Basis(const Basis &that)
       : dim_(that.get_dim()), name_(that.name_),
+        parameters_float_(that.parameters_float_),
+        parameters_int_(that.parameters_int_),
         derivative_matrix_array_(that.derivative_matrix_array_),
         derivative_matrix_(that.derivative_matrix_) {}
 
   Basis(Basis &&that)
       : dim_(that.get_dim()), name_(that.name_),
+        parameters_float_(std::move(that.parameters_float_)),
+        parameters_int_(std::move(that.parameters_int_)),
         derivative_matrix_array_(std::move(that.derivative_matrix_array_)),
         derivative_matrix_(std::move(that.derivative_matrix_)) {}
 
@@ -171,7 +178,8 @@ public:
       std::size_t _deriv_order,
       Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const;
 
-  bool operator==(const Basis &_that);
+  bool operator==(const Basis &_that) const;
+  bool operator!=(const Basis &_that) const { return not(*this == _that); }
 };
 
 std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);
