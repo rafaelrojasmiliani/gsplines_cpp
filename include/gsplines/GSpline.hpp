@@ -13,14 +13,13 @@ class GSpline
                                                   GSpline> {
   friend SobolevNorm;
 
+protected:
+  Eigen::VectorXd coefficients_;
+  Eigen::VectorXd domain_interval_lengths_;
+
 private:
   GSpline &operator=(const GSpline &);
-  const std::size_t number_of_intervals_;
   std::unique_ptr<basis::Basis> basis_;
-  Eigen::VectorXd coefficients_;
-  Eigen::VectorXd domain_break_points_;
-  Eigen::VectorXd domain_interval_lengths_;
-  Eigen::MatrixXd waypoints_;
   mutable Eigen::VectorXd basis_buffer_;
   double interval_to_window(double _t, std::size_t _interval) const;
 
@@ -45,16 +44,9 @@ public:
   void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
                   Eigen::Ref<Eigen::MatrixXd> _result) const override;
 
-  std::size_t get_intervals_num() const { return number_of_intervals_; }
-  double get_exec_time() {
-    return domain_break_points_.tail(1)(0) - domain_break_points_(0);
-  }
-  const Eigen::Ref<const Eigen::VectorXd> get_domain_breakpoints() {
-    return domain_break_points_;
-  }
-  const Eigen::Ref<const Eigen::MatrixXd> get_waypoints() const {
-    return waypoints_;
-  }
+  Eigen::VectorXd get_domain_breakpoints() const;
+
+  Eigen::MatrixXd get_waypoints() const;
 
   virtual ~GSpline() = default;
   const Eigen::VectorXd &get_coefficients() const { return coefficients_; }
@@ -67,7 +59,9 @@ public:
 
   const std::string &get_basis_name() const { return basis_->get_name(); }
 
-  std::size_t get_number_of_intervals() const { return number_of_intervals_; }
+  std::size_t get_number_of_intervals() const {
+    return domain_interval_lengths_.size();
+  }
 
   std::size_t get_basis_dim() const { return basis_->get_dim(); }
 

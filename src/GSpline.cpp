@@ -7,13 +7,12 @@ namespace gsplines {
 GSpline *GSpline::deriv_impl(std::size_t _deg) const {
 
   Eigen::VectorXd result_coeff(coefficients_);
-  int der_coor;
-  int interval_coor;
-  int codom_coor;
-  int i0;
+  std::size_t interval_coor;
+  std::size_t codom_coor;
+  std::size_t i0;
 
   if (_deg > 0) {
-    for (interval_coor = 0; interval_coor < number_of_intervals_;
+    for (interval_coor = 0; interval_coor < get_number_of_intervals();
          interval_coor++) {
       for (codom_coor = 0; codom_coor < get_codom_dim(); codom_coor++) {
         i0 = interval_coor * basis_->get_dim() * get_codom_dim() +
@@ -26,21 +25,19 @@ GSpline *GSpline::deriv_impl(std::size_t _deg) const {
     }
   }
 
-  return new GSpline(get_domain(), get_codom_dim(), number_of_intervals_,
+  return new GSpline(get_domain(), get_codom_dim(), get_number_of_intervals(),
                      *basis_, result_coeff, domain_interval_lengths_,
                      get_name());
 }
 
 GSpline::GSpline(const GSpline &that)
-    : FunctionInheritanceHelper(that),
-      number_of_intervals_(that.number_of_intervals_),
-      basis_(that.basis_->clone()), coefficients_(that.coefficients_),
-      domain_break_points_(that.domain_break_points_),
+    : FunctionInheritanceHelper(that), basis_(that.basis_->clone()),
+      coefficients_(that.coefficients_),
       domain_interval_lengths_(that.domain_interval_lengths_),
-      waypoints_(that.waypoints_), basis_buffer_(basis_->get_dim()) {
+      basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() !=
-      number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
+      (long)(get_number_of_intervals() * basis_->get_dim() * get_codom_dim())) {
     throw std::invalid_argument(
         "GSpline instantation Error: The number of coefficients is incorrect "
         "req base dim: " +
@@ -54,15 +51,13 @@ GSpline::GSpline(const GSpline &that)
 
 GSpline::GSpline(GSpline &&that)
     : FunctionInheritanceHelper(std::move(that)),
-      number_of_intervals_(that.number_of_intervals_),
       basis_(that.basis_->move_clone()),
       coefficients_(std::move(that.coefficients_)),
-      domain_break_points_(std::move(that.domain_break_points_)),
       domain_interval_lengths_(std::move(that.domain_interval_lengths_)),
-      waypoints_(std::move(that.waypoints_)), basis_buffer_(basis_->get_dim()) {
+      basis_buffer_(basis_->get_dim()) {
 
   if (coefficients_.size() !=
-      number_of_intervals_ * basis_->get_dim() * get_codom_dim()) {
+      (long)(get_number_of_intervals() * basis_->get_dim() * get_codom_dim())) {
     throw std::invalid_argument(
         "GSpline instantation Error: The number of coefficients is incorrect "
         "req base dim: " +
@@ -80,12 +75,11 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
                  const Eigen::Ref<const Eigen::VectorXd> _tauv,
                  const std::string &_name)
     : FunctionInheritanceHelper(_domain, _codom_dim, _name),
-      number_of_intervals_(_n_intervals), basis_(_basis.clone()),
-      coefficients_(_coefficents), domain_break_points_(_n_intervals + 1),
-      domain_interval_lengths_(_tauv), waypoints_(_n_intervals + 1, _codom_dim),
-      basis_buffer_(basis_->get_dim()) {
+      basis_(_basis.clone()), coefficients_(_coefficents),
+      domain_interval_lengths_(_tauv), basis_buffer_(basis_->get_dim()) {
 
-  if (coefficients_.size() != _n_intervals * basis_->get_dim() * _codom_dim) {
+  if (coefficients_.size() !=
+      (long)(_n_intervals * basis_->get_dim() * _codom_dim)) {
     throw std::invalid_argument(
         "GSpline instantation Error: The number of coefficients is incorrect "
         "req base dim: " +
@@ -95,14 +89,6 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
         ". However, the number of coeff was " +
         std::to_string(coefficients_.size()));
   }
-  double time_instant = 0.0;
-  domain_break_points_(0) = time_instant;
-  for (int i = 1; i < number_of_intervals_ + 1; i++) {
-    time_instant += domain_interval_lengths_(i - 1);
-    domain_break_points_(i) = time_instant;
-  }
-
-  GSpline::value(domain_break_points_, waypoints_);
 }
 
 void GSpline::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
@@ -112,7 +98,7 @@ void GSpline::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
   std::size_t current_interval = 0;
   double s, tau;
 
-  int i, j;
+  std::size_t i, j;
 
   for (i = 0; i < result_cols; i++) {
     current_interval = get_interval(_domain_points(i));
@@ -135,19 +121,23 @@ GSpline::linear_scaling_new_execution_time(double _new_exec_time) const {
   gsplines::Interpolator inter(get_codom_dim(), get_number_of_intervals(),
                                *basis_);
 
-  return inter.interpolate(new_domain_interva_lengths, waypoints_);
+  return inter.interpolate(new_domain_interva_lengths, get_waypoints());
 }
 
 std::size_t GSpline::get_interval(double _domain_point) const {
-  if (_domain_point <= domain_break_points_(0))
+  double left_breakpoint = get_domain().first;
+  double right_breakpoint;
+  if (_domain_point <= left_breakpoint)
     return 0;
-  for (int i = 0; i < number_of_intervals_; i++) {
-    if (domain_break_points_(i) < _domain_point and
-        _domain_point <= domain_break_points_(i + 1)) {
+
+  for (std::size_t i = 0; i < get_number_of_intervals(); i++) {
+    right_breakpoint = left_breakpoint + domain_interval_lengths_(i);
+    if (left_breakpoint < _domain_point and _domain_point <= right_breakpoint) {
       return i;
     }
+    left_breakpoint = right_breakpoint;
   }
-  return number_of_intervals_ - 1;
+  return get_number_of_intervals() - 1;
 }
 
 Eigen::Ref<const Eigen::VectorXd>
@@ -167,19 +157,39 @@ GSpline::coefficient_segment(std::size_t _interval, std::size_t _component) {
 
 double GSpline::interval_to_window(double _domain_point,
                                    std::size_t _interval) const {
-  return 2.0 * (_domain_point - domain_break_points_[_interval]) /
+  double left_breakpoint =
+      get_domain().first +
+      domain_interval_lengths_.segment(0, _interval).array().sum();
+  return 2.0 * (_domain_point - left_breakpoint) /
              domain_interval_lengths_[_interval] -
          1.0;
 }
 
 const Eigen::Ref<const Eigen::VectorXd>
 get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficients,
-                        basis::Basis &_basis, std::size_t _num_interval,
+                        basis::Basis &_basis, std::size_t /*_num_interval*/,
                         std::size_t _codom_dim, std::size_t _interval,
                         std::size_t _component) {
 
   int i0 =
       _interval * _basis.get_dim() * _codom_dim + _basis.get_dim() * _component;
   return _coefficients.segment(i0, _basis.get_dim());
+}
+Eigen::VectorXd GSpline::get_domain_breakpoints() const {
+
+  double time_instant = get_domain().first;
+  Eigen::VectorXd result(get_number_of_intervals() + 1);
+  result(0) = time_instant;
+  for (std::size_t i = 1; i < get_number_of_intervals() + 1; i++) {
+    time_instant += domain_interval_lengths_(i - 1);
+    result(i) = time_instant;
+  }
+  return result;
+}
+
+Eigen::MatrixXd GSpline::get_waypoints() const {
+  Eigen::MatrixXd result(get_number_of_intervals() + 1, get_codom_dim());
+  GSpline::value(get_domain_breakpoints(), result);
+  return result;
 }
 } // namespace gsplines

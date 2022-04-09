@@ -56,6 +56,8 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("is_point_in_domain",
            &gsplines::functions::FunctionBase::is_point_in_domain)
       .def("get_domain", &gsplines::functions::FunctionBase::get_domain)
+      .def("get_domain_length",
+           &gsplines::functions::FunctionBase::get_domain_length)
       .def("dot",
            [](const gsplines::functions::FunctionBase &_self,
               const gsplines::functions::FunctionBase &_that) {
@@ -309,7 +311,6 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
            std::pair<double, double>, std::size_t, std::size_t,
            gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,
            const Eigen::Ref<const Eigen::VectorXd>, const std::string &>())
-      .def("get_exec_time", &gsplines::GSpline::get_exec_time)
       .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
       .def("get_number_of_intervals",
            &gsplines::GSpline::get_number_of_intervals)
