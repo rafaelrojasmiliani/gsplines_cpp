@@ -12,6 +12,8 @@ class GSpline
     : public functions::FunctionInheritanceHelper<GSpline, functions::Function,
                                                   GSpline> {
   friend SobolevNorm;
+  friend GSpline operator*(double _a, const GSpline &_in);
+  friend GSpline &operator*(double _a, GSpline &&_in);
 
 protected:
   Eigen::VectorXd coefficients_;
@@ -66,7 +68,7 @@ public:
 
   const basis::Basis &get_basis() const { return *basis_; }
 
-  bool compatible(const GSpline &_that) const;
+  bool same_vector_space(const GSpline &_that) const;
 
   GSpline operator+(const GSpline &that) const &;
   GSpline operator+(GSpline &&that) const &;
@@ -75,6 +77,9 @@ public:
   GSpline operator-(const GSpline &that) const &;
   GSpline operator-(GSpline &&that) const &;
   GSpline operator-(const GSpline &that) &&;
+
+  GSpline &operator+=(const GSpline &that);
+  GSpline &operator-=(const GSpline &that);
   // GSpline operator-(GSpline &&that) &&;
   // GSpline operator-() const &;
   // GSpline operator-() &&;
@@ -89,6 +94,8 @@ get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficents,
                         std::size_t _codom_dim, std::size_t _interval,
                         std::size_t _component);
 
+GSpline operator*(double _a, const GSpline &_in);
+GSpline &operator*(double _a, GSpline &&_in);
 } // namespace gsplines
 
 #endif /* PIECEWISE_FUNCTION_H */
