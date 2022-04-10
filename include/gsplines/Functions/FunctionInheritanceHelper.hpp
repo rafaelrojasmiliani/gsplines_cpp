@@ -9,11 +9,9 @@ template <typename Current, typename Base, typename DerivativeClass>
 class FunctionInheritanceHelper : public Base {
 public:
   using Base::Base;
-  FunctionInheritanceHelper(const FunctionInheritanceHelper &_that)
-      : Base(_that){};
+  FunctionInheritanceHelper(const Base &_that) : Base(_that){};
 
-  FunctionInheritanceHelper(FunctionInheritanceHelper &&_that)
-      : Base(std::move(_that)){};
+  FunctionInheritanceHelper(Base &&_that) : Base(std::move(_that)){};
 
   std::unique_ptr<Current> clone() const & {
     return std::unique_ptr<Current>(static_cast<Current *>(this->clone_impl()));

@@ -73,10 +73,12 @@ public:
   GSpline operator+(const GSpline &that) const &;
   GSpline operator+(GSpline &&that) const &;
   GSpline operator+(const GSpline &that) &&;
+  GSpline operator+(GSpline &&that) &&;
 
   GSpline operator-(const GSpline &that) const &;
   GSpline operator-(GSpline &&that) const &;
   GSpline operator-(const GSpline &that) &&;
+  GSpline operator-(GSpline &&that) &&;
 
   GSpline &operator+=(const GSpline &that);
   GSpline &operator-=(const GSpline &that);

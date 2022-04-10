@@ -22,8 +22,6 @@ double integral(const functions::FunctionBase &_in, std::size_t _n_glp,
   Eigen::MatrixXd local_value(_n_glp, 1);
   for (std::size_t interval = 0; interval < _n_int; interval++) {
     double local_left_bound = left_bound + interval * local_interval_length;
-    double local_right_bound =
-        left_bound + (interval + 1) * local_interval_length;
     Eigen::VectorXd local_points =
         (glp.array() + 1.0) * local_interval_length / 2.0 + local_left_bound;
     _in.value(local_points, local_value);

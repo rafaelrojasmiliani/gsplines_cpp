@@ -31,9 +31,14 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     GaussLobattoLagrangeSpline &&_that)
     : FunctionInheritanceHelper(std::move(_that)) {}
 
+GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(const GSpline &_that)
+    : FunctionInheritanceHelper(_that) {}
+
+GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(GSpline &&_that)
+    : FunctionInheritanceHelper(std::move(_that)) {}
+
 GaussLobattoLagrangeSpline *
 GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
-
   GSpline *aux = GSpline::deriv_impl(_deg);
 
   GLLSpline *result = new GaussLobattoLagrangeSpline(
@@ -47,7 +52,6 @@ GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
     const ::gsplines::functions::FunctionBase &_in, std::size_t _n_glp,
     std::size_t _n_intervals) {
-
   Eigen::VectorXd result_coeff(_in.get_codom_dim() * _n_glp * _n_intervals);
   Eigen::MatrixXd local_value(_n_glp, _in.get_codom_dim());
 
@@ -90,24 +94,12 @@ GaussLobattoLagrangeSpline
 GaussLobattoLagrangeSpline::identity(std::pair<double, double> _domain,
                                      std::size_t _n_glp,
                                      std::size_t _n_intervals) {
-
   ::gsplines::functions::Identity id(_domain);
   return approximate(id, _n_glp, _n_intervals);
 }
 
-bool GaussLobattoLagrangeSpline::compatible(
-    const GaussLobattoLagrangeSpline &_in) {
-  return tools::approx_equal(get_domain().first, _in.get_domain().first,
-                             1.0e-8) and
-         tools::approx_equal(get_domain().second, _in.get_domain().second,
-                             1.0e-8) and
-         get_basis().get_dim() == _in.get_basis().get_dim() and
-         get_codom_dim() == _in.get_codom_dim();
-}
-
 double integral(::gsplines::functions::FunctionBase &_diffeo,
                 ::gsplines::functions::FunctionBase &_path) {
-
   return ::gsplines::functional_analysis::integral(
       _path.dot(_path).compose(_diffeo.to_expression()));
 }
