@@ -37,7 +37,10 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Functions/FunctionBase.cpp
   ${PROJECT_SOURCE_DIR}/src/Functions/ElementalFunctions.cpp
   ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoPointsWeights.cpp
-  ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoLagrange.cpp)
+  ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoLagrange.cpp
+  ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoLagrangeFunctionals.cpp
+  # --
+)
 
 target_link_libraries(gsplines ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES})
 target_include_directories(

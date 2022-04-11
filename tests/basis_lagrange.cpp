@@ -91,24 +91,6 @@ TEST(BasisLagrange, GSpline_Value) {
     Eigen::MatrixXd val_2 = curve_2(time_spam);
     EXPECT_TRUE(gsplines::tools::approx_equal(val_1, val_2, 5.0e-5));
   }
-  /*
-    {
-      gsplines::GSpline curve_1 = gsplines::optimization::optimal_sobolev_norm(
-          waypoints, basis_lagrange, {{3, 1.0}}, 5);
-
-      gsplines::GSpline curve_2 = gsplines::optimization::optimal_sobolev_norm(
-          waypoints, basis_legendre, {{3, 1.0}}, 5);
-
-      Eigen::MatrixXd val_1 = curve_1(time_spam);
-      Eigen::MatrixXd val_2 = curve_2(time_spam);
-
-      double err = Eigen::abs((val_1 - val_2).array()).maxCoeff();
-      double max_1 = Eigen::abs((val_1).array()).maxCoeff();
-      double max_2 = Eigen::abs((val_1).array()).maxCoeff();
-
-      // assert(err / max_1 < 1.0e-2 and err / max_2 < 1.0e-2);
-    }
-    */
 }
 int main(int argc, char **argv) {
 

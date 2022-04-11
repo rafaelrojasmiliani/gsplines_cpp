@@ -4,43 +4,45 @@ namespace gsplines {
 
 namespace collocation {
 
-SobolevError::SobolevError(const gsplines::functions::FunctionBase &_fun,
-                           std::size_t _nglp, std::size_t _n_inter)
+Integral::Integral(std::tuple<double, double> _domain, std::size_t _nglp,
+                   std::size_t _n_intervals)
+    : LinearFunctionalDense(
+          legendre_gauss_lobatto_weights(_domain, _nglp, _n_intervals)
+              .transpose()) {}
+
+Integral::Integral(const GaussLobattoLagrangeSpline &_in)
+    : Integral(_in.get_domain(), _in.get_basis().get_dim(),
+               _in.get_number_of_intervals()) {}
+
+SobolevDistance::SobolevDistance(const gsplines::functions::FunctionBase &_fun,
+                                 std::size_t _nglp, std::size_t _n_inter,
+                                 std::size_t /*_deg*/)
     : Functional(1),
       approx_(GaussLobattoLagrangeSpline::approximate(_fun, _nglp, _n_inter)),
       approx_d_(GaussLobattoLagrangeSpline::approximate(_fun.derivate(), _nglp,
                                                         _n_inter)),
-      der_(1, _fun.get_codom_dim() * _nglp * _n_inter),
-      int_(_fun.get_domain(), _nglp, _n_inter) {}
+      int_(approx_), der_(approx_),
+      diff_(1, _nglp * _n_inter * _fun.get_codom_dim()) {}
 
 Eigen::VectorXd
-SobolevError::operator()(const GaussLobattoLagrangeSpline &_in) {
+SobolevDistance::operator()(const GaussLobattoLagrangeSpline &_in) const {
   Derivative der_(_in);
   TransposeLeftMultiplication tr1_(approx_ - _in);
   TransposeLeftMultiplication tr2_(approx_d_ - der_ * _in);
   return int_(tr1_ * (approx_ - _in) + tr2_ * (approx_d_ - der_ * _in));
 }
 
-const Eigen::MatrixXd &
-SobolevError::derivative(const GaussLobattoLagrangeSpline &_in) const {
-  Derivative der(_in);
+std::shared_ptr<LinearFunctionalBase>
+SobolevDistance::differential(const GaussLobattoLagrangeSpline &_in) const {
   TransposeLeftMultiplication tr1_(approx_ - _in);
-  TransposeLeftMultiplication tr2_(approx_d_ - der * _in);
-  der_ = int_.derivative(_in) * (tr1_ + tr2_ * der).to_matrix();
-  return der_;
+  TransposeLeftMultiplication tr2_(approx_d_ - _in.derivate());
+  return std::make_shared<LinearFunctionalDense>(int_ * (tr1_ + tr2_ * der_) *
+                                                 der_);
 }
-Integral::Integral(std::tuple<double, double> _domain, std::size_t _nglp,
-                   std::size_t _n_intervals)
-    : Functional(1),
-      glw_(legendre_gauss_lobatto_weights(_domain, _nglp, _n_intervals)
-               .transpose()) {}
 
-Eigen::VectorXd
-Integral::operator()(const GaussLobattoLagrangeSpline &_in) const {
-  return glw_ * _in.get_coefficients();
-}
+/*
 const Eigen::MatrixXd &
-Integral::derivative(const GaussLobattoLagrangeSpline & /*_in*/) const {
+Integral::derivative(const GaussLobattoLagrangeSpline & _in) const {
   return glw_;
 }
 
@@ -57,23 +59,7 @@ void GLLSplineVariable::SetVariables(const Eigen::VectorXd &_vec) {
 Eigen::VectorXd GLLSplineVariable::GetValues() const {
   return get_coefficients();
 }
-
-ConstraintWrapper::ConstraintWrapper(Functional<T> _fun, double _min,
-                                     double _max);
-ConstraintWrapper::ConstraintWrapper(Functional<T> _fun,
-                                     const std::vector<double> &_min,
-                                     double _max);
-ConstraintWrapper::ConstraintWrapper(Functional<T> _fun, double _min,
-                                     const std::vector<double> &_max);
-ConstraintWrapper::ConstraintWrapper(Functional<T> _fun,
-                                     const std::vector<double> &_min,
-                                     const std::vector<double> &_max);
-
-Eigen::VectorXd ConstraintWrapper::GetValues() const override;
-ifopt::Component::VecBound ConstraintWrapper::GetBounds() const override;
-
-void ConstraintWrapper::FillJacobianBlock(std::string _set_name,
-                                          Jacobian &_jac_block) const override;
+*/
 
 } // namespace collocation
 } // namespace gsplines

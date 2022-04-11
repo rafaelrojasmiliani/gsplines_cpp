@@ -38,6 +38,27 @@ bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,
 bool approx_equal(const GSpline &_lhs, const GSpline &_rhs, double _tol) {
   return approx_equal(_lhs.get_coefficients(), _rhs.get_coefficients(), _tol);
 }
+
+bool approx_zero(double _rhs, double _tol) {
+
+  double rhs_abs = std::fabs(_rhs);
+
+  return (rhs_abs < _tol);
+}
+
+bool approx_zero(const Eigen::MatrixXd &_rhs, double _tol) {
+
+  if (_rhs.size() == 0)
+    return false;
+
+  double rhs_max = (_rhs).array().abs().maxCoeff();
+
+  return rhs_max < _tol;
+}
+
+bool approx_zero(const GSpline &_rhs, double _tol) {
+  return approx_zero(_rhs.get_coefficients(), _tol);
+}
 } // namespace tools
 
 } // namespace gsplines

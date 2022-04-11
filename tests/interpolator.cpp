@@ -22,7 +22,10 @@ TEST(Interpolator, Value) {
     GSpline res = inter.interpolate(tau, wp);
 
     Eigen::MatrixXd bp = res.get_waypoints();
-    EXPECT_TRUE(tools::approx_equal(bp, wp, 1.0e-9)) << bp << "\n ---\n" << wp;
+    EXPECT_TRUE(tools::approx_equal(bp, wp, 1.0e-9))
+        << "actual break points \n"
+        << bp << "\n ---\n desired break points \n"
+        << wp;
     /*
     for (std::size_t m = 0; m < bp.size(); m++) {
       bp(m);

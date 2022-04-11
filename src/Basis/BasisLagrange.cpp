@@ -9,7 +9,7 @@ namespace basis {
 bool almost_equal(double _a, double _b, double _epsilon) {
 
   if (std::fabs(_a) < _epsilon or std::fabs(_b) < _epsilon) {
-    if (std::fabs(_a - _b) < 2 * _epsilon)
+    if (std::fabs(_a - _b) < _epsilon)
       return true;
     return false;
   }
@@ -119,7 +119,7 @@ void BasisLagrange::eval_on_window(
    *  Algorithm 34: LagrangeInterpolatingPolynomials */
   _buff.setConstant(0.0);
   for (std::size_t j = 0; j < get_dim(); j++) {
-    if (almost_equal(_s, domain_points_(j), 1.0e-13)) {
+    if (almost_equal(_s, domain_points_(j), 1.0e-9)) {
       _buff(j) = 1.0;
       return;
     }
@@ -253,7 +253,7 @@ Eigen::MatrixXd BasisLagrange::change_interpolation_points(
   for (std::size_t k = 0; k < book_m; k++) {
     for (std::size_t j = 0; j < book_n; j++) {
       result(k, j) = 0.0;
-      if (almost_equal(_new_points(k), _old_points(j), 1.0e-12)) {
+      if (almost_equal(_new_points(k), _old_points(j), 1.0e-9)) {
         book_row_has_match = true;
         result(k, j) = 1.0;
       }

@@ -39,9 +39,15 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     Eigen::MatrixXd left_buffer(_deriv_order + 1, get_dim());
     Eigen::MatrixXd right_buffer(_deriv_order + 1, get_dim());
 
-    for (std::size_t der = 0; der <= _deriv_order; der++) {
-      eval_derivative_on_window(-1.0, 2.0, der, left_buffer.row(der));
-      eval_derivative_on_window(1.0, 2.0, der, right_buffer.row(der));
+    get_derivative_matrix_block(_deriv_order);
+
+    eval_derivative_on_window(-1.0, 2.0, 0, left_buffer.row(0));
+    eval_derivative_on_window(1.0, 2.0, 0, right_buffer.row(0));
+
+    for (std::size_t der = 1; der <= _deriv_order; der++) {
+      const Eigen::MatrixXd &dblock = get_derivative_matrix_block(der);
+      left_buffer.row(der) = dblock.row(0);
+      right_buffer.row(der) = dblock.bottomRows(1);
     }
 
     std::size_t i0, j0;

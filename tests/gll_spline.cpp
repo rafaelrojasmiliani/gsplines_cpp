@@ -2,13 +2,14 @@
 
 #include <eigen3/Eigen/Core>
 #include <gsplines/Collocation/GaussLobattoLagrange.hpp>
+#include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
 
 #include <random>
-
+/*
 using namespace gsplines;
 TEST(GLLSpline, Derivative_Operator) {
 
@@ -27,7 +28,7 @@ TEST(GLLSpline, Derivative_Operator) {
           optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
           nglp, n_inter);
 
-  collocation::GLLSpline::Derivative dmat(q1);
+  collocation::Derivative dmat(q1);
 
   collocation::GLLSpline q_d_test = q1.derivate();
   collocation::GLLSpline q_d_nom = dmat * q1;
@@ -61,7 +62,7 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
       collocation::GaussLobattoLagrangeSpline::approximate(q1.dot(q2), nglp,
                                                            n_inter);
 
-  collocation::GLLSpline::TransposeLeftMultiplication q1_t(q1);
+  collocation::TransposeLeftMultiplication q1_t(q1);
 
   collocation::GLLSpline q_test = q1_t * q2;
 
@@ -102,11 +103,11 @@ TEST(GLLSpline, Combined) {
       collocation::GaussLobattoLagrangeSpline::approximate(
           q1.dot(q2.derivate()), nglp, n_inter);
 
-  collocation::GLLSpline::TransposeLeftMultiplication q1_t(q1);
+  collocation::TransposeLeftMultiplication q1_t(q1);
 
-  collocation::GLLSpline::Derivative dmat(q2);
+  collocation::Derivative dmat(q2);
 
-  collocation::GLLSpline::LinearOperator m = q1_t * dmat;
+  collocation::LinearOperator m = q1_t * dmat;
 
   collocation::GLLSpline q_test = q1_t * dmat * q2;
 
@@ -130,7 +131,7 @@ TEST(GLLSpline, Combined) {
              .abs()
              .maxCoeff();
 }
-
+*/
 int main(int argc, char **argv) {
 
   ::testing::InitGoogleTest(&argc, argv);
