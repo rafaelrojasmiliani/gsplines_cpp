@@ -28,37 +28,6 @@ except ImportError:
     from gsplines.optimization import minimum_crackle_path
 
 
-def show_piecewisefunction(_q, _up_to_deriv=3, _dt=0.1, _title=''):
-    dim = _q.get_codom_dim()
-    fig, ax = plt.subplots(_up_to_deriv + 1, dim)
-    if dim == 1:
-        ax = np.array([[ax[i]] for i in range(_up_to_deriv + 1)])
-    if _title:
-        fig.suptitle(_title)
-    t = np.arange(0.0, _q.get_exec_time(), _dt)
-
-    for i in range(0, _up_to_deriv + 1):
-        q = _q.deriv(i)
-        qt = q(t)
-        for j in range(0, dim):
-            ax[i, j].plot(t, qt[:, j])
-            ax[i, j].grid()
-            if i == 0:
-                ax[i, j].set_title('coordinate {:d}'.format(j + 1), fontsize=8)
-
-            if hasattr(_q, 'get_domain_breakpoints'):
-                for ti in _q.get_domain_breakpoints():
-                    ax[i, j].axvline(ti, alpha=0.1, color='red')
-
-    plt.subplots_adjust(
-        left=0.025,
-        bottom=0.05,
-        right=0.975,
-        top=0.95,
-        wspace=0.25,
-        hspace=0.15)
-
-
 class MyTest(unittest.TestCase):
     # @debug_on()
     def __init__(self, *args, **kwargs):
@@ -76,10 +45,6 @@ class MyTest(unittest.TestCase):
         q_array = [res, broken_lines_path(waypoints),
                    minimum_acceleration_path(waypoints),
                    minimum_jerk_path(waypoints)]
-
-        for q in q_array:
-            show_piecewisefunction(q, 5, 0.001)
-        plt.show()
 
 
 if __name__ == '__main__':

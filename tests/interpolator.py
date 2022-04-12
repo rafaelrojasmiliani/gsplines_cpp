@@ -11,7 +11,6 @@ from gsplines.basis import BasisLegendre
 from gsplines.basis import BasisLagrange
 from gsplines import Interpolator
 
-from gsplines.plot import plot
 
 ##
 
@@ -34,7 +33,7 @@ class MyTest(unittest.TestCase):
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
 
-        plot(res, 5, 0.10, waypoints)
+        # plot(res, 5, 0.10, waypoints)
 
         nodes = np.array([np.cos((2*k-1)/2/basis_dim*np.pi)
                           for k in range(1, basis_dim+1)])
@@ -42,7 +41,7 @@ class MyTest(unittest.TestCase):
         basis = BasisLagrange(nodes)
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
-        plot(res, 5, 0.10, waypoints)
+        # plot(res, 5, 0.10, waypoints)
 
 #    #@debug_on()
 #    def interpolation_test_computation_time(self):

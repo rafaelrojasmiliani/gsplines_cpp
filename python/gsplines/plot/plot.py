@@ -5,13 +5,17 @@ import numpy as np
 
 
 def plot(_q, _up_to_deriv=3, _dt=0.1, _wp=None, _title='', _show=True):
+
+    if hasattr(_q, 'get_waypoints'):
+        _wp = _q.get_waypoints()
+
     dim = _q.get_codom_dim()
     fig, axis = plt.subplots(_up_to_deriv + 1, dim)
     if dim == 1:
         axis = np.array([[axis[i]] for i in range(_up_to_deriv + 1)])
     if _title:
         fig.suptitle(_title)
-    time_spam = np.arange(0.0, _q.get_exec_time(), _dt)
+    time_spam = np.arange(0.0, _q.get_domain_length(), _dt)
 
     for i in range(0, _up_to_deriv + 1):
         current_curve = _q.deriv(i)
