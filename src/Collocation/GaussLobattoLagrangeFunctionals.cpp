@@ -29,28 +29,19 @@ SobolevDistance::SobolevDistance(const gsplines::functions::FunctionBase &_fun,
 
 Eigen::VectorXd
 SobolevDistance::operator()(const GaussLobattoLagrangeSpline &_in) const {
-  Derivative der_(_in);
-  Integral int_(_in);
   TransposeLeftMultiplication tr1_(approx_ - _in);
   TransposeLeftMultiplication tr2_(approx_d_ - der_ * _in);
+
   return int_(tr1_ * (approx_ - _in) + tr2_ * (approx_d_ - der_ * _in));
 }
 
 std::shared_ptr<LinearFunctionalBase>
 SobolevDistance::differential(const GaussLobattoLagrangeSpline &_in) const {
-  Derivative der_(_in);
-  Integral int_(_in);
   TransposeLeftMultiplication tr1_(approx_ - _in);
   TransposeLeftMultiplication tr2_(approx_d_ - der_ * _in);
-  /*LinearFunctionalDense a(-2 * int_ * (tr1_ + tr2_ * der_));
-  LinearFunctionalDense b(2 * int_ * (-tr1_ + tr2_ * der_));
-  std::cout << "a-------------------------------" << std::endl;
-  std::cout << a.to_dense_matrix() << std::endl;
-  std::cout << b.to_dense_matrix() << std::endl;
-  std::cout << (2 * int_ * (tr2_ * der_)).to_dense_matrix() << std::endl;
-  std::cout << (2 * int_ * (tr1_)).to_dense_matrix() << std::endl;
-  std::cout << "a-------------------------------" << std::endl;*/
+
   diff_->set(-2 * int_ * (tr1_ + tr2_ * der_));
+
   return diff_;
 }
 
