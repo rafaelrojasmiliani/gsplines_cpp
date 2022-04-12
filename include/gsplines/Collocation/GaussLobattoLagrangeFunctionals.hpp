@@ -47,31 +47,52 @@ template <typename T> class LinearFunctional : public LinearFunctionalBase {
   template <typename M>
   friend LinearFunctional<M> &&operator*(double, LinearFunctional<M> &&);
 
-protected:
-  T mat_;
+private:
+  LinearFunctional<T> &operator=(const LinearFunctional<T> &that) = delete;
 
 public:
+  T mat_;
   LinearFunctional(const T &_args)
       : LinearFunctionalBase(_args.rows()), mat_(_args) {}
 
+  /*
   LinearFunctional(T &&_args)
       : LinearFunctionalBase(_args.rows()), mat_(std::move(_args)) {}
 
-  LinearFunctional(const LinearFunctional &_that)
+  LinearFunctional(const LinearFunctional<T> &_that)
       : LinearFunctionalBase(_that.get_codom_dim()), mat_(_that.mat_) {}
 
-  LinearFunctional(LinearFunctional &&_that)
+  LinearFunctional(LinearFunctional<T> &&_that)
       : LinearFunctionalBase(_that.get_codom_dim()),
-        mat_(std::move(_that.mat_)) {}
+        mat_(std::move(_that.mat_)) {}*/
 
   LinearFunctional(long _rows, long _cols)
       : LinearFunctionalBase((std::size_t)_rows), mat_(_rows, _cols) {}
 
   const T &to_matrix() const { return mat_; }
 
-  LinearFunctional &operator=(const T &_mat) {
-    mat_ = _mat;
-    return *this;
+  template <typename M> void set(LinearFunctional<M> &&_other) {
+    if constexpr (std::is_same_v<T, M>) {
+      mat_ = std::move(_other.mat_);
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
+                         std::is_same_v<Eigen::SparseMatrix<double>, M>) {
+      mat_ = _other.mat_.toDense();
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, M> and
+                         std::is_same_v<Eigen::SparseMatrix<double>, T>) {
+      mat_ = _other.mat_.sparseView();
+    }
+  }
+
+  template <typename M> void set(const LinearFunctional<M> &_other) {
+    if constexpr (std::is_same_v<T, M>) {
+      mat_ = _other.mat_;
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
+                         std::is_same_v<Eigen::SparseMatrix<double>, M>) {
+      mat_ = _other.mat_.toDense();
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, M> and
+                         std::is_same_v<Eigen::SparseMatrix<double>, T>) {
+      mat_ = _other.mat_.sparseView();
+    }
   }
 
   template <typename M>
@@ -143,17 +164,20 @@ LinearFunctional<T> &&operator*(double _num, LinearFunctional<T> &&_lm) {
   _lm.mat_ *= _num;
   return std::move(_lm);
 }
-
+class LinearFunctionalDense;
 class LinearFunctionalSparse
     : public LinearFunctional<Eigen::SparseMatrix<double>> {
 public:
   using LinearFunctional<Eigen::SparseMatrix<double>>::LinearFunctional;
   ~LinearFunctionalSparse() = default;
+
+  // operator const LinearFunctionalDense() const;
 };
 
 class LinearFunctionalDense : public LinearFunctional<Eigen::MatrixXd> {
 public:
   using LinearFunctional<Eigen::MatrixXd>::LinearFunctional;
+  // operator const LinearFunctionalSparse() const;
   ~LinearFunctionalDense() = default;
 };
 
@@ -246,7 +270,7 @@ private:
   Integral int_;
   Derivative der_;
 
-  LinearFunctionalDense diff_;
+  std::shared_ptr<LinearFunctionalDense> diff_;
 
 public:
   SobolevDistance(const gsplines::functions::FunctionBase &_fun,

@@ -3,6 +3,14 @@
 namespace gsplines {
 
 namespace collocation {
+/*
+LinearFunctionalSparse::operator LinearFunctionalDense() const {
+  return LinearFunctionalDense(mat_.toDense());
+}
+LinearFunctionalDense::operator LinearFunctionalSparse() const {
+  return LinearFunctionalSparse(mat_.sparseView());
+}
+*/
 
 Integral::Integral(std::tuple<double, double> _domain, std::size_t _nglp,
                    std::size_t _n_intervals)
@@ -22,7 +30,8 @@ SobolevDistance::SobolevDistance(const gsplines::functions::FunctionBase &_fun,
       approx_d_(GaussLobattoLagrangeSpline::approximate(_fun.derivate(), _nglp,
                                                         _n_inter)),
       int_(approx_), der_(approx_),
-      diff_(1, _nglp * _n_inter * _fun.get_codom_dim()) {}
+      diff_(std::make_shared<LinearFunctionalDense>(
+          1u, _nglp * _n_inter * _fun.get_codom_dim())) {}
 
 Eigen::VectorXd
 SobolevDistance::operator()(const GaussLobattoLagrangeSpline &_in) const {
@@ -36,8 +45,8 @@ std::shared_ptr<LinearFunctionalBase>
 SobolevDistance::differential(const GaussLobattoLagrangeSpline &_in) const {
   TransposeLeftMultiplication tr1_(approx_ - _in);
   TransposeLeftMultiplication tr2_(approx_d_ - _in.derivate());
-  return std::make_shared<LinearFunctionalDense>(int_ * (tr1_ + tr2_ * der_) *
-                                                 der_);
+  diff_->set(int_ * (tr1_ + tr2_ * der_) * der_);
+  return diff_;
 }
 
 /*
