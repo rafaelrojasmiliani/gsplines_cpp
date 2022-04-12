@@ -1,6 +1,7 @@
 #include <eigen3/Eigen/SparseLU>
 #include <gsplines/Interpolator.hpp>
 #include <iostream>
+#include <stdexcept>
 
 namespace gsplines {
 
@@ -51,9 +52,9 @@ void Interpolator::fill_interpolating_matrix(
   unsigned int j0 = 0;
 
   if (_interval_lengths.size() != (long)num_intervals_) {
-    fprintf(stderr, "Cannot fill matrix. Vector of interval lenghts is not of "
-                    "the requred dimention");
-    return;
+    throw std::logic_error(
+        "Cannot fill matrix. Vector of interval lenghts is not of "
+        "the requred dimention");
   }
   fill_buffers(-1.0, _interval_lengths(0));
 

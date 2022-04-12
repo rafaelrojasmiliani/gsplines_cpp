@@ -1,8 +1,10 @@
+#include <algorithm>
 #include <gsplines/Collocation/GaussLobattoLagrange.hpp>
 #include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <ifopt/constraint_set.h>
 #include <ifopt/cost_term.h>
 #include <ifopt/variable_set.h>
+#include <stdexcept>
 #ifndef GAUSSLOBATTOLAGRANGEFUNCTIONALS_H
 #define GAUSSLOBATTOLAGRANGEFUNCTIONALS_H
 
@@ -55,7 +57,6 @@ public:
   LinearFunctional(const T &_args)
       : LinearFunctionalBase(_args.rows()), mat_(_args) {}
 
-  /*
   LinearFunctional(T &&_args)
       : LinearFunctionalBase(_args.rows()), mat_(std::move(_args)) {}
 
@@ -64,7 +65,7 @@ public:
 
   LinearFunctional(LinearFunctional<T> &&_that)
       : LinearFunctionalBase(_that.get_codom_dim()),
-        mat_(std::move(_that.mat_)) {}*/
+        mat_(std::move(_that.mat_)) {}
 
   LinearFunctional(long _rows, long _cols)
       : LinearFunctionalBase((std::size_t)_rows), mat_(_rows, _cols) {}
@@ -73,26 +74,45 @@ public:
 
   template <typename M> void set(LinearFunctional<M> &&_other) {
     if constexpr (std::is_same_v<T, M>) {
-      mat_ = std::move(_other.mat_);
+      mat_ = _other.mat_;
+      return;
+    } else if constexpr (not std::is_same_v<Eigen::MatrixXd, T> and
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
+      mat_ = _other.mat_;
+      return;
     } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
-                         std::is_same_v<Eigen::SparseMatrix<double>, M>) {
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
       mat_ = _other.mat_.toDense();
-    } else if constexpr (std::is_same_v<Eigen::MatrixXd, M> and
-                         std::is_same_v<Eigen::SparseMatrix<double>, T>) {
-      mat_ = _other.mat_.sparseView();
+      return;
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
+      mat_ = _other.mat_.toDense();
+      return;
     }
+    throw std::runtime_error("This part of the code is not implement. An error "
+                             "on expected types: LinearFunctional");
   }
 
   template <typename M> void set(const LinearFunctional<M> &_other) {
     if constexpr (std::is_same_v<T, M>) {
       mat_ = _other.mat_;
+      return;
+    } else if constexpr (not std::is_same_v<Eigen::MatrixXd, T> and
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
+      mat_ = _other.mat_;
+      return;
     } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
-                         std::is_same_v<Eigen::SparseMatrix<double>, M>) {
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
       mat_ = _other.mat_.toDense();
-    } else if constexpr (std::is_same_v<Eigen::MatrixXd, M> and
-                         std::is_same_v<Eigen::SparseMatrix<double>, T>) {
-      mat_ = _other.mat_.sparseView();
+      return;
+    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T> and
+                         not std::is_same_v<Eigen::MatrixXd, M>) {
+      mat_ = _other.mat_.toDense();
+      return;
     }
+
+    throw std::runtime_error("This part of the code is not implement. An error "
+                             "on expected types: LinearFunctional");
   }
 
   template <typename M>
@@ -104,11 +124,17 @@ public:
   inline auto operator+(const LinearFunctional<M> &_rhs) const {
     return LinearFunctional(to_matrix() + _rhs.to_matrix());
   }
-
   template <typename M>
-  inline auto operator*(const Eigen::MatrixBase<M> &_rhs) const {
-    return to_matrix() * _rhs;
+  inline auto operator-(const LinearFunctional<M> &_rhs) const {
+    return LinearFunctional(to_matrix() - _rhs.to_matrix());
   }
+
+  inline LinearFunctional<T> operator-() const {
+    LinearFunctional<T> result(*this);
+    result.mat_ *= -1.0;
+    return result;
+  }
+
   Eigen::VectorXd
   operator()(const GaussLobattoLagrangeSpline &_in) const override {
     return mat_ * _in.get_coefficients();
@@ -116,9 +142,12 @@ public:
 
   GaussLobattoLagrangeSpline
   operator*(const GaussLobattoLagrangeSpline &_in) const {
+
     Eigen::VectorXd coeff = to_matrix() * _in.get_coefficients();
+
     std::size_t codom_dim = to_matrix().rows() / _in.get_number_of_intervals() /
                             _in.get_basis().get_dim();
+
     return GaussLobattoLagrangeSpline(
         _in.get_domain(), codom_dim, _in.get_number_of_intervals(),
         _in.get_basis().get_dim(), to_matrix() * _in.get_coefficients(),
@@ -126,26 +155,31 @@ public:
   }
 
   Eigen::MatrixXd to_dense_matrix() const override {
-    if constexpr (std::is_same_v<Eigen::SparseMatrix<double>, T>) {
-      return mat_.toDense();
-    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T>) {
+    if constexpr (std::is_same_v<Eigen::MatrixXd, T>) {
       return mat_;
+    } else {
+      return mat_.toDense();
     }
+    throw std::runtime_error("This part of the code is not implement. An error "
+                             "on expected types: LinearFunctional");
     return Eigen::MatrixXd();
   }
+
   Eigen::SparseMatrix<double> to_sparse_matrix() const override {
 
     if constexpr (std::is_same_v<Eigen::MatrixXd, T>) {
       return mat_.sparseView();
-    } else if constexpr (std::is_same_v<Eigen::MatrixXd, T>) {
-      return mat_;
+    } else {
+      Eigen::SparseMatrix<double> result(mat_);
+      return result;
     }
+    throw std::runtime_error("This part of the code is not implement. An error "
+                             "on expected types: LinearFunctional");
     return Eigen::SparseMatrix<double>();
   }
 
   std::shared_ptr<LinearFunctionalBase>
   differential(const GaussLobattoLagrangeSpline & /*_in*/) const override {
-
     return std::make_shared<LinearFunctional<T>>(*this);
   }
 
@@ -154,7 +188,7 @@ public:
 
 template <typename T>
 LinearFunctional<T> operator*(double _num, const LinearFunctional<T> &_lm) {
-  LinearFunctional result(_lm);
+  LinearFunctional<T> result(_lm);
   result.mat_ *= _num;
   return result;
 }
@@ -164,22 +198,10 @@ LinearFunctional<T> &&operator*(double _num, LinearFunctional<T> &&_lm) {
   _lm.mat_ *= _num;
   return std::move(_lm);
 }
-class LinearFunctionalDense;
-class LinearFunctionalSparse
-    : public LinearFunctional<Eigen::SparseMatrix<double>> {
-public:
-  using LinearFunctional<Eigen::SparseMatrix<double>>::LinearFunctional;
-  ~LinearFunctionalSparse() = default;
 
-  // operator const LinearFunctionalDense() const;
-};
+typedef LinearFunctional<Eigen::SparseMatrix<double>> LinearFunctionalSparse;
 
-class LinearFunctionalDense : public LinearFunctional<Eigen::MatrixXd> {
-public:
-  using LinearFunctional<Eigen::MatrixXd>::LinearFunctional;
-  // operator const LinearFunctionalSparse() const;
-  ~LinearFunctionalDense() = default;
-};
+typedef LinearFunctional<Eigen::MatrixXd> LinearFunctionalDense;
 
 class Derivative : public LinearFunctionalSparse {
 
@@ -282,8 +304,6 @@ public:
   differential(const GaussLobattoLagrangeSpline & /*_in*/) const override;
 };
 
-/*
-
 class GLLSplineVariable : public ifopt::VariableSet,
                           public GaussLobattoLagrangeSpline {
 private:
@@ -303,48 +323,59 @@ protected:
   __Counter() { counter__++; }
 };
 
-template <typename T>
-class CostWrapper : public __Counter, public T, public ifopt::CostTerm {
+template <typename T> class CostWrapper : public T, public ifopt::CostTerm {
+
+  static int counter__;
 
 public:
   template <typename... Ts>
   CostWrapper(Ts &&... args)
-      : __Counter(), T(args...), CostTerm("cost_" + std::to_string(counter__)) {
-  }
+      : T(args...),
+        CostTerm("cost_" + std::to_string(CostWrapper<T>::counter__)) {}
+
   double GetCost() const override {
+
     std::shared_ptr<GaussLobattoLagrangeSpline> spline =
         std::dynamic_pointer_cast<GaussLobattoLagrangeSpline>(
             GetVariables()->GetComponent("GLL"));
+
     if (not spline)
       throw std::logic_error("could not cast GLL into GLLSpline");
-    Eigen::VectorXd result = (*this)(*spline);
+
+    Eigen::VectorXd result = T::operator()(*spline);
+
     return result(0);
   }
-  void FillJacobianBlock(std::string var_set,
-                         Jacobian &jac) const override {
+
+  void FillJacobianBlock(std::string _set_name,
+                         Jacobian &_jac_block) const override {
     std::shared_ptr<GaussLobattoLagrangeSpline> spline =
         std::dynamic_pointer_cast<GaussLobattoLagrangeSpline>(
             GetVariables()->GetComponent("GLL"));
     if (not spline)
       throw std::logic_error("could not cast GLL into GLLSpline");
-    jac = this->derivate(*spline);
+
+    if (_set_name == "GLL") {
+      _jac_block = T::differential(*spline)->to_sparse_matrix();
+    } else {
+      throw std::logic_error("The unique variable implement is GLL");
+    }
   }
 };
 
 template <typename T>
-class ConstraintWrapper : public __Counter,
-                          public T,
-                          public ifopt::ConstraintSet {
+class ConstraintWrapper : public T, public ifopt::ConstraintSet {
 private:
-  ifopt::Component::Component::VecBound bounds_;
+  ifopt::Component::VecBound bounds_;
   static int counter__;
 
 public:
   template <typename... Ts>
   ConstraintWrapper(double _min, double _max, Ts &&... args)
-      : __Counter(), T(args...),
+      : T(args...),
         ConstraintSet(T::get_codom_dim(),
-                      "Wrapper_" + std::to_string(counter__)) {
+                      "Wrapper_" +
+                          std::to_string(ConstraintWrapper<T>::counter__)) {
 
     counter__++;
     ifopt::Bounds default_bound(_min, _max);
@@ -369,10 +400,17 @@ public:
     std::shared_ptr<GaussLobattoLagrangeSpline> spline =
         std::dynamic_pointer_cast<GaussLobattoLagrangeSpline>(
             GetVariables()->GetComponent("GLL"));
-    if (_set_name == "GLL")
-      _jac_block = T::differential(*spline);
+    if (not spline)
+      throw std::logic_error("could not cast GLL into GLLSpline");
+    if (_set_name == "GLL") {
+      _jac_block = T::differential(*spline)->to_sparse_matrix();
+    } else {
+      throw std::logic_error("The unique cost implement is GLL");
+    }
   }
-};*/
+};
+template <typename T> int ConstraintWrapper<T>::counter__ = 0;
+template <typename T> int CostWrapper<T>::counter__ = 0;
 } // namespace collocation
 } // namespace gsplines
 #endif /* GAUSSLOBATTOLAGRANGEFUNCTIONALS_H */

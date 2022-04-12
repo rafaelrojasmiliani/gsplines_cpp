@@ -1,11 +1,16 @@
+#include "gsplines/Basis/BasisLagrange.hpp"
+#include "gsplines/Collocation/GaussLobattoLagrange.hpp"
+#include "gsplines/Collocation/GaussLobattoPointsWeights.hpp"
 #include <iostream>
 
 #include <gsplines/Basis/BasisLegendre.hpp>
+#include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Optimization/ipopt_interface.hpp>
 #include <ifopt/ipopt_solver.h>
 #include <ifopt/problem.h>
+#include <memory>
 
 namespace gsplines {
 namespace optimization {
@@ -103,5 +108,6 @@ minimum_crackle_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
                               {{5, 1.0}}, _waypoints.rows() - 1)
       .linear_scaling_new_execution_time(1.0);
 }
+
 } // namespace optimization
 } // namespace gsplines

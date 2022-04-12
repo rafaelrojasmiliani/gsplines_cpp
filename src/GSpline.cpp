@@ -198,7 +198,7 @@ bool GSpline::same_vector_space(const GSpline &_that) const {
          tools::approx_equal(get_interval_lengths(),
                              _that.get_interval_lengths(), 1.0e-8);
 }
-
+// --- Sum
 GSpline GSpline::operator+(const GSpline &that) const & {
   if (not same_vector_space(that))
     throw std::invalid_argument("Cannot sum Incompatible Gspline");
@@ -206,6 +206,7 @@ GSpline GSpline::operator+(const GSpline &that) const & {
   result.coefficients_ += that.coefficients_;
   return result;
 }
+
 GSpline GSpline::operator+(GSpline &&that) const & {
   if (not same_vector_space(that))
     throw std::invalid_argument("Cannot sum Incompatible Gspline");
@@ -227,6 +228,7 @@ GSpline GSpline::operator+(GSpline &&that) && {
   return std::move(*this);
 }
 
+// --- subs
 GSpline GSpline::operator-(const GSpline &that) const & {
 
   if (not same_vector_space(that))
@@ -239,7 +241,7 @@ GSpline GSpline::operator-(GSpline &&that) const & {
 
   if (not same_vector_space(that))
     throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  that.coefficients_ -= coefficients_;
+  that.coefficients_ = coefficients_ - that.coefficients_;
   return std::move(that);
 }
 GSpline GSpline::operator-(const GSpline &that) && {
@@ -256,6 +258,8 @@ GSpline GSpline::operator-(GSpline &&that) && {
   coefficients_ -= that.coefficients_;
   return std::move(*this);
 }
+
+// increment
 GSpline &GSpline::operator+=(const GSpline &that) {
   if (not same_vector_space(that))
     throw std::invalid_argument("Cannot sum Incompatible Gspline");
@@ -267,7 +271,7 @@ GSpline &GSpline::operator-=(const GSpline &that) {
   if (not same_vector_space(that))
     throw std::invalid_argument("Cannot sum Incompatible Gspline");
 
-  coefficients_ += that.coefficients_;
+  coefficients_ -= that.coefficients_;
   return *this;
 }
 

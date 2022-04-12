@@ -1,16 +1,10 @@
+#include <algorithm>
 #include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
+#include <iostream>
 namespace gsplines {
 
 namespace collocation {
-/*
-LinearFunctionalSparse::operator LinearFunctionalDense() const {
-  return LinearFunctionalDense(mat_.toDense());
-}
-LinearFunctionalDense::operator LinearFunctionalSparse() const {
-  return LinearFunctionalSparse(mat_.sparseView());
-}
-*/
 
 Integral::Integral(std::tuple<double, double> _domain, std::size_t _nglp,
                    std::size_t _n_intervals)
@@ -36,6 +30,7 @@ SobolevDistance::SobolevDistance(const gsplines::functions::FunctionBase &_fun,
 Eigen::VectorXd
 SobolevDistance::operator()(const GaussLobattoLagrangeSpline &_in) const {
   Derivative der_(_in);
+  Integral int_(_in);
   TransposeLeftMultiplication tr1_(approx_ - _in);
   TransposeLeftMultiplication tr2_(approx_d_ - der_ * _in);
   return int_(tr1_ * (approx_ - _in) + tr2_ * (approx_d_ - der_ * _in));
@@ -43,16 +38,20 @@ SobolevDistance::operator()(const GaussLobattoLagrangeSpline &_in) const {
 
 std::shared_ptr<LinearFunctionalBase>
 SobolevDistance::differential(const GaussLobattoLagrangeSpline &_in) const {
+  Derivative der_(_in);
+  Integral int_(_in);
   TransposeLeftMultiplication tr1_(approx_ - _in);
-  TransposeLeftMultiplication tr2_(approx_d_ - _in.derivate());
-  diff_->set(int_ * (tr1_ + tr2_ * der_) * der_);
+  TransposeLeftMultiplication tr2_(approx_d_ - der_ * _in);
+  /*LinearFunctionalDense a(-2 * int_ * (tr1_ + tr2_ * der_));
+  LinearFunctionalDense b(2 * int_ * (-tr1_ + tr2_ * der_));
+  std::cout << "a-------------------------------" << std::endl;
+  std::cout << a.to_dense_matrix() << std::endl;
+  std::cout << b.to_dense_matrix() << std::endl;
+  std::cout << (2 * int_ * (tr2_ * der_)).to_dense_matrix() << std::endl;
+  std::cout << (2 * int_ * (tr1_)).to_dense_matrix() << std::endl;
+  std::cout << "a-------------------------------" << std::endl;*/
+  diff_->set(-2 * int_ * (tr1_ + tr2_ * der_));
   return diff_;
-}
-
-/*
-const Eigen::MatrixXd &
-Integral::derivative(const GaussLobattoLagrangeSpline & _in) const {
-  return glw_;
 }
 
 GLLSplineVariable::GLLSplineVariable(const GaussLobattoLagrangeSpline &_in)
@@ -68,7 +67,6 @@ void GLLSplineVariable::SetVariables(const Eigen::VectorXd &_vec) {
 Eigen::VectorXd GLLSplineVariable::GetValues() const {
   return get_coefficients();
 }
-*/
 
 } // namespace collocation
 } // namespace gsplines

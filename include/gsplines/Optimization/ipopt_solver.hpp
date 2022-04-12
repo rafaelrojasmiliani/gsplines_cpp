@@ -1,6 +1,8 @@
 #ifndef IPOPT_SOLVER_H
 #define IPOPT_SOLVER_H
 
+#include "gsplines/Functions/FunctionBase.hpp"
+#include <cstddef>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Optimization/ipopt_interface.hpp>
@@ -28,6 +30,9 @@ minimum_snap_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
 
 gsplines::GSpline
 minimum_crackle_path(const Eigen::Ref<const Eigen::MatrixXd> _waypoints);
+
+gsplines::GSpline best_approximation(const functions::FunctionBase &_in,
+                                     std::size_t _n_glp, std::size_t _n_inter);
 } // namespace optimization
 } // namespace gsplines
 #endif /* IPOPT_SOLVER_H */

@@ -7,6 +7,9 @@
 #include <gsplines/Optimization/ipopt_solver.hpp>
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
+#include <ifopt/ipopt_solver.h>
+#include <ifopt/problem.h>
+#include <iostream>
 #include <random>
 
 using namespace gsplines;
@@ -77,9 +80,12 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
   EXPECT_TRUE(tools::approx_equal(4 * q_nom, 2 * (q1_t + q1_t) * q2, 1.0e-9));
 }
 
+/* Test the evaluation of the continuity functions
+ * Confirm that the ouput of the interpolaiton is contiuous up the the first
+ * deriviate  */
 TEST(Collocation, ContinuityError) {
 
-  gsplines::basis::BasisLagrangeGaussLobatto bgl(nglp);
+  gsplines::basis::BasisLagrangeGaussLobatto bgl(6);
 
   Eigen::MatrixXd waypoints(Eigen::MatrixXd::Random(n_inter + 1, dim));
 
@@ -87,14 +93,113 @@ TEST(Collocation, ContinuityError) {
 
   gsplines::GSpline curve_1 = gsplines::interpolate(tauv, waypoints, bgl);
 
-  collocation::GLLSpline curve_2 =
-      collocation::GaussLobattoLagrangeSpline::approximate(curve_1, nglp,
-                                                           n_inter);
-  collocation::ContinuityError cerr(curve_1, 0);
+  collocation::ContinuityError cerr(curve_1, 3);
 
   Eigen::VectorXd res = cerr(curve_1);
 
-  // EXPECT_FALSE(tools::approx_zero(cerr(q1.derivate(2)), 1.0e-9));
+  EXPECT_TRUE(tools::approx_zero(cerr(curve_1), 1.0e-7))
+      << cerr(curve_1).array().abs().maxCoeff() << std::endl;
+}
+TEST(Collocation, Operations) {
+
+  collocation::GLLSpline q1 =
+      collocation::GaussLobattoLagrangeSpline::approximate(
+          optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
+          nglp, n_inter);
+
+  collocation::GLLSpline q2 =
+      collocation::GaussLobattoLagrangeSpline::approximate(
+          optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)),
+          nglp, n_inter);
+
+  collocation::Derivative der(q1);
+  collocation::Integral integral(q1);
+  collocation::TransposeLeftMultiplication tr1_(q1 - q2);
+  collocation::TransposeLeftMultiplication tr2_(q1 - der * q2);
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr1_ * (q1 - q2), tr1_ * q1 - tr1_ * q2, 1.0e-9));
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr2_ * (-der * q2), -tr2_ * der * q2, 1.0e-9));
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr2_ * (q1 - q2), tr2_ * q1 - tr2_ * q2, 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(
+      (der * (q1 - der * q2)).get_coefficients(),
+      der.to_matrix() * (q1 - der * q2).get_coefficients(), 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(
+      (der * (q1 - der * q2)).get_coefficients(),
+      der.to_matrix() *
+          (q1.get_coefficients() - der.to_matrix() * q2.get_coefficients()),
+      1.0e-9));
+
+  GSpline b = der * q1 - der * der * q2;
+  GSpline a = der * (q1 - der * q2);
+  EXPECT_TRUE(tools::approx_equal(a, b, 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(tr2_ * (q1 - der * q2),
+                                  tr2_ * q1 - tr2_ * der * q2, 1.0e-9));
+}
+
+TEST(Collocation, IfOpt) {
+
+  n_inter = 2;
+  dim = 1;
+  nglp = 4;
+  collocation::GLLSpline _in =
+      collocation::GaussLobattoLagrangeSpline::approximate(
+          optimization::minimum_jerk_path(
+              Eigen::MatrixXd::Random(n_inter + 1, dim)),
+          nglp, n_inter);
+
+  Eigen::VectorXd time_spam = Eigen::VectorXd::LinSpaced(
+      n_inter + 1, _in.get_domain().first, _in.get_domain().second);
+
+  Eigen::VectorXd tauv =
+      Eigen::VectorXd::Ones(n_inter) * _in.get_domain_length() / n_inter;
+
+  std::cout << "------------------------\n"
+            << tauv.transpose() << "\n"
+            << time_spam << "\n------------------------ " << n_inter << "\n"
+            << _in.get_waypoints();
+
+  collocation::GLLSpline first_guess =
+      interpolate(tauv, _in(time_spam), basis::BasisLagrangeGaussLobatto(nglp));
+
+  std::shared_ptr<collocation::GLLSplineVariable> variable =
+      std::make_shared<collocation::GLLSplineVariable>(first_guess);
+  // 1.2 Constraints
+  std::shared_ptr<collocation::ConstraintWrapper<collocation::ContinuityError>>
+      continuity = std::make_shared<
+          collocation::ConstraintWrapper<collocation::ContinuityError>>(
+          0.0, 0.0, first_guess, 1);
+
+  std::shared_ptr<collocation::CostWrapper<collocation::SobolevDistance>> cost =
+      std::make_shared<collocation::CostWrapper<collocation::SobolevDistance>>(
+          first_guess, nglp, n_inter, 1);
+
+  ifopt::Problem nlp;
+
+  nlp.AddVariableSet(variable);
+  nlp.AddConstraintSet(continuity);
+  nlp.AddCostSet(cost);
+  // nlp.PrintCurrent();
+
+  // 3. Instantiate ipopt solver
+  ifopt::IpoptSolver ipopt;
+  // 3.1 Customize the solver
+  ipopt.SetOption("derivative_test", "first-order");
+  ipopt.SetOption("jacobian_approximation", "exact");
+  ipopt.SetOption("fast_step_computation", "yes");
+  ipopt.SetOption("hessian_approximation", "limited-memory");
+  ipopt.SetOption("jac_c_constant", "yes");
+  ipopt.SetOption("print_level", 5);
+
+  // 4. Ask the solver to solve the problem
+  ipopt.Solve(nlp);
 }
 
 int main(int argc, char **argv) {
