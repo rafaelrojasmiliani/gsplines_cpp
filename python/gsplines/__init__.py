@@ -1,12 +1,13 @@
 try:
-    from . import pygsplines
+    import inspect
+    import sys
+    from .pygsplines import *
+    # ---
+    from .plot import *
 except ImportError:
-    import pygsplines
+    from pygsplines import *
+    from .plot import *
 
-
-from pygsplines import *
-import sys
-import inspect
 
 submodules = inspect.getmembers(pygsplines, inspect.ismodule)
 for module_info in submodules:
