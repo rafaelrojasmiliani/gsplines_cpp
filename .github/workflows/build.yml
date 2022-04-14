@@ -7,7 +7,7 @@ jobs:
     env:
       GITHUB_WORKSPACE: /workdir
     container:
-      image: rafa606/cpp-vim
+      image: ros:noetic-robot
       volumes:
         - ${{ github.workspace }}:/workdir
     steps:
@@ -19,6 +19,7 @@ jobs:
 
       - name: Git Sumbodule Update ad build
         run: |
+          apt-get install ros-noetic-ifopt libgtest-dev
           mkdir build
           cd build
           cmake ..
