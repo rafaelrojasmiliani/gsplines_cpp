@@ -29,15 +29,60 @@ trajectory  = path.linear_scaling_new_execution_time(10.0)
 trajectory_points = trajectory([0.0, 5.0, 10.0]) # matrix, rows are points
 
 # Get the derivative
-trajectory_derivative = trajectory.derivate()
+trajectory_derivative = trajectory.deriv()
 # Get the jerk
-trajectory_jerk = trajectory.derivate(3)
+trajectory_jerk = trajectory.deriv(3)
 # Evaluate the jerk at points
-trajectory_jerk_at_points = trajectory_jerk([0.0, 5.0, 10.0])
+trajectory_jerk_at_instants = trajectory_jerk([0.0, 5.0, 10.0])
 
 
 # Algebraic operations
 expression = trajectory + trajectory_jerk + 4*trajectory_derivative
+```
+
+# Installation
+
+## In Ubuntu using deb packages and ROS
+To install using debian packages it is needed to have access to the ROS repos ([read here](http://wiki.ros.org/it/hydro/Installation/Ubuntu)).
+The reason to use ros packages is that this library depends on [`ifopt`](https://github.com/ethz-adrl/ifopt), and its deb package is available with ros.
+1. Install the requirements
+```bash
+sudo apt-get install  python3-matplotlib ros-noetic-ifopt
+```
+2. Download the package a install
+```bash
+wget https://github.com/rafaelrojasmiliani/gsplines_cpp/releases/download/package/gsplines-0.0.1-amd64.deb
+sudo dpkg -i gsplines-0.0.1-amd64.deb
+```
+
+## From source without ros
+
+1. Install the requirements
+```bash
+sudo apt-get install  python3-matplotlib libgtest-dev cmake libeigen3-dev coinor-libipopt-dev
+```
+
+2. Install `ifopt`
+```bash
+   git clone https://github.com/ethz-adrl/ifopt.git
+   cd ifopt
+   mkdir build
+   cd build
+   cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+   make
+   make install
+```
+3. Download the repo with recursive mode and compile
+```bash
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
+git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+cd gsplines_cpp
+mkdir build
+cd build
+cmake ..
+make
+make install
 ```
 
 # Definition
