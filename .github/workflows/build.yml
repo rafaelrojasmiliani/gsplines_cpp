@@ -7,18 +7,20 @@ jobs:
     env:
       GITHUB_WORKSPACE: /workdir
     container:
-      image: rafa606/cpp-vim
+      image: ros:noetic-robot
       volumes:
         - ${{ github.workspace }}:/workdir
     steps:
-      - name: checkout code
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 2
-          submodules: recursive
+#      - name: checkout code
+#        uses: actions/checkout@master
+#        with:
+#          fetch-depth: 2
+#          submodules: recursive
 
       - name: Git Sumbodule Update ad build
         run: |
+          apt-get install git ros-noetic-ifopt libgtest-dev
+          git submodule update --init --recursive
           mkdir build
           cd build
           cmake ..
