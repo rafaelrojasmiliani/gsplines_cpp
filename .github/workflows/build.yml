@@ -31,7 +31,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/gsplines-0.0.1-amd64.deb
+          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
           asset_name: gsplines-0.0.1-amd64.deb
           tag: package
           overwrite: true
