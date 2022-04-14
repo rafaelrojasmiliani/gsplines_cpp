@@ -19,6 +19,7 @@ jobs:
 
       - name: Git Sumbodule Update ad build
         run: |
+          apt-get update
           apt-get install git ros-noetic-ifopt libgtest-dev
           git submodule update --init --recursive
           mkdir build
