@@ -25,7 +25,7 @@ jobs:
           cd gsplines_cpp
           mkdir build
           cd build
-          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make && cpack -G DEB"
+          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
