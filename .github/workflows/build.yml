@@ -11,14 +11,18 @@ jobs:
       volumes:
         - ${{ github.workspace }}:/workdir
     steps:
-      - name: checkout code
-        uses: actions/checkout@master
+#      - name: checkout code
+#        uses: actions/checkout@master
+#        with:
+#          fetch-depth: 2
+#          submodules: recursive
 
       - name: Git Sumbodule Update ad build
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
-          git submodule update --init --recursive
+          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+          cd gsplines_cpp
           mkdir build
           cd build
           cmake ..
