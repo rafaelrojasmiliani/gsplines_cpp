@@ -25,6 +25,7 @@ jobs:
           cd gsplines_cpp
           mkdir build
           cd build
+          source /opt/ros/noetic/setup.bash
           cmake ..
           make
           cpack -G DEB
