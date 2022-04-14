@@ -37,7 +37,7 @@ trajectory_jerk_at_instants = trajectory_jerk([0.0, 5.0, 10.0])
 
 
 # Algebraic operations
-expression = trajectory + trajectory_jerk + 4*trajectory_derivative
+expression = trajectory + trajectory_jerk + trajectory_derivative
 ```
 
 # Installation
