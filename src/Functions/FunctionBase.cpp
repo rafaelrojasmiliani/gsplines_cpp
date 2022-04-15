@@ -2,6 +2,7 @@
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionBase.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
+#include <gsplines/Tools.hpp>
 #include <stdexcept>
 
 namespace gsplines {
@@ -88,6 +89,15 @@ FunctionExpression FunctionBase::derivate(std::size_t _deg) const {
                             std::move(result_array));
 }
 
+bool FunctionBase::same_domain(const FunctionBase &_f1) const {
+  return tools::approx_equal(get_domain().second, _f1.get_domain().second,
+                             dom_tollerance_) and
+         tools::approx_equal(get_domain().first, _f1.get_domain().first,
+                             dom_tollerance_);
+}
+bool FunctionBase::same_codomain(const FunctionBase &_f1) const {
+  return get_codom_dim() == _f1.get_codom_dim();
+}
 // ----------------
 // Sum of functions
 // ----------------

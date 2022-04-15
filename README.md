@@ -1,11 +1,12 @@
 # General Splines: A Library for Algebraically and Analytically Consistent Representation of Motions
 Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
-- Piecewise polynomial curves representation
-- Automatic **exact** (and fast) differentiation of generalized splines implemented
-- Algebraic operations: inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
+- Generalized splines as a `GSpline` class. They can represent
+    - Piecewise polynomial curves representation
+    - Piece-wise Lagrange polynomials at (interpolation at Gauss-Lobatto points already implemented).
+- **Analitical consistenc** `GSpline` provide a `derivate` method which returns the its derivative as a new `GSpline` instance. This library provides automatic **exact** (and fast) differentiation of the generalized splines implemented.
+- **Algebraic consistence**: This library implement basic operations between `GSplines` inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
-- Implements piece-wise Lagrange polynomials at Gauss-Lobatto points.
 - ROS implementation [here](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
 - MoveIt implementation [here](https://github.com/rafaelrojasmiliani/gsplines_moveit)
 

@@ -1,5 +1,6 @@
 
 
+#include "gsplines/Collocation/GaussLobattoPointsWeights.hpp"
 #include <eigen3/Eigen/Core>
 #include <gsplines/Collocation/GaussLobattoLagrange.hpp>
 #include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
@@ -200,6 +201,51 @@ TEST(Collocation, IfOpt) {
 
   // 4. Ask the solver to solve the problem
   ipopt.Solve(nlp);
+}
+
+collocation::GLLSpline vector =
+    collocation::GaussLobattoLagrangeSpline::approximate(
+        optimization::minimum_jerk_path(
+            Eigen::MatrixXd::Random(n_inter + 1, dim)),
+        nglp, n_inter);
+
+collocation::GLLSpline scalar =
+    collocation::GaussLobattoLagrangeSpline::approximate(
+        optimization::minimum_jerk_path(
+            Eigen::MatrixXd::Random(n_inter + 1, 1)),
+        nglp, n_inter);
+
+TEST(Collocation, MultiplicationConstConst) {
+
+  Eigen::VectorXd time_spam =
+      collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
+  {
+    collocation::GLLSpline res = vector * scalar;
+    collocation::GLLSpline res1 = scalar * vector;
+    EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
+    EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
+    EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
+                                        scalar(time_spam).col(0).array(),
+                                    res1(time_spam), 1.0e-7));
+    {
+      collocation::GLLSpline res = vector * (scalar * scalar);
+      collocation::GLLSpline res1 = (vector * scalar) * scalar;
+      EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
+      EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
+      EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
+                                          (scalar(time_spam).col(0).array() *
+                                           scalar(time_spam).col(0).array()),
+                                      res1(time_spam), 1.0e-7));
+    }
+  }
+}
+TEST(Collocation, MultiplicationConstNonConst) {
+
+  Eigen::VectorXd time_spam =
+      collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
+
+  collocation::GLLSpline res1 = ((vector + vector) * scalar) * scalar;
+  collocation::GLLSpline res2 = ((vector + vector) * scalar) * scalar;
 }
 
 int main(int argc, char **argv) {

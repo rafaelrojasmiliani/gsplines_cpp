@@ -1,6 +1,7 @@
 #ifndef GAUSSLOBATTOLAGRANGE_H
 #define GAUSSLOBATTOLAGRANGE_H
 #include <Eigen/SparseCore>
+#include <cstddef>
 #include <gsplines/Basis/BasisLagrange.hpp>
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
@@ -10,23 +11,39 @@ namespace gsplines {
 
 namespace collocation {
 class GaussLobattoLagrangeSpline
-    : public ::gsplines::functions::FunctionInheritanceHelper<
-          GaussLobattoLagrangeSpline, ::gsplines::GSpline,
-          GaussLobattoLagrangeSpline> {
+    : public GSplineInheritanceHelper<GaussLobattoLagrangeSpline> {
+
   friend GSpline;
 
+private:
+  Eigen::Map<Eigen::MatrixXd> get_value_block(std::size_t _interval);
+  Eigen::Map<const Eigen::MatrixXd>
+  get_value_block(std::size_t _interval) const;
+
 public:
+  using GSplineInheritanceHelper<
+      GaussLobattoLagrangeSpline>::GSplineInheritanceHelper;
   GaussLobattoLagrangeSpline(
       std::pair<double, double> _domain, std::size_t _codom_dim,
       std::size_t _n_intervals, std::size_t _n_glp,
       const Eigen::Ref<const Eigen::VectorXd> _coefficents,
       const Eigen::Ref<const Eigen::VectorXd> _tauv);
+
+  // create moving data
+  GaussLobattoLagrangeSpline(std::pair<double, double> _domain,
+                             std::size_t _codom_dim, std::size_t _n_intervals,
+                             std::size_t _n_glp, Eigen::VectorXd &&_coefficents,
+                             Eigen::VectorXd &&_tauv);
+
+  // create a zero polynomial with equal intervals
+  GaussLobattoLagrangeSpline(std::pair<double, double> _domain,
+                             std::size_t _codom_dim, std::size_t _n_intervals,
+                             std::size_t _n_glp);
+
   GaussLobattoLagrangeSpline(const GaussLobattoLagrangeSpline &_that);
   GaussLobattoLagrangeSpline(GaussLobattoLagrangeSpline &&_that);
   GaussLobattoLagrangeSpline(const GSpline &_that);
   GaussLobattoLagrangeSpline(GSpline &&_that);
-  GaussLobattoLagrangeSpline &
-  operator=(const GaussLobattoLagrangeSpline &) = delete;
   virtual ~GaussLobattoLagrangeSpline() = default;
 
   static GaussLobattoLagrangeSpline identity(std::pair<double, double> _domain,
@@ -39,8 +56,21 @@ public:
 
   std::size_t get_nglp() const { return get_basis_dim(); }
 
-protected:
-  GaussLobattoLagrangeSpline *deriv_impl(std::size_t _deg = 1) const override;
+  GaussLobattoLagrangeSpline
+  operator*(const GaussLobattoLagrangeSpline &_that) const &;
+  GaussLobattoLagrangeSpline
+  operator*(const GaussLobattoLagrangeSpline &_that) &&;
+  GaussLobattoLagrangeSpline
+  operator*(GaussLobattoLagrangeSpline &&_that) const &;
+  GaussLobattoLagrangeSpline operator*(GaussLobattoLagrangeSpline &&_that) &&;
+
+  GaussLobattoLagrangeSpline &
+  operator=(const GaussLobattoLagrangeSpline &_that) &;
+  GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
+
+  GaussLobattoLagrangeSpline &norm(const GaussLobattoLagrangeSpline &_that) &;
+
+  bool same_discretization(const GaussLobattoLagrangeSpline &_that) const;
 };
 
 double integral(::gsplines::functions::FunctionBase &_diffeo,

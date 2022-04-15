@@ -29,6 +29,9 @@ public:
 
   std::size_t get_codom_dim() const { return codom_dim_; };
 
+  bool same_domain(const FunctionBase &_f1) const;
+  bool same_codomain(const FunctionBase &_f1) const;
+
   static bool same_domain(const FunctionBase &_f1, const FunctionBase &_f2);
 
   static bool same_codomain(const FunctionBase &_f1, const FunctionBase &_f2);

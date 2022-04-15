@@ -5,48 +5,98 @@
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Tools.hpp>
+#include <stdexcept>
 
 namespace gsplines {
 
 namespace collocation {
+
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     std::pair<double, double> _domain, std::size_t _codom_dim,
     std::size_t _n_intervals, std::size_t _n_glp,
     const Eigen::Ref<const Eigen::VectorXd> _coefficents,
     const Eigen::Ref<const Eigen::VectorXd> _tauv)
-    : FunctionInheritanceHelper(
+    : GSplineInheritanceHelper(
           _domain, _codom_dim, _n_intervals,
           ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp), _coefficents,
-          _tauv) {
+          _tauv) {}
 
-  Eigen::MatrixXd mat = Eigen::Map<const Eigen::MatrixXd>(
-      get_coefficients().data(), _n_glp * _n_intervals, _codom_dim);
-}
+GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
+    std::pair<double, double> _domain, std::size_t _codom_dim,
+    std::size_t _n_intervals, std::size_t _n_glp,
+    Eigen::VectorXd &&_coefficents, Eigen::VectorXd &&_tauv)
+    : GSplineInheritanceHelper(
+          _domain, _codom_dim, _n_intervals,
+          ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp),
+          std::move(_coefficents), std::move(_tauv)) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     const GaussLobattoLagrangeSpline &_that)
-    : FunctionInheritanceHelper(_that) {}
+    : GSplineInheritanceHelper(_that) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     GaussLobattoLagrangeSpline &&_that)
-    : FunctionInheritanceHelper(std::move(_that)) {}
+    : GSplineInheritanceHelper(std::move(_that)) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(const GSpline &_that)
-    : FunctionInheritanceHelper(_that) {}
+    : GSplineInheritanceHelper(_that) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(GSpline &&_that)
-    : FunctionInheritanceHelper(std::move(_that)) {}
+    : GSplineInheritanceHelper(std::move(_that)) {}
 
-GaussLobattoLagrangeSpline *
-GaussLobattoLagrangeSpline::deriv_impl(std::size_t _deg) const {
-  GSpline *aux = GSpline::deriv_impl(_deg);
+GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
+    const GaussLobattoLagrangeSpline &_that) & {
 
-  GLLSpline *result = new GaussLobattoLagrangeSpline(
-      get_domain(), get_codom_dim(), get_number_of_intervals(),
-      get_basis().get_dim(), aux->get_coefficients(), get_interval_lengths());
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(same_codomain(_that)))
+    throw std::invalid_argument("Assigmention requires same codomain");
 
-  delete aux;
-  return result;
+  coefficients_ = _that.coefficients_;
+  return *this;
+}
+GaussLobattoLagrangeSpline &
+GaussLobattoLagrangeSpline::operator=(GaussLobattoLagrangeSpline &&_that) & {
+  if (this == &_that) {
+    throw std::invalid_argument(" Cannot move assign to itself");
+  }
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(same_codomain(_that)))
+    throw std::invalid_argument("Assigmention requires same codomain");
+
+  coefficients_ = std::move(_that.coefficients_);
+  return *this;
+}
+
+Eigen::Map<Eigen::MatrixXd>
+GaussLobattoLagrangeSpline::get_value_block(std::size_t _interval) {
+  std::size_t nglp = get_nglp();
+  std::size_t dim = get_codom_dim();
+  std::size_t chunk_size = nglp * dim;
+  if (_interval >= get_number_of_intervals()) {
+    throw std::invalid_argument("Cannot accest to that interval");
+  }
+  double *data =
+      coefficients_.segment(_interval * chunk_size, chunk_size).data();
+  return Eigen::Map<Eigen::MatrixXd>(data, nglp, get_codom_dim());
+}
+
+Eigen::Map<const Eigen::MatrixXd>
+GaussLobattoLagrangeSpline::get_value_block(std::size_t _interval) const {
+  std::size_t nglp = get_nglp();
+  std::size_t dim = get_codom_dim();
+  std::size_t chunk_size = nglp * dim;
+  if (_interval >= get_number_of_intervals()) {
+    throw std::invalid_argument("Cannot accest to that interval");
+  }
+  const double *data =
+      coefficients_.segment(_interval * chunk_size, chunk_size).data();
+  return Eigen::Map<const Eigen::MatrixXd>(data, nglp, get_codom_dim());
 }
 
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::approximate(
@@ -103,5 +153,153 @@ double integral(::gsplines::functions::FunctionBase &_diffeo,
   return ::gsplines::functional_analysis::integral(
       _path.dot(_path).compose(_diffeo.to_expression()));
 }
+bool GaussLobattoLagrangeSpline::same_discretization(
+    const GaussLobattoLagrangeSpline &_that) const {
+  return get_nglp() == _that.get_nglp() and
+         get_number_of_intervals() == _that.get_number_of_intervals();
+}
+
+// Operations -----------------------------
+// -----------------------------------------
+
+GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::operator*(
+    const GaussLobattoLagrangeSpline &_that) const & {
+
+  std::cout << "----------------------\n";
+  fflush(stdout);
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(get_codom_dim() == 1 or _that.get_codom_dim() == 1))
+    throw std::invalid_argument("Multiplication can be only done by scalars");
+
+  const GaussLobattoLagrangeSpline &scalar =
+      (_that.get_codom_dim() == 1) ? _that : *this;
+  const GaussLobattoLagrangeSpline &vector =
+      (_that.get_codom_dim() != 1) ? _that : *this;
+  GaussLobattoLagrangeSpline result(vector);
+
+  std::size_t n_inter = get_number_of_intervals();
+
+  for (std::size_t i = 0; i < n_inter; i++) {
+
+    Eigen::Map<Eigen::MatrixXd> matrix = result.get_value_block(i);
+
+    matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+  }
+
+  return result;
+}
+
+GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::operator*(
+    const GaussLobattoLagrangeSpline &_that) && {
+
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(get_codom_dim() == 1 or _that.get_codom_dim() == 1))
+    throw std::invalid_argument("Multiplication can be only done by scalars");
+
+  const GaussLobattoLagrangeSpline &scalar =
+      (_that.get_codom_dim() == 1) ? _that : *this;
+  const GaussLobattoLagrangeSpline &vector =
+      (_that.get_codom_dim() != 1) ? _that : *this;
+
+  if (&vector == this) {
+    std::size_t n_inter = get_number_of_intervals();
+
+    for (std::size_t i = 0; i < n_inter; i++) {
+
+      Eigen::Map<Eigen::MatrixXd> matrix = get_value_block(i);
+
+      matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+    }
+    return std::move(*this);
+  }
+  GaussLobattoLagrangeSpline result(vector);
+
+  std::size_t n_inter = get_number_of_intervals();
+
+  for (std::size_t i = 0; i < n_inter; i++) {
+
+    Eigen::Map<Eigen::MatrixXd> matrix = result.get_value_block(i);
+
+    matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+  }
+
+  return result;
+}
+
+GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::operator*(
+    GaussLobattoLagrangeSpline &&_that) const & {
+
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(get_codom_dim() == 1 or _that.get_codom_dim() == 1))
+    throw std::invalid_argument("Multiplication can be only done by scalars");
+
+  const GaussLobattoLagrangeSpline &scalar =
+      (_that.get_codom_dim() == 1) ? _that : *this;
+  const GaussLobattoLagrangeSpline &vector =
+      (_that.get_codom_dim() != 1) ? _that : *this;
+
+  if (&vector == &_that) {
+    std::size_t n_inter = get_number_of_intervals();
+
+    for (std::size_t i = 0; i < n_inter; i++) {
+
+      Eigen::Map<Eigen::MatrixXd> matrix = _that.get_value_block(i);
+
+      matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+    }
+    return std::move(_that);
+  }
+  GaussLobattoLagrangeSpline result(vector);
+
+  std::size_t n_inter = get_number_of_intervals();
+
+  for (std::size_t i = 0; i < n_inter; i++) {
+
+    Eigen::Map<Eigen::MatrixXd> matrix = result.get_value_block(i);
+
+    matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+  }
+
+  return result;
+}
+
+GaussLobattoLagrangeSpline
+GaussLobattoLagrangeSpline::operator*(GaussLobattoLagrangeSpline &&_that) && {
+
+  if (not same_discretization(_that))
+    throw std::invalid_argument("Discretization must be the same");
+  if (not same_domain(_that))
+    throw std::invalid_argument("GSplines must have same domain");
+  if (not(get_codom_dim() == 1 or _that.get_codom_dim() == 1))
+    throw std::invalid_argument("Multiplication can be only done by scalars");
+
+  GaussLobattoLagrangeSpline &scalar =
+      (_that.get_codom_dim() == 1) ? _that : *this;
+  GaussLobattoLagrangeSpline &vector =
+      (_that.get_codom_dim() != 1) ? _that : *this;
+
+  GaussLobattoLagrangeSpline &result = vector;
+
+  std::size_t n_inter = get_number_of_intervals();
+
+  for (std::size_t i = 0; i < n_inter; i++) {
+
+    Eigen::Map<Eigen::MatrixXd> matrix = result.get_value_block(i);
+
+    matrix.array().colwise() *= scalar.get_value_block(i).col(0).array();
+  }
+
+  return std::move(result);
+}
+
 } // namespace collocation
 } // namespace gsplines

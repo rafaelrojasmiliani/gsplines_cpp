@@ -5,33 +5,7 @@
 
 namespace gsplines {
 
-GSpline *GSpline::deriv_impl(std::size_t _deg) const {
-
-  Eigen::VectorXd result_coeff(coefficients_);
-  std::size_t interval_coor;
-  std::size_t codom_coor;
-  std::size_t i0;
-
-  if (_deg > 0) {
-    for (interval_coor = 0; interval_coor < get_number_of_intervals();
-         interval_coor++) {
-      for (codom_coor = 0; codom_coor < get_codom_dim(); codom_coor++) {
-        i0 = interval_coor * basis_->get_dim() * get_codom_dim() +
-             basis_->get_dim() * codom_coor;
-        result_coeff.segment(i0, basis_->get_dim()) =
-            basis_->get_derivative_matrix_block(_deg) *
-            result_coeff.segment(i0, basis_->get_dim()) *
-            std::pow(2 / domain_interval_lengths_(interval_coor), _deg);
-      }
-    }
-  }
-
-  return new GSpline(get_domain(), get_codom_dim(), get_number_of_intervals(),
-                     *basis_, result_coeff, domain_interval_lengths_,
-                     get_name());
-}
-
-GSpline::GSpline(const GSpline &that)
+GSplineBase::GSplineBase(const GSplineBase &that)
     : FunctionInheritanceHelper(that), coefficients_(that.coefficients_),
       domain_interval_lengths_(that.domain_interval_lengths_),
       basis_(that.basis_->clone()), basis_buffer_(basis_->get_dim()) {
@@ -39,7 +13,8 @@ GSpline::GSpline(const GSpline &that)
   if (coefficients_.size() !=
       (long)(get_number_of_intervals() * basis_->get_dim() * get_codom_dim())) {
     throw std::invalid_argument(
-        "GSpline instantation Error: The number of coefficients is incorrect "
+        "GSplineBase instantation Error: The number of coefficients is "
+        "incorrect "
         "req base dim: " +
         std::to_string(basis_->get_dim()) +
         " req codom dim: " + std::to_string(that.get_codom_dim()) +
@@ -49,7 +24,7 @@ GSpline::GSpline(const GSpline &that)
   }
 }
 
-GSpline::GSpline(GSpline &&that)
+GSplineBase::GSplineBase(GSplineBase &&that)
     : FunctionInheritanceHelper(std::move(that)),
       coefficients_(std::move(that.coefficients_)),
       domain_interval_lengths_(std::move(that.domain_interval_lengths_)),
@@ -58,7 +33,8 @@ GSpline::GSpline(GSpline &&that)
   if (coefficients_.size() !=
       (long)(get_number_of_intervals() * basis_->get_dim() * get_codom_dim())) {
     throw std::invalid_argument(
-        "GSpline instantation Error: The number of coefficients is incorrect "
+        "GSplineBase instantation Error: The number of coefficients is "
+        "incorrect "
         "req base dim: " +
         std::to_string(basis_->get_dim()) +
         " req codom dim: " + std::to_string(that.get_codom_dim()) +
@@ -68,11 +44,12 @@ GSpline::GSpline(GSpline &&that)
   }
 }
 
-GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
-                 std::size_t _n_intervals, const basis::Basis &_basis,
-                 const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-                 const Eigen::Ref<const Eigen::VectorXd> _tauv,
-                 const std::string &_name)
+GSplineBase::GSplineBase(std::pair<double, double> _domain,
+                         std::size_t _codom_dim, std::size_t _n_intervals,
+                         const basis::Basis &_basis,
+                         const Eigen::Ref<const Eigen::VectorXd> _coefficents,
+                         const Eigen::Ref<const Eigen::VectorXd> _tauv,
+                         const std::string &_name)
     : FunctionInheritanceHelper(_domain, _codom_dim, _name),
       coefficients_(_coefficents), domain_interval_lengths_(_tauv),
       basis_(_basis.clone()), basis_buffer_(basis_->get_dim()) {
@@ -80,7 +57,8 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
   if (coefficients_.size() !=
       (long)(_n_intervals * basis_->get_dim() * _codom_dim)) {
     throw std::invalid_argument(
-        "GSpline instantation Error: The number of coefficients is incorrect "
+        "GSplineBase instantation Error: The number of coefficients is "
+        "incorrect "
         "req base dim: " +
         std::to_string(basis_->get_dim()) +
         " req codom dim: " + std::to_string(get_codom_dim()) +
@@ -90,8 +68,33 @@ GSpline::GSpline(std::pair<double, double> _domain, std::size_t _codom_dim,
   }
 }
 
-void GSpline::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
-                         Eigen::Ref<Eigen::MatrixXd> _result) const {
+GSplineBase::GSplineBase(std::pair<double, double> _domain,
+                         std::size_t _codom_dim, std::size_t _n_intervals,
+                         const basis::Basis &_basis,
+                         Eigen::VectorXd &&_coefficents,
+                         Eigen::VectorXd &&_tauv, const std::string &_name)
+    : FunctionInheritanceHelper(_domain, _codom_dim, _name),
+      coefficients_(std::move(_coefficents)),
+      domain_interval_lengths_(std::move(_tauv)), basis_(_basis.clone()),
+      basis_buffer_(basis_->get_dim()) {
+
+  if (coefficients_.size() !=
+      (long)(_n_intervals * basis_->get_dim() * _codom_dim)) {
+    throw std::invalid_argument(
+        "GSplineBase instantation Error: The number of coefficients is "
+        "incorrect "
+        "req base dim: " +
+        std::to_string(basis_->get_dim()) +
+        " req codom dim: " + std::to_string(get_codom_dim()) +
+        " req num inter: " + std::to_string(get_number_of_intervals()) +
+        ". However, the number of coeff was " +
+        std::to_string(coefficients_.size()));
+  }
+}
+
+void GSplineBase::value_impl(
+    const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+    Eigen::Ref<Eigen::MatrixXd> _result) const {
 
   std::size_t result_cols(_domain_points.size());
   std::size_t current_interval = 0;
@@ -111,19 +114,7 @@ void GSpline::value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
   }
 }
 
-GSpline
-GSpline::linear_scaling_new_execution_time(double _new_exec_time) const {
-  assert(_new_exec_time > 0);
-  Eigen::VectorXd new_domain_interva_lengths =
-      domain_interval_lengths_ * _new_exec_time / get_domain_length();
-
-  gsplines::Interpolator inter(get_codom_dim(), get_number_of_intervals(),
-                               *basis_);
-
-  return inter.interpolate(new_domain_interva_lengths, get_waypoints());
-}
-
-std::size_t GSpline::get_interval(double _domain_point) const {
+std::size_t GSplineBase::get_interval(double _domain_point) const {
   double left_breakpoint = get_domain().first;
   double right_breakpoint;
   if (_domain_point <= left_breakpoint)
@@ -140,22 +131,23 @@ std::size_t GSpline::get_interval(double _domain_point) const {
 }
 
 Eigen::Ref<const Eigen::VectorXd>
-GSpline::coefficient_segment(std::size_t _interval,
-                             std::size_t _component) const {
+GSplineBase::coefficient_segment(std::size_t _interval,
+                                 std::size_t _component) const {
   int i0 = _interval * basis_->get_dim() * get_codom_dim() +
            basis_->get_dim() * _component;
   return coefficients_.segment(i0, basis_->get_dim());
 }
 
 Eigen::Ref<Eigen::VectorXd>
-GSpline::coefficient_segment(std::size_t _interval, std::size_t _component) {
+GSplineBase::coefficient_segment(std::size_t _interval,
+                                 std::size_t _component) {
   int i0 = _interval * basis_->get_dim() * get_codom_dim() +
            basis_->get_dim() * _component;
   return coefficients_.segment(i0, basis_->get_dim());
 }
 
-double GSpline::interval_to_window(double _domain_point,
-                                   std::size_t _interval) const {
+double GSplineBase::interval_to_window(double _domain_point,
+                                       std::size_t _interval) const {
   double left_breakpoint =
       get_domain().first +
       domain_interval_lengths_.segment(0, _interval).array().sum();
@@ -174,7 +166,7 @@ get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficients,
       _interval * _basis.get_dim() * _codom_dim + _basis.get_dim() * _component;
   return _coefficients.segment(i0, _basis.get_dim());
 }
-Eigen::VectorXd GSpline::get_domain_breakpoints() const {
+Eigen::VectorXd GSplineBase::get_domain_breakpoints() const {
 
   double time_instant = get_domain().first;
   Eigen::VectorXd result(get_number_of_intervals() + 1);
@@ -186,102 +178,27 @@ Eigen::VectorXd GSpline::get_domain_breakpoints() const {
   return result;
 }
 
-Eigen::MatrixXd GSpline::get_waypoints() const {
+Eigen::MatrixXd GSplineBase::get_waypoints() const {
   Eigen::MatrixXd result(get_number_of_intervals() + 1, get_codom_dim());
-  GSpline::value(get_domain_breakpoints(), result);
+  GSplineBase::value(get_domain_breakpoints(), result);
   return result;
 }
 
-bool GSpline::same_vector_space(const GSpline &_that) const {
+bool GSplineBase::same_vector_space(const GSplineBase &_that) const {
   return get_basis() == _that.get_basis() and
          get_codom_dim() == _that.get_codom_dim() and
          tools::approx_equal(get_interval_lengths(),
                              _that.get_interval_lengths(), 1.0e-8);
 }
-// --- Sum
-GSpline GSpline::operator+(const GSpline &that) const & {
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  GSpline result = GSpline(*this);
-  result.coefficients_ += that.coefficients_;
+
+GSpline operator*(double _a, const GSpline &_that) {
+  GSpline result(_that);
+  _that.coefficients_ *= _a;
   return result;
 }
-
-GSpline GSpline::operator+(GSpline &&that) const & {
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  that.coefficients_ += coefficients_;
-  return std::move(that);
-}
-GSpline GSpline::operator+(const GSpline &that) && {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  coefficients_ += that.coefficients_;
-  return std::move(*this);
-}
-GSpline GSpline::operator+(GSpline &&that) && {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  coefficients_ += that.coefficients_;
-  return std::move(*this);
-}
-
-// --- subs
-GSpline GSpline::operator-(const GSpline &that) const & {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  GSpline result = GSpline(*this);
-  result.coefficients_ -= that.coefficients_;
-  return result;
-}
-GSpline GSpline::operator-(GSpline &&that) const & {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  that.coefficients_ = coefficients_ - that.coefficients_;
-  return std::move(that);
-}
-GSpline GSpline::operator-(const GSpline &that) && {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  coefficients_ -= that.coefficients_;
-  return std::move(*this);
-}
-GSpline GSpline::operator-(GSpline &&that) && {
-
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-  coefficients_ -= that.coefficients_;
-  return std::move(*this);
-}
-
-// increment
-GSpline &GSpline::operator+=(const GSpline &that) {
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-
-  coefficients_ += that.coefficients_;
-  return *this;
-}
-GSpline &GSpline::operator-=(const GSpline &that) {
-  if (not same_vector_space(that))
-    throw std::invalid_argument("Cannot sum Incompatible Gspline");
-
-  coefficients_ -= that.coefficients_;
-  return *this;
-}
-
-GSpline operator*(double _a, const GSpline &_in) {
-  GSpline result(_in);
-  result.coefficients_ *= _a;
-  return result;
-}
-GSpline &operator*(double _a, GSpline &&_in) {
-  _in.coefficients_ *= _a;
-  return _in;
-}
+GSpline operator*(double _a, GSpline &&_that);
+GSpline operator*(const GSpline &_that, double _a);
+GSpline operator*(GSpline &&_that, double _a);
+GSpline operator-(const GSpline &_that);
+GSpline operator-(GSpline &&_that);
 } // namespace gsplines

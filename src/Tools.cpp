@@ -35,7 +35,8 @@ bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,
   return err / lhs_max < _tol and err / rhs_max < _tol;
 }
 
-bool approx_equal(const GSpline &_lhs, const GSpline &_rhs, double _tol) {
+bool approx_equal(const GSplineBase &_lhs, const GSplineBase &_rhs,
+                  double _tol) {
   return approx_equal(_lhs.get_coefficients(), _rhs.get_coefficients(), _tol);
 }
 
@@ -56,7 +57,7 @@ bool approx_zero(const Eigen::MatrixXd &_rhs, double _tol) {
   return rhs_max < _tol;
 }
 
-bool approx_zero(const GSpline &_rhs, double _tol) {
+bool approx_zero(const GSplineBase &_rhs, double _tol) {
   return approx_zero(_rhs.get_coefficients(), _tol);
 }
 } // namespace tools
