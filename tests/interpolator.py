@@ -7,6 +7,7 @@ import unittest
 import sys
 import os
 import pathlib
+import gsplines
 from gsplines.basis import BasisLegendre
 from gsplines.basis import BasisLagrange
 from gsplines import Interpolator
@@ -26,7 +27,7 @@ class MyTest(unittest.TestCase):
         """ Test the computation of an interpolating gpline """
         basis_dim = 8
         basis = BasisLegendre(basis_dim)
-        dim = 6  # np.random.randint(1, 10)
+        dim = np.random.randint(1, 10)
         intervals = np.random.randint(3, 6)
         waypoints = np.random.rand(intervals+1, dim)
         interval_lengths = 1.0 + np.random.rand(intervals) * 2.0
@@ -41,7 +42,8 @@ class MyTest(unittest.TestCase):
         basis = BasisLagrange(nodes)
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
-        # plot(res, 5, 0.10, waypoints)
+
+        gsplines.plot(res)
 
 #    #@debug_on()
 #    def interpolation_test_computation_time(self):

@@ -162,11 +162,6 @@ TEST(Collocation, IfOpt) {
   Eigen::VectorXd tauv =
       Eigen::VectorXd::Ones(n_inter) * _in.get_domain_length() / n_inter;
 
-  std::cout << "------------------------\n"
-            << tauv.transpose() << "\n"
-            << time_spam << "\n------------------------ " << n_inter << "\n"
-            << _in.get_waypoints();
-
   collocation::GLLSpline first_guess =
       interpolate(tauv, _in(time_spam), basis::BasisLagrangeGaussLobatto(nglp));
 
@@ -226,17 +221,24 @@ TEST(Collocation, MultiplicationConstConst) {
     EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
     EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
                                         scalar(time_spam).col(0).array(),
-                                    res1(time_spam), 1.0e-7));
-    {
-      collocation::GLLSpline res = vector * (scalar * scalar);
-      collocation::GLLSpline res1 = (vector * scalar) * scalar;
-      EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
-      EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
-      EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
-                                          (scalar(time_spam).col(0).array() *
-                                           scalar(time_spam).col(0).array()),
-                                      res1(time_spam), 1.0e-7));
-    }
+                                    res1(time_spam), 1.0e-4))
+        << "Fail value\n"
+        << (vector(time_spam).array().colwise() *
+            scalar(time_spam).col(0).array())
+               .matrix()
+        << "\n---\n"
+        << res1(time_spam);
+  }
+  {
+    collocation::GLLSpline res = vector * (scalar * scalar);
+    collocation::GLLSpline res1 = (vector * scalar) * scalar;
+    EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
+    EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
+    EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
+                                        (scalar(time_spam).col(0).array() *
+                                         scalar(time_spam).col(0).array()),
+                                    res1(time_spam), 1.0e-7))
+        << "Fail Value";
   }
 }
 TEST(Collocation, MultiplicationConstNonConst) {
@@ -245,7 +247,13 @@ TEST(Collocation, MultiplicationConstNonConst) {
       collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
 
   collocation::GLLSpline res1 = ((vector + vector) * scalar) * scalar;
-  collocation::GLLSpline res2 = ((vector + vector) * scalar) * scalar;
+  collocation::GLLSpline res2 = (vector * scalar + vector * scalar) * scalar;
+  collocation::GLLSpline res3 =
+      vector * scalar * scalar + vector * scalar * scalar;
+  collocation::GLLSpline res4 = (vector + vector) * (scalar * scalar);
+  EXPECT_TRUE(tools::approx_equal(res1, res2, 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(res2, res3, 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(res3, res4, 1.0e-9));
 }
 
 int main(int argc, char **argv) {
