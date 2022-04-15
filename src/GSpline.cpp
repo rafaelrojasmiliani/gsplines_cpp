@@ -193,12 +193,24 @@ bool GSplineBase::same_vector_space(const GSplineBase &_that) const {
 
 GSpline operator*(double _a, const GSpline &_that) {
   GSpline result(_that);
-  _that.coefficients_ *= _a;
+  result.coefficients_ *= _a;
   return result;
 }
-GSpline operator*(double _a, GSpline &&_that);
-GSpline operator*(const GSpline &_that, double _a);
-GSpline operator*(GSpline &&_that, double _a);
-GSpline operator-(const GSpline &_that);
-GSpline operator-(GSpline &&_that);
+GSpline operator*(double _a, GSpline &&_that) {
+  _that.coefficients_ *= _a;
+  return std::move(_that);
+}
+GSpline operator*(const GSpline &_that, double _a) { return _a * _that; }
+GSpline operator*(GSpline &&_that, double _a) { return _a * std::move(_that); }
+GSpline operator-(const GSpline &_that) {
+
+  GSpline result(_that);
+  result.coefficients_ *= -1.0;
+  return result;
+}
+GSpline operator-(GSpline &&_that) {
+
+  _that.coefficients_ *= -1.0;
+  return std::move(_that);
+}
 } // namespace gsplines

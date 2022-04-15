@@ -14,6 +14,18 @@ class GaussLobattoLagrangeSpline
     : public GSplineInheritanceHelper<GaussLobattoLagrangeSpline> {
 
   friend GSpline;
+  friend GaussLobattoLagrangeSpline
+  operator*(double _a, const GaussLobattoLagrangeSpline &_that);
+  friend GaussLobattoLagrangeSpline
+  operator*(double _a, GaussLobattoLagrangeSpline &&_that);
+  friend GaussLobattoLagrangeSpline
+  operator*(const GaussLobattoLagrangeSpline &_that, double _a);
+  friend GaussLobattoLagrangeSpline
+  operator*(GaussLobattoLagrangeSpline &&_that, double _a);
+  friend GaussLobattoLagrangeSpline
+  operator-(const GaussLobattoLagrangeSpline &_that);
+  friend GaussLobattoLagrangeSpline
+  operator-(GaussLobattoLagrangeSpline &&_that);
 
 private:
   Eigen::Map<Eigen::MatrixXd> get_value_block(std::size_t _interval);

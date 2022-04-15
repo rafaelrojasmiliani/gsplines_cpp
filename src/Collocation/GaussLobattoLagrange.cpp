@@ -300,6 +300,36 @@ GaussLobattoLagrangeSpline::operator*(GaussLobattoLagrangeSpline &&_that) && {
 
   return std::move(result);
 }
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     const GaussLobattoLagrangeSpline &_that) {
+  GaussLobattoLagrangeSpline result(_that);
+  result.coefficients_ *= _a;
+  return result;
+}
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     GaussLobattoLagrangeSpline &&_that) {
+  _that.coefficients_ *= _a;
+  return std::move(_that);
+}
+GaussLobattoLagrangeSpline operator*(const GaussLobattoLagrangeSpline &_that,
+                                     double _a) {
+  return _a * _that;
+}
+GaussLobattoLagrangeSpline operator*(GaussLobattoLagrangeSpline &&_that,
+                                     double _a) {
+  return _a * std::move(_that);
+}
+GaussLobattoLagrangeSpline operator-(const GaussLobattoLagrangeSpline &_that) {
+
+  GaussLobattoLagrangeSpline result(_that);
+  result.coefficients_ *= -1.0;
+  return result;
+}
+GaussLobattoLagrangeSpline operator-(GaussLobattoLagrangeSpline &&_that) {
+
+  _that.coefficients_ *= -1.0;
+  return std::move(_that);
+}
 
 } // namespace collocation
 } // namespace gsplines

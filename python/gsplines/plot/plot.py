@@ -1,4 +1,4 @@
-import gsplines
+
 from typing import List
 
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ def fix_to_lines(_ax):
     _ax.set_ylim(1.01*ymin, 1.01*ymax)
 
 
-def plot_derivatives_in_axes(_q: gsplines.functions.FunctionBase,
+def plot_derivatives_in_axes(_q,
                              _axis, _dt: float = 0.01,
                              _up_to_deriv: int = 3, color='blue'):
 
@@ -47,7 +47,7 @@ def plot_derivatives_in_axes(_q: gsplines.functions.FunctionBase,
         cvt.update_data(_q.get_domain_breakpoints(), wp)
 
 
-def plot(_q: gsplines.functions.FunctionBase, _up_to_deriv: int = 3,
+def plot(_q, _up_to_deriv: int = 3,
          _dt: float = 0.01, _wp=None, _title='', _show=True):
 
     fig, axis = plt.subplots(_up_to_deriv+1, _q.get_codom_dim())
