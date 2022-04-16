@@ -100,8 +100,9 @@ make install
 
     5. A **generalized spline** from <img src="https://render.githubusercontent.com/render/math?math=J"> into <img src="https://render.githubusercontent.com/render/math?math=\mathbb{R}^n"> is a curve given by
     <p align="center">
-    <img src="https://render.githubusercontent.com/render/math?math=f=\sum_{i=1}^k \mathbf{y}_k^j B_k \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)">
+    <img src="https://render.githubusercontent.com/render/math?math=f_r= (y_{i}^j)^\top \matbf{B} \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)">
     </p>
+    where <img src="https://render.githubusercontent.com/render/math?math=\mathbf{B}"> is the vector constructed by stacking the basis in a colunm vector
 
 # Motivation
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.

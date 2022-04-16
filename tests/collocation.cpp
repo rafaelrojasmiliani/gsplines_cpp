@@ -192,7 +192,7 @@ TEST(Collocation, IfOpt) {
   ipopt.SetOption("fast_step_computation", "yes");
   ipopt.SetOption("hessian_approximation", "limited-memory");
   ipopt.SetOption("jac_c_constant", "yes");
-  ipopt.SetOption("print_level", 5);
+  ipopt.SetOption("print_level", 0);
 
   // 4. Ask the solver to solve the problem
   ipopt.Solve(nlp);
@@ -210,41 +210,41 @@ collocation::GLLSpline scalar =
             Eigen::MatrixXd::Random(n_inter + 1, 1)),
         nglp, n_inter);
 
+Eigen::VectorXd time_spam =
+    collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
+
 TEST(Collocation, MultiplicationConstConst) {
 
-  Eigen::VectorXd time_spam =
-      collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
-  {
-    collocation::GLLSpline res = vector * scalar;
-    collocation::GLLSpline res1 = scalar * vector;
-    EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
-    EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
-    EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
-                                        scalar(time_spam).col(0).array(),
-                                    res1(time_spam), 1.0e-4))
-        << "Fail value\n"
-        << (vector(time_spam).array().colwise() *
-            scalar(time_spam).col(0).array())
-               .matrix()
-        << "\n---\n"
-        << res1(time_spam);
-  }
-  {
-    collocation::GLLSpline res = vector * (scalar * scalar);
-    collocation::GLLSpline res1 = (vector * scalar) * scalar;
-    EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
-    EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
-    EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
-                                        (scalar(time_spam).col(0).array() *
-                                         scalar(time_spam).col(0).array()),
-                                    res1(time_spam), 1.0e-7))
-        << "Fail Value";
-  }
+  collocation::GLLSpline res = vector * scalar;
+  collocation::GLLSpline res1 = scalar * vector;
+  EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
+                                      scalar(time_spam).col(0).array(),
+                                  res1(time_spam), 1.0e-4))
+      << "Fail value\n"
+      << ((vector(time_spam).array().colwise() *
+           scalar(time_spam).col(0).array())
+              .matrix() -
+          res1(time_spam))
+             .array()
+             .abs()
+             .maxCoeff()
+      << "  -- \n";
 }
 TEST(Collocation, MultiplicationConstNonConst) {
 
-  Eigen::VectorXd time_spam =
-      collocation::legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
+  collocation::GLLSpline res = vector * (scalar * scalar);
+  collocation::GLLSpline res1 = (vector * scalar) * scalar;
+  EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
+  EXPECT_TRUE(tools::approx_equal(
+      vector(time_spam).array().colwise() *
+          (scalar(time_spam).col(0).array() * scalar(time_spam).col(0).array()),
+      res1(time_spam), 1.0e-7))
+      << "Fail Value";
+}
+TEST(Collocation, MultiplicationNonConstNonConst) {
 
   collocation::GLLSpline res1 = ((vector + vector) * scalar) * scalar;
   collocation::GLLSpline res2 = (vector * scalar + vector * scalar) * scalar;

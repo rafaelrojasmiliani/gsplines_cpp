@@ -199,6 +199,7 @@ public:
   }
 
   Current linear_scaling_new_execution_time(double _new_exec_time) const {
+
     if (_new_exec_time < 1.0e-8) {
       throw std::invalid_argument("New time cannot be negative");
     }
@@ -207,7 +208,10 @@ public:
         Base::domain_interval_lengths_ * _new_exec_time /
         Base::get_domain_length();
 
-    return Current(Base::get_domain(), Base::get_codom_dim(),
+    std::pair<double, double> new_domain = Base::get_domain();
+    new_domain.second = new_domain.first + _new_exec_time;
+
+    return Current(new_domain, Base::get_codom_dim(),
                    Base::get_number_of_intervals(), *Base::basis_,
                    Base::coefficients_, new_domain_interva_lengths,
                    Base::get_name());
