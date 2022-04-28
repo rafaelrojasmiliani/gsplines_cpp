@@ -27,8 +27,8 @@ jobs:
           tags: rafa606/cpp-vim-gsplines
           file: docker/vim_cpp_gsplines.dockerfile
           push: true
-        if: |
-          contains(steps.changed-files.outputs.modified_files, 'docker/vim_cpp_gsplines.dockerfile')
+#        if: |
+#          contains(steps.changed-files.outputs.modified_files, 'docker/vim_cpp_gsplines.dockerfile')
 
       - name: build and push vim ros noetic with gsplines
         uses: docker/build-push-action@v2
@@ -36,8 +36,8 @@ jobs:
           tags: rafa606/vim-ros-noetic-gsplines
           file: docker/vim_ros_noetic_gsplines.dockerfile
           push: true
-        if: |
-          contains(steps.changed-files.outputs.modified_files, 'docker/vim_ros_noetic_gsplines.dockerfile')
+#        if: |
+#          contains(steps.changed-files.outputs.modified_files, 'docker/vim_ros_noetic_gsplines.dockerfile')
 #
 #      - name: Git Sumbodule Update ad build
 #        run: |

@@ -160,6 +160,8 @@ public:
 
   const std::string &get_name() const { return name_; };
 
+  const Eigen::VectorXd &get_parameters() const { return parameters_float_; }
+
   virtual Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const = 0;
 
   /*
