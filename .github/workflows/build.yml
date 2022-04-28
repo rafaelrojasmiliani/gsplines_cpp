@@ -12,7 +12,7 @@ jobs:
         - ${{ github.workspace }}:/workdir
     steps:
       - name: checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@main
         with:
           fetch-depth: 2
           submodules: recursive
