@@ -4,12 +4,6 @@ jobs:
   deploy:
     name: build image
     runs-on: ubuntu-latest
-    env:
-      GITHUB_WORKSPACE: /workdir
-    container:
-      image: ros:noetic-robot
-      volumes:
-        - ${{ github.workspace }}:/workdir
     steps:
       - name: checkout code
         uses: actions/checkout@main
