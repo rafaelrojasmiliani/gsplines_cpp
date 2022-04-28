@@ -2,6 +2,8 @@
 #define BASISLAGRANGE_H
 
 #include <gsplines/Basis/Basis.hpp>
+#include <memory>
+#include <vector>
 namespace gsplines {
 
 namespace basis {
@@ -17,6 +19,12 @@ private:
   mutable Eigen::MatrixXd deriv_buff_2_;
 
 public:
+  static std::shared_ptr<BasisLagrange>
+  get(const Eigen::Ref<const Eigen::VectorXd> &_domain_points);
+
+  static std::shared_ptr<BasisLagrange>
+  get(const std::vector<double> &_domain_points);
+
   explicit BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points);
   explicit BasisLagrange(const std::vector<double> &_domain_points);
   BasisLagrange(const BasisLagrange &that);

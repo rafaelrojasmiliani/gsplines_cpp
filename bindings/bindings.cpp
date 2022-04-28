@@ -1,4 +1,5 @@
 
+#include "gsplines/Basis/Basis.hpp"
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
@@ -41,7 +42,11 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       basis_submodule, "BasisLagrange")
       .def(py::init<Eigen::Ref<const Eigen::VectorXd>>());
 
-  basis_submodule.def("string_to_basis", gsplines::basis::string_to_basis);
+  basis_submodule.def(
+      "get_basis", [](const std::string &_basis_name, std::size_t _dim,
+                      const Eigen::Ref<const Eigen::VectorXd> _params) {
+        return gsplines::basis::get_basis(_basis_name, _dim, _params);
+      });
 
   // --------------------
   // Functions Submodule

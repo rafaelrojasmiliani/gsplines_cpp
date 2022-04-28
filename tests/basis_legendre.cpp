@@ -14,7 +14,9 @@ TEST(BasisLegendre, Value) {
     basis::BasisLegendre basis(i);
 
     EXPECT_TRUE(basis::BasisLegendre(i) == basis::BasisLegendre(i));
+    EXPECT_TRUE(basis::BasisLegendre(i) == *basis::BasisLegendre::get(i));
     EXPECT_FALSE(basis::BasisLegendre(i) != basis::BasisLegendre(i));
+    EXPECT_FALSE(basis::BasisLegendre(i) != *basis::BasisLegendre::get(i));
 
     for (int j = 3; j < 17; j++) {
       if (i != j) {

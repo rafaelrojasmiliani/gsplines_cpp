@@ -19,7 +19,7 @@ struct BasisIndexer {
   BasisIndexer(const std::string &_name, const std::vector<int32_t> &_p1,
                const std::vector<double> &_p2)
       : name_(_name), p1_(_p1), p2_(_p2) {}
-  bool operator==(const BasisIndexer &_in) const { return true; }
+  bool operator==(const BasisIndexer & /*_in*/) const { return true; }
 };
 
 namespace std {

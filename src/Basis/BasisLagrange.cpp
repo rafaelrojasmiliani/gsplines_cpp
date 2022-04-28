@@ -2,9 +2,20 @@
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <iostream>
 #include <math.h>
+#include <memory>
 namespace gsplines {
 
 namespace basis {
+
+std::shared_ptr<BasisLagrange>
+BasisLagrange::get(const Eigen::Ref<const Eigen::VectorXd> &_domain_points) {
+  return std::make_shared<BasisLagrange>(_domain_points);
+}
+
+std::shared_ptr<BasisLagrange>
+BasisLagrange::get(const std::vector<double> &_domain_points) {
+  return std::make_shared<BasisLagrange>(_domain_points);
+}
 
 bool almost_equal(double _a, double _b, double _epsilon) {
 
@@ -22,9 +33,7 @@ bool almost_equal(double _a, double _b, double _epsilon) {
 void gsplines_lagrange_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 
 BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
-    : Basis(_domain_points.size(),
-            "lagrange_" + std::to_string(_domain_points.size()),
-            _domain_points),
+    : Basis(_domain_points.size(), "lagrange", _domain_points),
       domain_points_(_domain_points),
       barycentric_weights_(barycentric_weights(domain_points_)),
       deriv_buff_1_(derivative_matrix(domain_points_)),

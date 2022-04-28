@@ -5,18 +5,30 @@
 #include <gsplines/Tools.hpp>
 #include <iostream>
 #include <math.h>
+#include <memory>
+#include <stdexcept>
 namespace gsplines {
 
 namespace basis {
 
-std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name) {
-  std::string::size_type pos = _basis_name.find("_");
-  if (_basis_name.find("legendre") != std::string::npos)
-    return std::make_unique<BasisLegendre>(
-        std::stoul(_basis_name.substr(pos + 1)));
+std::shared_ptr<Basis> get_basis(const std::string &_basis_name,
+                                 std::size_t _dim,
+                                 const std::vector<double> &_params) {
+  return get_basis(
+      _basis_name, _dim,
+      Eigen::Map<const Eigen::VectorXd>(_params.data(), _params.size()));
+}
 
-  throw std::invalid_argument("The basis" + _basis_name + " is unknwon");
-  return nullptr;
+std::shared_ptr<Basis>
+get_basis(const std::string &_basis_name, std::size_t _dim,
+          const Eigen::Ref<const Eigen::VectorXd> _params) {
+  if (_basis_name == "lagrange") {
+    return BasisLagrange::get(_params);
+  } else if (_basis_name == "legendre") {
+    return BasisLegendre::get(_dim);
+  }
+  throw std::invalid_argument("basis name does not exists");
+  return std::make_shared<BasisLagrange>(_params);
 }
 
 const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(

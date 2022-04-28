@@ -182,7 +182,13 @@ public:
   bool operator!=(const Basis &_that) const { return not(*this == _that); }
 };
 
-std::unique_ptr<Basis> string_to_basis(const std::string &_basis_name);
+std::shared_ptr<Basis> get_basis(const std::string &_basis_name,
+                                 std::size_t _dim,
+                                 const std::vector<double> &_params);
+
+std::shared_ptr<Basis>
+get_basis(const std::string &_basis_name, std::size_t _dim,
+          const Eigen::Ref<const Eigen::VectorXd> _params);
 } // namespace basis
 } // namespace gsplines
 

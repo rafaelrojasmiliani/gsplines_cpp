@@ -1,14 +1,19 @@
 #include <gsplines/Basis/BasisLegendre.hpp>
 #include <iostream>
 #include <math.h>
+#include <memory>
 namespace gsplines {
 
 namespace basis {
 
+std::shared_ptr<BasisLegendre> BasisLegendre::get(std::size_t _dim) {
+  return std::make_shared<BasisLegendre>(_dim);
+}
+
 void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
 
 BasisLegendre::BasisLegendre(std::size_t _dim)
-    : Basis(_dim, "legendre_" + std::to_string(_dim)), buff_next(get_dim()) {
+    : Basis(_dim, "legendre"), buff_next(get_dim()) {
   gsplines_legendre_dmat(_dim, derivative_matrix_);
 
   derivative_matrix_.transposeInPlace();

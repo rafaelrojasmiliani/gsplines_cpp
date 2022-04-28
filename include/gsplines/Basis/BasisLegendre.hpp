@@ -2,6 +2,7 @@
 #define BASISLEGENDRE_H
 
 #include <gsplines/Basis/Basis.hpp>
+#include <memory>
 namespace gsplines {
 
 namespace basis {
@@ -10,10 +11,11 @@ class BasisLegendre : public Basis {
 
 private:
   BasisLegendre &operator=(const BasisLegendre &) = delete;
-  std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
   mutable Eigen::VectorXd buff_next;
+  std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
 
 public:
+  static std::shared_ptr<BasisLegendre> get(std::size_t _dim);
   BasisLegendre(std::size_t _dim);
   BasisLegendre(const BasisLegendre &that);
   BasisLegendre(BasisLegendre &&that);
