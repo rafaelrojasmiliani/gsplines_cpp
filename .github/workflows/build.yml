@@ -11,28 +11,56 @@ jobs:
       volumes:
         - ${{ github.workspace }}:/workdir
     steps:
-#      - name: checkout code
-#        uses: actions/checkout@master
-#        with:
-#          fetch-depth: 2
-#          submodules: recursive
-
-      - name: Git Sumbodule Update ad build
-        run: |
-          apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
-          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
-          cd gsplines_cpp
-          mkdir build
-          cd build
-          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: checkout code
+        uses: actions/checkout@master
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
-          asset_name: gsplines-0.0.1-amd64.deb
-          tag: package
-          overwrite: true
-          body: "Debian pack"
+          fetch-depth: 2
+          submodules: recursive
+
+      - name: Get changed files using defaults
+        id: changed-files
+        uses: tj-actions/changed-files@v17.2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: build and push vim cpp with gsplines
+        uses: docker/build-push-action@v2
+        with:
+          tags: rafa606/cpp-vim-gsplines
+          file: docker/vim_cpp_gsplines.dockerfile
+          push: true
+        if: |
+          contains(steps.changed-files.outputs.modified_files, 'docker/vim_cpp_gsplines.dockerfile')
+
+      - name: build and push vim ros noetic with gsplines
+        uses: docker/build-push-action@v2
+        with:
+          tags: rafa606/vim-ros-noetic-gsplines
+          file: docker/vim_ros_noetic_gsplines.dockerfile
+          push: true
+        if: |
+          contains(steps.changed-files.outputs.modified_files, 'docker/vim_ros_noetic_gsplines.dockerfile')
+#
+#      - name: Git Sumbodule Update ad build
+#        run: |
+#          apt-get update
+#          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
+#          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+#          cd gsplines_cpp
+#          mkdir build
+#          cd build
+#          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
+#
+#      - name: Upload binaries to release
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
+#          asset_name: gsplines-0.0.1-amd64.deb
+#          tag: package
+#          overwrite: true
+#          body: "Debian pack"
