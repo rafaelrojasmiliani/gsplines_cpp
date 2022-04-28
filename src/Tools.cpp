@@ -37,7 +37,11 @@ bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,
 
 bool approx_equal(const GSplineBase &_lhs, const GSplineBase &_rhs,
                   double _tol) {
-  return approx_equal(_lhs.get_coefficients(), _rhs.get_coefficients(), _tol);
+  return approx_equal(_lhs.get_coefficients(), _rhs.get_coefficients(),
+                      _tol) and
+         approx_equal(_lhs.get_interval_lengths(), _rhs.get_interval_lengths(),
+                      _tol) and
+         _lhs.get_basis() == _rhs.get_basis();
 }
 
 bool approx_zero(double _rhs, double _tol) {
