@@ -75,6 +75,10 @@ public:
 
   bool same_vector_space(const GSplineBase &_that) const;
 
+  bool operator==(const GSplineBase &_that) const;
+
+  bool operator!=(const GSplineBase &_that) const;
+
 protected:
   GSplineBase *deriv_impl(std::size_t) const override {
     throw std::runtime_error("Base class cannot be used");

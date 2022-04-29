@@ -156,6 +156,13 @@ double GSplineBase::interval_to_window(double _domain_point,
          1.0;
 }
 
+bool GSplineBase::operator==(const GSplineBase &_that) const {
+  return tools::approx_equal(*this, _that, 1.0e-7);
+}
+bool GSplineBase::operator!=(const GSplineBase &_that) const {
+  return not(*this == _that);
+}
+
 const Eigen::Ref<const Eigen::VectorXd>
 get_coefficient_segment(const Eigen::Ref<const Eigen::VectorXd> _coefficients,
                         basis::Basis &_basis, std::size_t /*_num_interval*/,
