@@ -39,6 +39,12 @@ jobs:
 #        if: |
 #          contains(steps.changed-files.outputs.modified_files, 'docker/vim_ros_noetic_gsplines.dockerfile')
 #
+      - name: build and push vim ros melodic with gsplines
+        uses: docker/build-push-action@v2
+        with:
+          tags: rafa606/vim-ros-melodic-gsplines
+          file: docker/vim_ros_melodic_gsplines.dockerfile
+          push: true
 #      - name: Git Sumbodule Update ad build
 #        run: |
 #          apt-get update
