@@ -43,7 +43,9 @@ class MyTest(unittest.TestCase):
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
 
-        gsplines.plot(res)
+        # Test that we can get the basis
+        b = res.get_basis()
+
 
 #    #@debug_on()
 #    def interpolation_test_computation_time(self):
@@ -66,6 +68,8 @@ class MyTest(unittest.TestCase):
 #        print('mean time = ', tmean/iters)
 
     # @debug_on()
+
+
     def derivative_y(self):
         ''' Compare the numerical derivate of y w.r.t tau with the nominal one
         '''
