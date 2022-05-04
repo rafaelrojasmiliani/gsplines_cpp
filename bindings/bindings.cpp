@@ -28,6 +28,7 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def(py::init<std::size_t, const std::string &>())
       .def("get_dim", &gsplines::basis::Basis::get_dim)
       .def("get_name", &gsplines::basis::Basis::get_name)
+      .def("get_parameters", &gsplines::basis::Basis::get_parameters)
       .def("eval_on_window", &gsplines::basis::Basis::eval_on_window)
       .def("eval_derivative_on_window",
            &gsplines::basis::Basis::eval_derivative_on_window)

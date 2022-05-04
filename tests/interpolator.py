@@ -44,7 +44,7 @@ class MyTest(unittest.TestCase):
         res = inter.interpolate(interval_lengths, waypoints)
 
         # Test that we can get the basis
-        b = res.get_basis()
+        self.assertTrue(res.get_basis() == basis)
 
 
 #    #@debug_on()
