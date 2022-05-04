@@ -32,7 +32,9 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("eval_derivative_on_window",
            &gsplines::basis::Basis::eval_derivative_on_window)
       .def("eval_derivative_wrt_tau_on_window",
-           &gsplines::basis::Basis::eval_derivative_wrt_tau_on_window);
+           &gsplines::basis::Basis::eval_derivative_wrt_tau_on_window)
+      .def("__eq__", &gsplines::basis::Basis::operator==)
+      .def("__neq__", &gsplines::basis::Basis::operator!=);
 
   py::class_<gsplines::basis::BasisLegendre, gsplines::basis::Basis>(
       basis_submodule, "BasisLegendre")
@@ -326,7 +328,9 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("deriv", &gsplines::GSpline::derivate, py::arg("_deg") = 1)
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time)
-      .def("get_coefficients", &gsplines::GSpline::get_coefficients);
+      .def("get_coefficients", &gsplines::GSpline::get_coefficients)
+      .def("__eq__", &gsplines::GSpline::operator==)
+      .def("__nq__", &gsplines::GSpline::operator!=);
 
   // ------------------------------
   // Functional Analysis submodule
