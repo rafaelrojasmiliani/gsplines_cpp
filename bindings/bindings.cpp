@@ -339,6 +339,10 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
 
   py::class_<gsplines::GSpline, gsplines::GSplineBase>(gsplines_module,
                                                        "GSpline")
+      .def(py::init<
+           std::pair<double, double>, std::size_t, std::size_t,
+           gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,
+           const Eigen::Ref<const Eigen::VectorXd>, const std::string &>())
       .def("deriv", &gsplines::GSpline::derivate, py::arg("_deg") = 1)
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time);
