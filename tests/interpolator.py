@@ -43,9 +43,11 @@ class MyTest(unittest.TestCase):
         basis = BasisLagrange(nodes)
         inter = Interpolator(dim, intervals, basis)
         res = inter.interpolate(interval_lengths, waypoints)
+        res1 = inter.interpolate(interval_lengths, waypoints)
 
         # Test that we can get the basis
         self.assertTrue(res.get_basis() == basis)
+        self.assertTrue(res1 == res)
 
         b = get_basis("legendre", 8, [])
 

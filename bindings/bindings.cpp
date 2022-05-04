@@ -79,6 +79,25 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0);
 
+  py::class_<gsplines::GSplineBase, gsplines::functions::PyGSplineBase>(
+      gsplines_module, "GSplineBase")
+      .def(py::init<
+           std::pair<double, double>, std::size_t, std::size_t,
+           gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,
+           const Eigen::Ref<const Eigen::VectorXd>, const std::string &>())
+      .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
+      .def("get_coefficients", &gsplines::GSpline::get_coefficients)
+      .def("get_number_of_intervals",
+           &gsplines::GSpline::get_number_of_intervals)
+      .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
+      .def("get_waypoints", &gsplines::GSpline::get_waypoints)
+      .def("__eq__", &gsplines::GSpline::operator==)
+      .def("__nq__", &gsplines::GSpline::operator!=)
+      .def("get_basis_name", &gsplines::GSpline::get_basis_name)
+      .def("get_basis", [](const gsplines::GSpline &_self) {
+        return _self.get_basis().clone();
+      });
+
   py::class_<gsplines::functions::FunctionExpression,
              gsplines::functions::FunctionBase>(functions_submodule,
                                                 "FunctionExpression")
@@ -318,28 +337,11 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("print_interpolating_vector",
            &gsplines::PyInterpolator::print_interpolating_vector);
 
-  py::class_<gsplines::GSpline, gsplines::functions::Function>(gsplines_module,
-                                                               "GSpline")
-      .def(py::init<
-           std::pair<double, double>, std::size_t, std::size_t,
-           gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,
-           const Eigen::Ref<const Eigen::VectorXd>, const std::string &>())
-      .def("get_domain_breakpoints", &gsplines::GSpline::get_domain_breakpoints)
-      .def("get_number_of_intervals",
-           &gsplines::GSpline::get_number_of_intervals)
-      .def("get_interval_lengths", &gsplines::GSpline::get_interval_lengths)
-      .def("get_waypoints", &gsplines::GSpline::get_waypoints)
-      .def("get_basis_name", &gsplines::GSpline::get_basis_name)
-      .def("get_basis",
-           [](const gsplines::GSpline &_self) {
-             return _self.get_basis().clone();
-           })
+  py::class_<gsplines::GSpline, gsplines::GSplineBase>(gsplines_module,
+                                                       "GSpline")
       .def("deriv", &gsplines::GSpline::derivate, py::arg("_deg") = 1)
       .def("linear_scaling_new_execution_time",
-           &gsplines::GSpline::linear_scaling_new_execution_time)
-      .def("get_coefficients", &gsplines::GSpline::get_coefficients)
-      .def("__eq__", &gsplines::GSpline::operator==)
-      .def("__nq__", &gsplines::GSpline::operator!=);
+           &gsplines::GSpline::linear_scaling_new_execution_time);
 
   // ------------------------------
   // Functional Analysis submodule

@@ -69,6 +69,22 @@ public:
 private:
 };
 
+class PyGSplineBase : public GSplineBase {
+public:
+  using GSplineBase::GSplineBase;
+  void value_impl(const Eigen::Ref<const Eigen::VectorXd> _domain_points,
+                  Eigen::Ref<Eigen::MatrixXd> _result) const override {
+
+    PYBIND11_OVERRIDE_PURE(void, GSplineBase, value_impl, _domain_points,
+                           _result);
+  }
+
+  GSplineBase *deriv_impl(std::size_t _deg) const override {
+
+    PYBIND11_OVERRIDE_PURE(GSplineBase *, GSplineBase, deriv_impl);
+  };
+};
+
 } // namespace functions
 } // namespace gsplines
 #endif /* ifndef PYFUNCTIOND */
