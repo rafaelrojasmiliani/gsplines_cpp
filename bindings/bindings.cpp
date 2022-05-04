@@ -38,11 +38,15 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
 
   py::class_<gsplines::basis::BasisLegendre, gsplines::basis::Basis>(
       basis_submodule, "BasisLegendre")
-      .def(py::init<std::size_t>());
+      .def(py::init<std::size_t>())
+      .def_static("get", &gsplines::basis::BasisLegendre::get);
 
   py::class_<gsplines::basis::BasisLagrange, gsplines::basis::Basis>(
       basis_submodule, "BasisLagrange")
-      .def(py::init<Eigen::Ref<const Eigen::VectorXd>>());
+      .def(py::init<Eigen::Ref<const Eigen::VectorXd>>())
+      .def_static("get", [](const Eigen::Ref<const Eigen::VectorXd> _params) {
+        return gsplines::basis::BasisLagrange::get(_params);
+      });
 
   basis_submodule.def(
       "get_basis", [](const std::string &_basis_name, std::size_t _dim,
