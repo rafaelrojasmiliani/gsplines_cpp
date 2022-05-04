@@ -79,8 +79,8 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0);
 
-  py::class_<gsplines::GSplineBase, gsplines::functions::PyGSplineBase>(
-      gsplines_module, "GSplineBase")
+  py::class_<gsplines::GSplineBase, gsplines::functions::PyGSplineBase,
+             gsplines::functions::FunctionBase>(gsplines_module, "GSplineBase")
       .def(py::init<
            std::pair<double, double>, std::size_t, std::size_t,
            gsplines::basis::Basis &, const Eigen::Ref<const Eigen::VectorXd>,

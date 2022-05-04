@@ -49,6 +49,10 @@ class MyTest(unittest.TestCase):
         self.assertTrue(res.get_basis() == basis)
         self.assertTrue(res1 == res)
 
+        print(res.get_codom_dim())
+        print(res.get_domain())
+        print(res.get_waypoints())
+
         b = get_basis("legendre", 8, [])
 
 
