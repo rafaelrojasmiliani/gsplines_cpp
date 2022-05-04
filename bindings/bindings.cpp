@@ -52,7 +52,8 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
   basis_submodule.def(
       "get_basis", [](const std::string &_basis_name, std::size_t _dim,
                       const Eigen::Ref<const Eigen::VectorXd> _params) {
-        return gsplines::basis::get_basis(_basis_name, _dim, _params);
+        auto basis = gsplines::basis::get_basis(_basis_name, _dim, _params);
+        return basis->clone();
       });
 
   // --------------------

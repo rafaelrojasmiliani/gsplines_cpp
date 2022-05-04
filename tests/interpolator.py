@@ -10,6 +10,7 @@ import pathlib
 import gsplines
 from gsplines.basis import BasisLegendre
 from gsplines.basis import BasisLagrange
+from gsplines.basis import get_basis
 from gsplines import Interpolator
 
 
@@ -46,6 +47,8 @@ class MyTest(unittest.TestCase):
         # Test that we can get the basis
         self.assertTrue(res.get_basis() == basis)
 
+        b = get_basis("legendre", 8, [])
+
 
 #    #@debug_on()
 #    def interpolation_test_computation_time(self):
@@ -68,7 +71,6 @@ class MyTest(unittest.TestCase):
 #        print('mean time = ', tmean/iters)
 
     # @debug_on()
-
 
     def derivative_y(self):
         ''' Compare the numerical derivate of y w.r.t tau with the nominal one
