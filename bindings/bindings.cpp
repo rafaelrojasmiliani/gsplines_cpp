@@ -347,6 +347,10 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time);
 
+  gsplines_module.def("interpolate", &gsplines::interpolate);
+
+  gsplines_module.def("pw_polynomial_interpolation",
+                      &gsplines::pw_polynomial_interpolation);
   // ------------------------------
   // Functional Analysis submodule
   // ------------------------------

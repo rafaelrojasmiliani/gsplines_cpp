@@ -68,5 +68,9 @@ public:
 GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
                     const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
                     const basis::Basis &_basis);
+
+GSpline pw_polynomial_interpolation(
+    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+    const Eigen::Ref<const Eigen::MatrixXd> _waypoints, std::size_t _nc);
 } // namespace gsplines
 #endif /* INTERPOLATOR_H */

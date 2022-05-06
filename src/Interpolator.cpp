@@ -1,4 +1,5 @@
 #include <eigen3/Eigen/SparseLU>
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -373,5 +374,12 @@ GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
                     const basis::Basis &_basis) {
   return Interpolator(_waypoints.cols(), _waypoints.rows() - 1, _basis)
       .interpolate(_interval_lengths, _waypoints);
+}
+
+GSpline pw_polynomial_interpolation(
+    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
+    const Eigen::Ref<const Eigen::MatrixXd> _waypoints, std::size_t _nc) {
+  return interpolate(_interval_lengths, _waypoints,
+                     *basis::BasisLegendre::get(_nc));
 }
 } // namespace gsplines
