@@ -4,6 +4,17 @@ jobs:
   deploy:
     name: build image
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker_image:
+          - file_name: "docker/noetic.dockerfile"
+            image_name: "rafa606/vim-ros-noetic-gsplines"
+          - file_name: "docker/melodic.dockerfile"
+            image_name: "rafa606/vim-ros-melodic-gsplines"
+          - file_name: "docker/galactic.dockerfile"
+            image_name: "rafa606/vim-ros-galactic-gsplines"
+          - file_name: "docker/cpp.dockerfile"
+            image_name: "rafa606/cpp-vim-gsplines"
     steps:
       - name: checkout code
         uses: actions/checkout@main
@@ -24,43 +35,6 @@ jobs:
       - name: build and push vim cpp with gsplines
         uses: docker/build-push-action@v2
         with:
-          tags: rafa606/cpp-vim-gsplines
-          file: docker/vim_cpp_gsplines.dockerfile
+          tags: ${{ matrix.docker_image.image_name }}
+          file: ${{ matrix.docker_image.file_name }}
           push: true
-#        if: |
-#          contains(steps.changed-files.outputs.modified_files, 'docker/vim_cpp_gsplines.dockerfile')
-
-      - name: build and push vim ros noetic with gsplines
-        uses: docker/build-push-action@v2
-        with:
-          tags: rafa606/vim-ros-noetic-gsplines
-          file: docker/vim_ros_noetic_gsplines.dockerfile
-          push: true
-#        if: |
-#          contains(steps.changed-files.outputs.modified_files, 'docker/vim_ros_noetic_gsplines.dockerfile')
-#
-      - name: build and push vim ros melodic with gsplines
-        uses: docker/build-push-action@v2
-        with:
-          tags: rafa606/vim-ros-melodic-gsplines
-          file: docker/vim_ros_melodic_gsplines.dockerfile
-          push: true
-#      - name: Git Sumbodule Update ad build
-#        run: |
-#          apt-get update
-#          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
-#          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
-#          cd gsplines_cpp
-#          mkdir build
-#          cd build
-#          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
-#
-#      - name: Upload binaries to release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
-#          asset_name: gsplines-0.0.1-amd64.deb
-#          tag: package
-#          overwrite: true
-#          body: "Debian pack"
