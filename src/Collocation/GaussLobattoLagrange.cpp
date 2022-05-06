@@ -14,8 +14,7 @@ namespace collocation {
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     std::pair<double, double> _domain, std::size_t _codom_dim,
     std::size_t _n_intervals, std::size_t _n_glp,
-    const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-    const Eigen::Ref<const Eigen::VectorXd> _tauv)
+    const Eigen::VectorXd &_coefficents, const Eigen::VectorXd &_tauv)
     : GSplineInheritanceHelper(
           _domain, _codom_dim, _n_intervals,
           ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp), _coefficents,
@@ -29,6 +28,14 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
           _domain, _codom_dim, _n_intervals,
           ::gsplines::basis::BasisLagrangeGaussLobatto(_n_glp),
           std::move(_coefficents), std::move(_tauv)) {}
+
+GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
+    std::pair<double, double> _domain, std::size_t _codom_dim,
+    std::size_t _n_intervals, std::size_t _n_glp)
+    : GaussLobattoLagrangeSpline(
+          _domain, _codom_dim, _n_intervals, _n_glp,
+          std::move(Eigen::VectorXd::Zero(_n_intervals * _n_glp * _codom_dim)),
+          std::move(Eigen::VectorXd::Zero(_n_intervals))) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     const GaussLobattoLagrangeSpline &_that)

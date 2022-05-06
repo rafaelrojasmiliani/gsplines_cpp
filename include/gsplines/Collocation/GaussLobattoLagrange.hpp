@@ -35,11 +35,11 @@ private:
 public:
   using GSplineInheritanceHelper<
       GaussLobattoLagrangeSpline>::GSplineInheritanceHelper;
-  GaussLobattoLagrangeSpline(
-      std::pair<double, double> _domain, std::size_t _codom_dim,
-      std::size_t _n_intervals, std::size_t _n_glp,
-      const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-      const Eigen::Ref<const Eigen::VectorXd> _tauv);
+  GaussLobattoLagrangeSpline(std::pair<double, double> _domain,
+                             std::size_t _codom_dim, std::size_t _n_intervals,
+                             std::size_t _n_glp,
+                             const Eigen::VectorXd &_coefficents,
+                             const Eigen::VectorXd &_tauv);
 
   // create moving data
   GaussLobattoLagrangeSpline(std::pair<double, double> _domain,
