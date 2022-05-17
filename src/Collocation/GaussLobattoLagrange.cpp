@@ -56,10 +56,10 @@ GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
 
   if (not same_discretization(_that))
     throw std::invalid_argument("Discretization must be the same");
-  if (not same_domain(_that))
-    throw std::invalid_argument("GSplines must have same domain");
   if (not(same_codomain(_that)))
     throw std::invalid_argument("Assigmention requires same codomain");
+
+  set_domain(_that.get_domain());
 
   coefficients_ = _that.coefficients_;
   return *this;
@@ -71,11 +71,10 @@ GaussLobattoLagrangeSpline::operator=(GaussLobattoLagrangeSpline &&_that) & {
   }
   if (not same_discretization(_that))
     throw std::invalid_argument("Discretization must be the same");
-  if (not same_domain(_that))
-    throw std::invalid_argument("GSplines must have same domain");
   if (not(same_codomain(_that)))
     throw std::invalid_argument("Assigmention requires same codomain");
 
+  set_domain(_that.get_domain());
   coefficients_ = std::move(_that.coefficients_);
   return *this;
 }
@@ -172,8 +171,6 @@ bool GaussLobattoLagrangeSpline::same_discretization(
 GaussLobattoLagrangeSpline GaussLobattoLagrangeSpline::operator*(
     const GaussLobattoLagrangeSpline &_that) const & {
 
-  std::cout << "----------------------\n";
-  fflush(stdout);
   if (not same_discretization(_that))
     throw std::invalid_argument("Discretization must be the same");
   if (not same_domain(_that))

@@ -126,6 +126,9 @@ protected:
     domain_.first = _t0;
     domain_.second = _t1;
   }
+  void set_domain(const std::pair<double, double> &_new_domain) {
+    domain_ = _new_domain;
+  }
 
   virtual FunctionBase *clone_impl() const = 0;
 
