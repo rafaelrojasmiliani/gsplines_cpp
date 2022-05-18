@@ -79,6 +79,7 @@ GaussLobattoLagrangeSpline::operator=(GaussLobattoLagrangeSpline &&_that) & {
   coefficients_ = std::move(_that.coefficients_);
   return *this;
 }
+
 GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
     const ::gsplines::functions::FunctionBase &_that) & {
   if (this == &_that) {
@@ -368,5 +369,157 @@ GaussLobattoLagrangeSpline operator-(GaussLobattoLagrangeSpline &&_that) {
   return std::move(_that);
 }
 
+GaussLobattoLagrangeSpline norm(const GaussLobattoLagrangeSpline &_that) {
+
+  Eigen::VectorXd coefficients(_that.get_nglp() *
+                               _that.get_number_of_intervals());
+  Eigen::VectorXd interval_length(_that.get_interval_lengths());
+
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    Eigen::Map<const Eigen::MatrixXd> matrix = _that.get_value_block(i);
+    coefficients.segment(i * _that.get_nglp(), _that.get_nglp()) =
+        matrix.rowwise().norm();
+  }
+
+  return GaussLobattoLagrangeSpline(
+      _that.get_domain(), 1, _that.get_number_of_intervals(), _that.get_nglp(),
+      std::move(coefficients), std::move(interval_length));
+}
+/*
+GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that) {
+
+  Eigen::VectorXd coefficients();
+  Eigen::VectorXd interval_length(_that.get_interval_lengths());
+
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    Eigen::Map<const Eigen::MatrixXd> matrix = _that.get_value_block(i);
+    coefficients.segment(i * _that.get_nglp(), _that.get_nglp()) =
+        matrix.rowwise().norm();
+  }
+
+  return GaussLobattoLagrangeSpline(
+      _that.get_domain(), 1, _that.get_number_of_intervals(), _that.get_nglp(),
+      std::move(coefficients), std::move(interval_length));
+}
+*/
+
+GaussLobattoLagrangeSpline operator+(const Eigen::VectorXd &_lhs,
+                                     const GaussLobattoLagrangeSpline &_that) {
+
+  if (_lhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+
+  GaussLobattoLagrangeSpline result(_that);
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    result.get_value_block(i).rowwise() += _lhs.transpose();
+  }
+  return result;
+}
+GaussLobattoLagrangeSpline operator+(const Eigen::VectorXd &_lhs,
+                                     GaussLobattoLagrangeSpline &&_that) {
+
+  if (_lhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    _that.get_value_block(i).rowwise() += _lhs.transpose();
+  }
+  return std::move(_that);
+}
+GaussLobattoLagrangeSpline operator+(const GaussLobattoLagrangeSpline &_that,
+                                     const Eigen::VectorXd &_rhs) {
+  return _rhs + _that;
+}
+GaussLobattoLagrangeSpline operator+(GaussLobattoLagrangeSpline &&_that,
+                                     const Eigen::VectorXd &_rhs) {
+
+  return _rhs + std::move(_that);
+}
+
+GaussLobattoLagrangeSpline operator-(const Eigen::VectorXd &_lhs,
+                                     const GaussLobattoLagrangeSpline &_that) {
+  if (_lhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+
+  GaussLobattoLagrangeSpline result(_that);
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    result.get_value_block(i) = -result.get_value_block(i);
+    result.get_value_block(i).rowwise() += _lhs.transpose();
+
+    _lhs.transpose();
+  }
+  return result;
+}
+GaussLobattoLagrangeSpline operator-(const Eigen::VectorXd &_lhs,
+                                     GaussLobattoLagrangeSpline &&_that) {
+
+  if (_lhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    _that.get_value_block(i) = -_that.get_value_block(i);
+    _that.get_value_block(i).rowwise() += _lhs.transpose();
+  }
+  return std::move(_that);
+}
+GaussLobattoLagrangeSpline operator-(const GaussLobattoLagrangeSpline &_that,
+                                     const Eigen::VectorXd &_rhs) {
+
+  if (_rhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+  GaussLobattoLagrangeSpline result(_that);
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    result.get_value_block(i).rowwise() -= _rhs.transpose();
+  }
+  return result;
+}
+GaussLobattoLagrangeSpline operator-(GaussLobattoLagrangeSpline &&_that,
+                                     const Eigen::VectorXd &_rhs) {
+
+  if (_rhs.size() != (long)_that.get_codom_dim()) {
+    throw std::invalid_argument("cannot sum a vector with different dimension");
+  }
+
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    _that.get_value_block(i).rowwise() -= _rhs.transpose();
+  }
+  return std::move(_that);
+}
+
+GaussLobattoLagrangeSpline operator/(double _a,
+                                     const GaussLobattoLagrangeSpline &_that) {
+  if (_that.get_codom_dim() != 1) {
+    throw std::invalid_argument("cannot divide by a vector");
+  }
+  GaussLobattoLagrangeSpline result(_that);
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    result.get_value_block(i).array() = _a / result.get_value_block(i).array();
+  }
+  return result;
+}
+GaussLobattoLagrangeSpline operator/(double _a,
+                                     GaussLobattoLagrangeSpline &&_that) {
+
+  if (_that.get_codom_dim() != 1) {
+    throw std::invalid_argument("cannot divide by a vector");
+  }
+  for (std::size_t i = 0; i < _that.get_number_of_intervals(); i++) {
+
+    _that.get_value_block(i).array() = _a / _that.get_value_block(i).array();
+  }
+  return std::move(_that);
+}
 } // namespace collocation
 } // namespace gsplines

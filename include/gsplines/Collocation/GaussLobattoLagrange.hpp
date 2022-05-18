@@ -14,6 +14,12 @@ class GaussLobattoLagrangeSpline
     : public GSplineInheritanceHelper<GaussLobattoLagrangeSpline> {
 
   friend GSpline;
+
+  friend GaussLobattoLagrangeSpline
+  norm(const GaussLobattoLagrangeSpline &_that);
+
+  friend GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that);
+
   friend GaussLobattoLagrangeSpline
   operator*(double _a, const GaussLobattoLagrangeSpline &_that);
   friend GaussLobattoLagrangeSpline
@@ -22,6 +28,34 @@ class GaussLobattoLagrangeSpline
   operator*(const GaussLobattoLagrangeSpline &_that, double _a);
   friend GaussLobattoLagrangeSpline
   operator*(GaussLobattoLagrangeSpline &&_that, double _a);
+
+  friend GaussLobattoLagrangeSpline
+  operator/(double _a, const GaussLobattoLagrangeSpline &_that);
+  friend GaussLobattoLagrangeSpline
+  operator/(double _a, GaussLobattoLagrangeSpline &&_that);
+
+  friend GaussLobattoLagrangeSpline
+  operator+(const Eigen::VectorXd &_lhs,
+            const GaussLobattoLagrangeSpline &_that);
+  friend GaussLobattoLagrangeSpline
+  operator+(const Eigen::VectorXd &_lhs, GaussLobattoLagrangeSpline &&_that);
+  friend GaussLobattoLagrangeSpline
+  operator+(const GaussLobattoLagrangeSpline &_that,
+            const Eigen::VectorXd &_rhs);
+  friend GaussLobattoLagrangeSpline
+  operator+(GaussLobattoLagrangeSpline &&_that, const Eigen::VectorXd &_rhs);
+
+  friend GaussLobattoLagrangeSpline
+  operator-(const Eigen::VectorXd &_lhs,
+            const GaussLobattoLagrangeSpline &_that);
+  friend GaussLobattoLagrangeSpline
+  operator-(const Eigen::VectorXd &_lhs, GaussLobattoLagrangeSpline &&_that);
+  friend GaussLobattoLagrangeSpline
+  operator-(const GaussLobattoLagrangeSpline &_that,
+            const Eigen::VectorXd &_rhs);
+  friend GaussLobattoLagrangeSpline
+  operator-(GaussLobattoLagrangeSpline &&_that, const Eigen::VectorXd &_rhs);
+
   friend GaussLobattoLagrangeSpline
   operator-(const GaussLobattoLagrangeSpline &_that);
   friend GaussLobattoLagrangeSpline
@@ -86,13 +120,52 @@ public:
   operator=(const ::gsplines::functions::FunctionBase &_that) &;
   GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
 
-  GaussLobattoLagrangeSpline &norm(const GaussLobattoLagrangeSpline &_that) &;
-
   bool same_discretization(const GaussLobattoLagrangeSpline &_that) const;
 };
 
+GaussLobattoLagrangeSpline norm(const GaussLobattoLagrangeSpline &_that);
+/*
+GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that);
+*/
 double integral(::gsplines::functions::FunctionBase &_diffeo,
                 ::gsplines::functions::FunctionBase &_path);
+
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     GaussLobattoLagrangeSpline &&_that);
+GaussLobattoLagrangeSpline operator*(const GaussLobattoLagrangeSpline &_that,
+                                     double _a);
+GaussLobattoLagrangeSpline operator*(GaussLobattoLagrangeSpline &&_that,
+                                     double _a);
+
+GaussLobattoLagrangeSpline operator+(const Eigen::VectorXd &_lhs,
+                                     const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline operator+(const Eigen::VectorXd &_lhs,
+                                     GaussLobattoLagrangeSpline &&_that);
+GaussLobattoLagrangeSpline operator+(const GaussLobattoLagrangeSpline &_that,
+                                     const Eigen::VectorXd &_rhs);
+GaussLobattoLagrangeSpline operator+(GaussLobattoLagrangeSpline &&_that,
+                                     const Eigen::VectorXd &_rhs);
+
+GaussLobattoLagrangeSpline operator-(const Eigen::VectorXd &_lhs,
+                                     const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline operator-(const Eigen::VectorXd &_lhs,
+                                     GaussLobattoLagrangeSpline &&_that);
+GaussLobattoLagrangeSpline operator-(const GaussLobattoLagrangeSpline &_that,
+                                     const Eigen::VectorXd &_rhs);
+GaussLobattoLagrangeSpline operator-(GaussLobattoLagrangeSpline &&_that,
+                                     const Eigen::VectorXd &_rhs);
+
+GaussLobattoLagrangeSpline operator/(double _a,
+                                     const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline operator/(double _a,
+                                     GaussLobattoLagrangeSpline &&_that);
+
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline operator*(double _a,
+                                     GaussLobattoLagrangeSpline &&_that);
 
 using GLLSpline = GaussLobattoLagrangeSpline;
 } // namespace collocation
