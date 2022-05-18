@@ -2,6 +2,7 @@
 
 #include "gsplines/Collocation/GaussLobattoPointsWeights.hpp"
 #include <eigen3/Eigen/Core>
+#include <fenv.h>
 #include <gsplines/Collocation/GaussLobattoLagrange.hpp>
 #include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
@@ -264,10 +265,17 @@ TEST(Collocation, Approximation) {
   GLLSpline res2({0, intervals}, codom_dim, intervals, nc);
 
   res2 = GLLSpline::approximate(trj, nc, intervals);
+
+  Eigen::VectorXd domain = res2.get_domain_discretization();
+  EXPECT_TRUE(tools::approx_equal(res2(domain), trj(domain), 1.0e-9))
+      << "error " << tools::last_error;
+  res2 = trj;
+  EXPECT_TRUE(tools::approx_equal(res2(domain), trj(domain), 1.0e-9));
 }
 
 int main(int argc, char **argv) {
 
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

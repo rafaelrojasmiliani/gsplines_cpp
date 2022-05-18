@@ -4,6 +4,9 @@
 namespace gsplines {
 namespace tools {
 
+extern double last_error;
+extern double last_relative_error;
+
 bool approx_equal(double _lhs, double _rhs, double _tol);
 
 bool approx_equal(const Eigen::MatrixXd &_lhs, const Eigen::MatrixXd &_rhs,

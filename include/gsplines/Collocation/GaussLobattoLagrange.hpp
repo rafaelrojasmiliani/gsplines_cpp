@@ -67,6 +67,10 @@ public:
               std::size_t _n_glp, std::size_t _n_intervals);
 
   std::size_t get_nglp() const { return get_basis_dim(); }
+  Eigen::VectorXd get_domain_discretization() const {
+    return legendre_gauss_lobatto_points(get_domain(), get_nglp(),
+                                         get_number_of_intervals());
+  }
 
   GaussLobattoLagrangeSpline
   operator*(const GaussLobattoLagrangeSpline &_that) const &;
@@ -78,6 +82,8 @@ public:
 
   GaussLobattoLagrangeSpline &
   operator=(const GaussLobattoLagrangeSpline &_that) &;
+  GaussLobattoLagrangeSpline &
+  operator=(const ::gsplines::functions::FunctionBase &_that) &;
   GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
 
   GaussLobattoLagrangeSpline &norm(const GaussLobattoLagrangeSpline &_that) &;

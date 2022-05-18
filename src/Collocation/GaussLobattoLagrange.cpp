@@ -35,7 +35,8 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     : GaussLobattoLagrangeSpline(
           _domain, _codom_dim, _n_intervals, _n_glp,
           std::move(Eigen::VectorXd::Zero(_n_intervals * _n_glp * _codom_dim)),
-          std::move(Eigen::VectorXd::Zero(_n_intervals))) {}
+          std::move(Eigen::VectorXd::Ones(_n_intervals) *
+                    (_domain.second - _domain.first) / _n_intervals)) {}
 
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
     const GaussLobattoLagrangeSpline &_that)
@@ -76,6 +77,38 @@ GaussLobattoLagrangeSpline::operator=(GaussLobattoLagrangeSpline &&_that) & {
 
   set_domain(_that.get_domain());
   coefficients_ = std::move(_that.coefficients_);
+  return *this;
+}
+GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
+    const ::gsplines::functions::FunctionBase &_that) & {
+  if (this == &_that) {
+    throw std::invalid_argument(" Cannot move assign to itself");
+  }
+  if (not(same_codomain(_that)))
+    throw std::invalid_argument("Assigmention requires same codomain");
+
+  set_domain(_that.get_domain());
+
+  double left_bound = get_domain().first;
+  Eigen::MatrixXd local_value(get_basis().get_dim(), get_codom_dim());
+
+  for (std::size_t interval = 0; interval < get_number_of_intervals();
+       interval++) {
+
+    Eigen::VectorXd local_points =
+        (get_basis().get_parameters().array() + 1.0) *
+            get_interval_lengths()(interval) / 2.0 +
+        left_bound;
+
+    _that.value(local_points, local_value);
+
+    std::size_t i0 = interval * get_basis().get_dim() * get_codom_dim();
+
+    coefficients_.segment(i0, get_basis().get_dim() * get_codom_dim()) =
+        Eigen::Map<Eigen::VectorXd>(local_value.data(), local_value.size());
+    left_bound += get_interval_lengths()(interval);
+  }
+
   return *this;
 }
 
