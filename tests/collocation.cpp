@@ -100,47 +100,6 @@ TEST(Collocation, ContinuityError) {
   EXPECT_TRUE(tools::approx_zero(cerr(curve_1), 1.0e-7))
       << cerr(curve_1).array().abs().maxCoeff() << std::endl;
 }
-TEST(Collocation, Operations) {
-
-  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
-      n_inter);
-
-  GLLSpline q2 = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
-      n_inter);
-
-  Derivative der(q1);
-  Integral integral(q1);
-  TransposeLeftMultiplication tr1_(q1 - q2);
-  TransposeLeftMultiplication tr2_(q1 - der * q2);
-
-  EXPECT_TRUE(
-      tools::approx_equal(tr1_ * (q1 - q2), tr1_ * q1 - tr1_ * q2, 1.0e-9));
-
-  EXPECT_TRUE(
-      tools::approx_equal(tr2_ * (-der * q2), -tr2_ * der * q2, 1.0e-9));
-
-  EXPECT_TRUE(
-      tools::approx_equal(tr2_ * (q1 - q2), tr2_ * q1 - tr2_ * q2, 1.0e-9));
-
-  EXPECT_TRUE(tools::approx_equal(
-      (der * (q1 - der * q2)).get_coefficients(),
-      der.to_matrix() * (q1 - der * q2).get_coefficients(), 1.0e-9));
-
-  EXPECT_TRUE(tools::approx_equal(
-      (der * (q1 - der * q2)).get_coefficients(),
-      der.to_matrix() *
-          (q1.get_coefficients() - der.to_matrix() * q2.get_coefficients()),
-      1.0e-9));
-
-  GSpline b = der * q1 - der * der * q2;
-  GSpline a = der * (q1 - der * q2);
-  EXPECT_TRUE(tools::approx_equal(a, b, 1.0e-9));
-
-  EXPECT_TRUE(tools::approx_equal(tr2_ * (q1 - der * q2),
-                                  tr2_ * q1 - tr2_ * der * q2, 1.0e-9));
-}
 
 TEST(Collocation, IfOpt) {
 
@@ -271,6 +230,75 @@ TEST(Collocation, Approximation) {
       << "error " << tools::last_error;
   res2 = trj;
   EXPECT_TRUE(tools::approx_equal(res2(domain), trj(domain), 1.0e-9));
+}
+
+TEST(Collocation, Operations) {
+
+  Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
+
+  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
+      interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
+                  basis::BasisLagrangeGaussLobatto(10)),
+      nglp, n_inter);
+
+  GLLSpline q2 = GaussLobattoLagrangeSpline::approximate(
+      interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
+                  basis::BasisLagrangeGaussLobatto(10)),
+      nglp, n_inter);
+
+  Derivative der(q1);
+  Integral integral(q1);
+  TransposeLeftMultiplication tr1_(q1 - q2);
+  TransposeLeftMultiplication tr2_(q1 - der * q2);
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr1_ * (q1 - q2), tr1_ * q1 - tr1_ * q2, 1.0e-9));
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr2_ * (-der * q2), -tr2_ * der * q2, 1.0e-9));
+
+  EXPECT_TRUE(
+      tools::approx_equal(tr2_ * (q1 - q2), tr2_ * q1 - tr2_ * q2, 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(
+      (der * (q1 - der * q2)).get_coefficients(),
+      der.to_matrix() * (q1 - der * q2).get_coefficients(), 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(
+      (der * (q1 - der * q2)).get_coefficients(),
+      der.to_matrix() *
+          (q1.get_coefficients() - der.to_matrix() * q2.get_coefficients()),
+      1.0e-9));
+
+  GSpline b = der * q1 - der * der * q2;
+  GSpline a = der * (q1 - der * q2);
+  EXPECT_TRUE(tools::approx_equal(a, b, 1.0e-9));
+
+  EXPECT_TRUE(tools::approx_equal(tr2_ * (q1 - der * q2),
+                                  tr2_ * q1 - tr2_ * der * q2, 1.0e-9));
+
+  tr1_ = q1 - der * q2;
+  EXPECT_TRUE(tools::approx_equal(tr1_ * q2, tr2_ * q2, 1.0e-9))
+      << "error " << tools::last_error << std::endl
+      << "relative" << tools::last_relative_error << std::endl;
+}
+TEST(Collocation, Value_At) {
+
+  Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
+
+  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
+      interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
+                  basis::BasisLagrangeGaussLobatto(10)),
+      nglp, n_inter);
+  Eigen::VectorXd time_spam =
+      legendre_gauss_lobatto_points(q1.get_domain(), nglp, n_inter);
+
+  Eigen::MatrixXd res = q1(time_spam);
+
+  for (long i = 0; i < time_spam.size(); i++)
+    EXPECT_TRUE(
+        tools::approx_equal(q1.value_at(i), res.row(i).transpose(), 1.0e-9))
+        << tools::last_error;
 }
 
 int main(int argc, char **argv) {

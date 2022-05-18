@@ -121,6 +121,8 @@ public:
   GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
 
   bool same_discretization(const GaussLobattoLagrangeSpline &_that) const;
+
+  Eigen::VectorXd value_at(std::size_t _i) const;
 };
 
 GaussLobattoLagrangeSpline norm(const GaussLobattoLagrangeSpline &_that);

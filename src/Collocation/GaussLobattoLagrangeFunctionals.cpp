@@ -16,6 +16,11 @@ Integral::Integral(const GaussLobattoLagrangeSpline &_in)
     : Integral(_in.get_domain(), _in.get_basis().get_dim(),
                _in.get_number_of_intervals()) {}
 
+void Integral::update(std::tuple<double, double> _domain, std::size_t _nglp,
+                      std::size_t _n_intervals) {
+  mat_ =
+      legendre_gauss_lobatto_weights(_domain, _nglp, _n_intervals).transpose();
+}
 SobolevDistance::SobolevDistance(const gsplines::functions::FunctionBase &_fun,
                                  std::size_t _nglp, std::size_t _n_inter,
                                  std::size_t /*_deg*/)

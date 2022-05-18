@@ -199,6 +199,16 @@ bool GaussLobattoLagrangeSpline::same_discretization(
          get_number_of_intervals() == _that.get_number_of_intervals();
 }
 
+Eigen::VectorXd GaussLobattoLagrangeSpline::value_at(std::size_t _i) const {
+  if (_i >= get_nglp() * get_number_of_intervals()) {
+    throw std::invalid_argument("Cannot access");
+  }
+  std::size_t interval = _i / get_nglp();
+  std::size_t sub_index = _i % get_nglp();
+
+  return get_value_block(interval).row(sub_index).transpose();
+}
+
 // Operations -----------------------------
 // -----------------------------------------
 

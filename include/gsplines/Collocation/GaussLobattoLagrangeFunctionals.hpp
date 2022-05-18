@@ -210,22 +210,25 @@ private:
   const std::size_t nglp_;
   const std::size_t n_intervals_;
   const std::size_t codom_dim_;
+  const std::size_t deg_;
 
 public:
   Derivative(std::pair<double, double> _domain, std::size_t _codom_dim,
-             std::size_t _n_glp, std::size_t _n_intervals)
+             std::size_t _n_glp, std::size_t _n_intervals, std::size_t _deg = 1)
       : Derivative(_codom_dim, _n_glp, _n_intervals,
                    Eigen::VectorXd::Ones(_n_intervals) *
-                       (_domain.second - _domain.first) / _n_intervals) {}
+                       (_domain.second - _domain.first) / _n_intervals,
+                   _deg) {}
 
   Derivative(std::size_t _codom_dim, std::size_t _n_glp,
-             std::size_t _n_intervals, const Eigen::VectorXd &_int_lengs)
+             std::size_t _n_intervals, const Eigen::VectorXd &_int_lengs,
+             std::size_t _deg = 1)
       : LinearFunctionalSparse(_n_glp * _n_intervals * _codom_dim,
                                _n_glp * _n_intervals * _codom_dim),
         basis_(_n_glp), nglp_(_n_glp), n_intervals_(_n_intervals),
-        codom_dim_(_codom_dim) {
+        codom_dim_(_codom_dim), deg_(_deg) {
 
-    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block();
+    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
     std::size_t total_size = _n_glp * _n_intervals * _codom_dim;
     // ---
     for (std::size_t uici = 0; uici < total_size; uici += _n_glp) {
@@ -245,7 +248,7 @@ public:
                    _that.get_number_of_intervals(),
                    _that.get_interval_lengths()) {}
 
-  void update_intervals(const Eigen::VectorXd &_int_lengs) {
+  void update(const Eigen::VectorXd &_int_lengs) {
 
     const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block();
     std::size_t total_size = nglp_ * n_intervals_ * codom_dim_;
@@ -331,6 +334,30 @@ public:
     mat_.makeCompressed();
     return *this;
   }
+
+  TransposeLeftMultiplication &
+  operator=(const GaussLobattoLagrangeSpline &_that) {
+    if (_that.get_codom_dim() != codom_dim_)
+      throw std::invalid_argument("");
+
+    const Eigen::VectorXd &vec = _that.get_coefficients();
+    // ---
+    for (std::size_t uic_interval = 0; uic_interval < n_inter_;
+         uic_interval++) {
+      for (std::size_t uic_coor = 0; uic_coor < codom_dim_; uic_coor++) {
+        std::size_t i0 = uic_interval * nglp_;
+        std::size_t j0 = uic_coor * nglp_ + uic_interval * nglp_ * codom_dim_;
+
+        for (std::size_t i = 0; i < nglp_; i++) {
+
+          mat_.coeffRef(i0 + i, j0 + i) =
+              vec(uic_interval * nglp_ * codom_dim_ + uic_coor * nglp_ + i);
+        }
+      }
+    }
+    mat_.makeCompressed();
+    return *this;
+  }
 };
 
 class ContinuityError
@@ -350,6 +377,8 @@ public:
   Integral(std::tuple<double, double> _domain, std::size_t _nglp,
            std::size_t _n_intervals);
   Integral(const GaussLobattoLagrangeSpline &_in);
+  void update(std::tuple<double, double> _domain, std::size_t _nglp,
+              std::size_t _n_intervals);
 };
 
 class SobolevDistance : public Functional {
