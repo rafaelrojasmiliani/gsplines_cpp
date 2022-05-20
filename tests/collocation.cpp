@@ -204,7 +204,7 @@ TEST(Collocation, MultiplicationNonConstNonConst) {
   EXPECT_TRUE(tools::approx_equal(res2, res3, 1.0e-9));
   EXPECT_TRUE(tools::approx_equal(res3, res4, 1.0e-9));
 }
-*/
+
 TEST(Collocation, Approximation) {
 
   std::size_t codom_dim = 8;
@@ -299,6 +299,30 @@ TEST(Collocation, Value_At) {
     EXPECT_TRUE(
         tools::approx_equal(q1.value_at(i), res.row(i).transpose(), 1.0e-9))
         << tools::last_error;
+}
+*/
+TEST(Collocation, Matrix_Multiplication) {
+
+  Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
+
+  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
+      interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
+                  basis::BasisLagrangeGaussLobatto(10)),
+      nglp, n_inter);
+  Eigen::VectorXd time_spam =
+      legendre_gauss_lobatto_points(q1.get_domain(), nglp, n_inter);
+
+  Eigen::MatrixXd res = q1(time_spam);
+  MatrixLeftMultiplication mat(dim, nglp, n_inter, 2);
+  std::vector<Eigen::MatrixXd> matrix_vector;
+  for (std::size_t i = 0; i < n_inter * nglp; i++)
+    matrix_vector.push_back(Eigen::MatrixXd::Random(2, dim));
+  mat.update(
+      matrix_vector.cbegin(), matrix_vector.cend(),
+      [](const Eigen::MatrixXd &in) -> const Eigen::MatrixXd & { return in; });
+  /*
+    GLLSpline q2 = mat * q1;
+    EXPECT_TRUE(tools::approx_equal(q1, q2, 1.0e-9));*/
 }
 
 int main(int argc, char **argv) {

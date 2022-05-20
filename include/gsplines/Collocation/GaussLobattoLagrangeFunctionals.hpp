@@ -359,6 +359,90 @@ public:
     return *this;
   }
 };
+class MatrixLeftMultiplication : public LinearFunctionalSparse {
+private:
+  const std::size_t nglp_;
+  const std::size_t n_inter_;
+  const long matrix_cols_;
+  const long matrix_rows_;
+
+public:
+  MatrixLeftMultiplication(std::size_t _matrix_dom_dim, std::size_t _n_glp,
+                           std::size_t _n_intervals,
+                           std::size_t _matrix_codom_dim)
+      : LinearFunctionalSparse(_n_glp * _n_intervals * _matrix_codom_dim,
+                               _n_glp * _n_intervals * _matrix_dom_dim),
+        nglp_(_n_glp), n_inter_(_n_intervals), matrix_cols_(_matrix_dom_dim),
+        matrix_rows_(_matrix_codom_dim) {
+
+    for (std::size_t interval = 0; interval < n_inter_; interval++) {
+
+      for (long col = 0; col < matrix_cols_; col++) {
+
+        for (long row = 0; row < matrix_rows_; row++) {
+
+          std::size_t j0 = col * nglp_ + interval * nglp_ * matrix_cols_;
+          std::size_t i0 = row * nglp_ + interval * nglp_ * matrix_rows_;
+
+          for (std::size_t i = 0; i < nglp_; i++) {
+
+            mat_.coeffRef(i0 + i, j0 + i) = 1.0;
+          }
+        }
+      }
+    }
+    mat_.makeCompressed();
+  }
+
+  template <typename IteratorType, typename Function>
+  void update(const IteratorType &_begin, const IteratorType &_end,
+              Function _fun) {
+
+    if (std::distance(_begin, _end) != nglp_ * n_inter_) {
+      throw std::runtime_error("wrong number of elements");
+    }
+
+    for (auto it = _begin; it != _end; ++it) {
+      decltype(auto) mat = _fun(*it);
+
+      long index = std::distance(_begin, it);
+      long interval = index / nglp_;
+
+      for (long col = 0; col < matrix_cols_; col++) {
+        for (long row = 0; row < matrix_cols_; row++) {
+
+          std::size_t j0 =
+              col * nglp_ + interval * nglp_ * matrix_cols_ + index % nglp_;
+          std::size_t i0 =
+              row * nglp_ + interval * nglp_ * matrix_rows_ + index % nglp_;
+          mat_.coeffRef(i0, j0) = mat(col, row);
+        }
+      }
+    }
+  }
+  void update(const Eigen::MatrixXd &_mat) {
+
+    if (_mat.rows() != matrix_rows_ || _mat.cols() != matrix_cols_) {
+      throw std::runtime_error("wrong number of elements");
+    }
+
+    for (std::size_t index = 0; index < n_inter_ * nglp_; index++) {
+
+      long interval = index / nglp_;
+
+      for (long col = 0; col < matrix_cols_; col++) {
+        for (long row = 0; row < matrix_cols_; row++) {
+
+          std::size_t j0 =
+              col * nglp_ + interval * nglp_ * matrix_cols_ + index % nglp_;
+          std::size_t i0 =
+              row * nglp_ + interval * nglp_ * matrix_rows_ + index % nglp_;
+          mat_.coeffRef(i0, j0) = _mat(col, row);
+        }
+      }
+    }
+  }
+};
 
 class ContinuityError
     : public LinearFunctional<Eigen::SparseMatrix<double, Eigen::RowMajor>> {
