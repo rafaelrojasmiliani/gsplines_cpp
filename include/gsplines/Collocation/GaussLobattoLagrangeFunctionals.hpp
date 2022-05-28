@@ -442,6 +442,13 @@ public:
       }
     }
   }
+  template <typename IteratorType>
+  void update(const IteratorType &_begin, const IteratorType &_end) {
+    update(_begin, _end,
+           [](const Eigen::MatrixXd &_in) -> const Eigen::MatrixXd & {
+             return _in;
+           });
+  }
 };
 
 class ContinuityError
