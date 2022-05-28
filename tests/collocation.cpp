@@ -23,6 +23,7 @@ std::uniform_real_distribution<double> real_dist(0.0, 1.0);
 std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
 
 std::size_t dim = uint_dist(mt);
+std::size_t dim_2 = uint_dist(mt);
 std::size_t nglp = 2 * uint_dist(mt) + 2;
 std::size_t n_inter = uint_dist(mt);
 std::size_t wpn = uint_dist(mt);
@@ -312,17 +313,24 @@ TEST(Collocation, Matrix_Multiplication) {
   Eigen::VectorXd time_spam =
       legendre_gauss_lobatto_points(q1.get_domain(), nglp, n_inter);
 
-  Eigen::MatrixXd res = q1(time_spam);
-  MatrixLeftMultiplication mat(dim, nglp, n_inter, 2);
+  Eigen::MatrixXd q1_value = q1(time_spam);
+  Eigen::MatrixXd res_2(time_spam.size(), dim_2);
+  MatrixLeftMultiplication mat(dim, nglp, n_inter, dim_2);
   std::vector<Eigen::MatrixXd> matrix_vector;
-  for (std::size_t i = 0; i < n_inter * nglp; i++)
-    matrix_vector.push_back(Eigen::MatrixXd::Random(2, dim));
+
+  for (std::size_t i = 0; i < n_inter * nglp; i++) {
+    matrix_vector.push_back(Eigen::MatrixXd::Random(dim_2, dim));
+    res_2.row(i) = q1_value.row(i) * matrix_vector.back().transpose();
+    if (i > 2 and i % nglp == 0)
+      res_2.row(i) = res_2.row(i - 1);
+  }
   mat.update(
       matrix_vector.cbegin(), matrix_vector.cend(),
       [](const Eigen::MatrixXd &in) -> const Eigen::MatrixXd & { return in; });
-  /*
-    GLLSpline q2 = mat * q1;
-    EXPECT_TRUE(tools::approx_equal(q1, q2, 1.0e-9));*/
+
+  GLLSpline q2 = mat * q1;
+  Eigen::MatrixXd res_1 = q2(time_spam);
+  EXPECT_TRUE(tools::approx_equal(res_1, res_2, 1.0e-9));
 }
 
 int main(int argc, char **argv) {

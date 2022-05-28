@@ -386,7 +386,7 @@ public:
 
           for (std::size_t i = 0; i < nglp_; i++) {
 
-            mat_.coeffRef(i0 + i, j0 + i) = 1.0;
+            mat_.coeffRef(i0 + i, j0 + i) = 0.0;
           }
         }
       }
@@ -409,13 +409,13 @@ public:
       long interval = index / nglp_;
 
       for (long col = 0; col < matrix_cols_; col++) {
-        for (long row = 0; row < matrix_cols_; row++) {
+        for (long row = 0; row < matrix_rows_; row++) {
 
           std::size_t j0 =
               col * nglp_ + interval * nglp_ * matrix_cols_ + index % nglp_;
           std::size_t i0 =
               row * nglp_ + interval * nglp_ * matrix_rows_ + index % nglp_;
-          mat_.coeffRef(i0, j0) = mat(col, row);
+          mat_.coeffRef(i0, j0) = mat(row, col);
         }
       }
     }
