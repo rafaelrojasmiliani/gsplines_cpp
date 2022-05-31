@@ -18,6 +18,12 @@ class GaussLobattoLagrangeSpline
   friend GaussLobattoLagrangeSpline
   norm(const GaussLobattoLagrangeSpline &_that);
 
+  friend GaussLobattoLagrangeSpline pow(const GaussLobattoLagrangeSpline &_that,
+                                        double);
+
+  friend GaussLobattoLagrangeSpline pow(GaussLobattoLagrangeSpline &&_that,
+                                        double);
+
   friend GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that);
 
   friend GaussLobattoLagrangeSpline
@@ -158,6 +164,9 @@ public:
 };
 
 GaussLobattoLagrangeSpline norm(const GaussLobattoLagrangeSpline &_that);
+GaussLobattoLagrangeSpline pow(const GaussLobattoLagrangeSpline &_that,
+                               double _exp);
+GaussLobattoLagrangeSpline pow(GaussLobattoLagrangeSpline &&_that, double _exp);
 /*
 GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that);
 */

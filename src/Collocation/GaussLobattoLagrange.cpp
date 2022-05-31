@@ -399,6 +399,28 @@ GaussLobattoLagrangeSpline norm(const GaussLobattoLagrangeSpline &_that) {
       _that.get_domain(), 1, _that.get_number_of_intervals(), _that.get_nglp(),
       std::move(coefficients), std::move(interval_length));
 }
+
+GaussLobattoLagrangeSpline pow(const GaussLobattoLagrangeSpline &_that,
+                               double _exp) {
+  if (_that.get_codom_dim() != 1)
+    throw std::invalid_argument(
+        "Only scalar functions may by raised to a power");
+
+  GaussLobattoLagrangeSpline result(_that);
+  result.coefficients_ = _that.coefficients_.array().pow(_exp).matrix();
+  return result;
+}
+
+GaussLobattoLagrangeSpline pow(GaussLobattoLagrangeSpline &&_that,
+                               double _exp) {
+
+  if (_that.get_codom_dim() != 1)
+    throw std::invalid_argument(
+        "Only scalar functions may by raised to a power");
+
+  _that.coefficients_ = _that.coefficients_.array().pow(_exp).matrix();
+  return std::move(_that);
+}
 /*
 GaussLobattoLagrangeSpline norm(GaussLobattoLagrangeSpline &&_that) {
 
