@@ -396,7 +396,7 @@ public:
 
   template <typename IteratorType, typename Function>
   void update(const IteratorType &_begin, const IteratorType &_end,
-              Function _fun) {
+              const Function &_fun) {
 
     if (std::distance(_begin, _end) != nglp_ * n_inter_) {
       throw std::runtime_error("wrong number of elements");

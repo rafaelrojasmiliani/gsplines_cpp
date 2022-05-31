@@ -120,6 +120,38 @@ public:
   operator=(const ::gsplines::functions::FunctionBase &_that) &;
   GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
 
+  template <typename IteratorType, typename Function>
+  void set_from_array(std::pair<double, double> _domain,
+                      const IteratorType &_begin, const IteratorType &_end,
+                      const Function &_fun) {
+
+    set_domain(_domain);
+    if (std::distance(_begin, _end) !=
+        get_basis().get_dim() * get_number_of_intervals()) {
+      throw std::runtime_error("wrong number of elements");
+    }
+    domain_interval_lengths_ =
+        domain_interval_lengths_ *
+        (get_domain_length() / domain_interval_lengths_.array().sum());
+
+    for (auto it = _begin; it != _end; ++it) {
+      long index = std::distance(_begin, it);
+      long interval = index / get_basis().get_dim();
+      decltype(auto) vec = _fun(*it);
+      get_value_block(interval).row(index % get_basis().get_dim()) = vec;
+    }
+  }
+
+  template <typename IteratorType>
+  void set_from_array(std::pair<double, double> _domain,
+                      const IteratorType &_begin, const IteratorType &_end) {
+    set_domain(_domain);
+    set_from_array(_begin, _end,
+                   [](const Eigen::MatrixXd &_in) -> const Eigen::MatrixXd & {
+                     return _in;
+                   });
+  }
+
   bool same_discretization(const GaussLobattoLagrangeSpline &_that) const;
 
   Eigen::VectorXd value_at(std::size_t _i) const;

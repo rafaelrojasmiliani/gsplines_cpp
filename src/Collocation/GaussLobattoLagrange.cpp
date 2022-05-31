@@ -89,6 +89,9 @@ GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
     throw std::invalid_argument("Assigmention requires same codomain");
 
   set_domain(_that.get_domain());
+  domain_interval_lengths_ =
+      domain_interval_lengths_ *
+      (_that.get_domain_length() / domain_interval_lengths_.array().sum());
 
   double left_bound = get_domain().first;
   Eigen::MatrixXd local_value(get_basis().get_dim(), get_codom_dim());
