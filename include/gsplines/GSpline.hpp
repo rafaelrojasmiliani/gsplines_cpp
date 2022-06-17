@@ -244,6 +244,9 @@ GSpline operator*(GSpline &&_that, double _a);
 GSpline operator-(const GSpline &_that);
 GSpline operator-(GSpline &&_that);
 
+GSpline random_gspline(std::pair<double, double> _domain,
+                       std::size_t _codom_dim);
+
 } // namespace gsplines
 
 #endif /* PIECEWISE_FUNCTION_H */

@@ -1,7 +1,9 @@
+#include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Tools.hpp>
 #include <iostream>
+#include <random>
 
 namespace gsplines {
 
@@ -220,4 +222,23 @@ GSpline operator-(GSpline &&_that) {
   _that.coefficients_ *= -1.0;
   return std::move(_that);
 }
+
+GSpline random_gspline(std::pair<double, double> _domain,
+                       std::size_t _codom_dim) {
+
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
+  std::size_t number_of_intervals = uint_dist(mt);
+
+  Eigen::VectorXd tau =
+      1.0 + (Eigen::VectorXd::Random(number_of_intervals).array()) / 2.0;
+
+  Eigen::MatrixXd wp =
+      Eigen::MatrixXd::Random(number_of_intervals + 1, _codom_dim);
+
+  GSpline result = interpolate(tau, wp, *basis::BasisLegendre::get(6));
+  return result.linear_scaling_new_execution_time(_domain.second);
+}
+
 } // namespace gsplines
