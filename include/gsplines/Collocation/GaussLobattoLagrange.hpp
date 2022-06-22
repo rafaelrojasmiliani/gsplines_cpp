@@ -144,6 +144,12 @@ public:
       long index = std::distance(_begin, it);
       long interval = index / get_basis().get_dim();
       decltype(auto) vec = _fun(*it);
+      if (vec.cols() != 1) {
+        std::invalid_argument("This function only accept eigen row vectors");
+      }
+      if (vec.rows() != get_codom_dim()) {
+        std::invalid_argument(__FILE__ "Vector dimension error");
+      }
       get_value_block(interval).row(index % get_basis().get_dim()) = vec;
     }
   }
