@@ -404,6 +404,9 @@ public:
 
     for (auto it = _begin; it != _end; ++it) {
       decltype(auto) mat = _fun(*it);
+      if (mat.cols() != matrix_cols_ or mat.rows() != matrix_rows_) {
+        throw std::runtime_error("wrong number of rows or cols");
+      }
 
       long index = std::distance(_begin, it);
       long interval = index / nglp_;
