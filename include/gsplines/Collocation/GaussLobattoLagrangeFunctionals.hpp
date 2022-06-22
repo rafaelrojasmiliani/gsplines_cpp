@@ -235,7 +235,7 @@ public:
       for (std::size_t i = 0; i < _n_glp; i++) {
         for (std::size_t j = 0; j < _n_glp; j++) {
           mat_.block(uici, uici, _n_glp, _n_glp).coeffRef(i, j) =
-              2 * d_mat(i, j) / _int_lengs(0);
+              d_mat(i, j) * std::pow(2.0 / _int_lengs(0), _deg);
         }
       }
     }
@@ -250,14 +250,31 @@ public:
 
   void update(const Eigen::VectorXd &_int_lengs) {
 
-    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block();
+    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
     std::size_t total_size = nglp_ * n_intervals_ * codom_dim_;
     // ---
     for (std::size_t uici = 0; uici < total_size; uici += nglp_) {
       for (std::size_t i = 0; i < nglp_; i++) {
         for (std::size_t j = 0; j < nglp_; j++) {
           mat_.block(uici, uici, nglp_, nglp_).coeffRef(i, j) =
-              2 * d_mat(i, j) / _int_lengs(0);
+              d_mat(i, j) * std::pow(2.0 / _int_lengs(0), deg_);
+        }
+      }
+    }
+    // ---
+    mat_.makeCompressed();
+  }
+
+  void update(double _interval_length) {
+
+    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
+    std::size_t total_size = nglp_ * n_intervals_ * codom_dim_;
+    // ---
+    for (std::size_t uici = 0; uici < total_size; uici += nglp_) {
+      for (std::size_t i = 0; i < nglp_; i++) {
+        for (std::size_t j = 0; j < nglp_; j++) {
+          mat_.block(uici, uici, nglp_, nglp_).coeffRef(i, j) =
+              d_mat(i, j) * std::pow(2.0 / _interval_length, deg_);
         }
       }
     }
