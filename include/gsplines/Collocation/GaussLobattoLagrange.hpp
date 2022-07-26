@@ -92,10 +92,14 @@ public:
                              std::size_t _codom_dim, std::size_t _n_intervals,
                              std::size_t _n_glp);
 
+  GaussLobattoLagrangeSpline(const ::gsplines::functions::FunctionBase &_that,
+                             std::size_t _n_intervals, std::size_t _n_glp);
+  // -- Copy constructors
   GaussLobattoLagrangeSpline(const GaussLobattoLagrangeSpline &_that);
   GaussLobattoLagrangeSpline(GaussLobattoLagrangeSpline &&_that);
   GaussLobattoLagrangeSpline(const GSpline &_that);
   GaussLobattoLagrangeSpline(GSpline &&_that);
+
   virtual ~GaussLobattoLagrangeSpline() = default;
 
   static GaussLobattoLagrangeSpline identity(std::pair<double, double> _domain,
@@ -120,11 +124,12 @@ public:
   operator*(GaussLobattoLagrangeSpline &&_that) const &;
   GaussLobattoLagrangeSpline operator*(GaussLobattoLagrangeSpline &&_that) &&;
 
+  // --- Assigment Operators
   GaussLobattoLagrangeSpline &
   operator=(const GaussLobattoLagrangeSpline &_that) &;
+  GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
   GaussLobattoLagrangeSpline &
   operator=(const ::gsplines::functions::FunctionBase &_that) &;
-  GaussLobattoLagrangeSpline &operator=(GaussLobattoLagrangeSpline &&_that) &;
 
   template <typename IteratorType, typename Function>
   void set_from_array(std::pair<double, double> _domain,

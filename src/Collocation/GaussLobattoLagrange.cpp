@@ -52,6 +52,11 @@ GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(const GSpline &_that)
 GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(GSpline &&_that)
     : GSplineInheritanceHelper(std::move(_that)) {}
 
+GaussLobattoLagrangeSpline::GaussLobattoLagrangeSpline(
+    const ::gsplines::functions::FunctionBase &_that, std::size_t _n_intervals,
+    std::size_t _n_glp)
+    : GaussLobattoLagrangeSpline(approximate(_that, _n_intervals, _n_glp)) {}
+
 GaussLobattoLagrangeSpline &GaussLobattoLagrangeSpline::operator=(
     const GaussLobattoLagrangeSpline &_that) & {
 
