@@ -23,6 +23,15 @@ Eigen::VectorXd legendre_gauss_lobatto_points(std::tuple<double, double>,
 Eigen::VectorXd legendre_gauss_lobatto_weights(std::tuple<double, double>,
                                                std::size_t _nglp,
                                                std::size_t _ninter);
+
+Eigen::VectorXd
+legendre_gauss_lobatto_points(double _left_bound, std::size_t _nglp,
+                              const Eigen::VectorXd &_intervals);
+
+Eigen::VectorXd
+legendre_gauss_lobatto_weights(std::size_t _nglp,
+                               const Eigen::VectorXd &_intervals);
+
 std::tuple<double, double, double> q_and_evaluation(double _t, std::size_t _n);
 
 } // namespace collocation

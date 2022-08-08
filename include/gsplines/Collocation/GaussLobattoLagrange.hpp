@@ -137,8 +137,9 @@ public:
                       const Function &_fun) {
 
     set_domain(_domain);
-    if (std::distance(_begin, _end) !=
-        get_basis().get_dim() * get_number_of_intervals()) {
+    auto dist = std::distance(_begin, _end);
+    if (dist != static_cast<decltype(dist)>(get_basis().get_dim() *
+                                            get_number_of_intervals())) {
       throw std::runtime_error("wrong number of elements");
     }
     domain_interval_lengths_ =
@@ -152,7 +153,7 @@ public:
       if (vec.cols() != 1) {
         std::invalid_argument("This function only accept eigen row vectors");
       }
-      if (vec.rows() != get_codom_dim()) {
+      if (vec.rows() != static_cast<long>(get_codom_dim())) {
         std::invalid_argument(__FILE__ "Vector dimension error");
       }
       get_value_block(interval).row(index % get_basis().get_dim()) = vec;

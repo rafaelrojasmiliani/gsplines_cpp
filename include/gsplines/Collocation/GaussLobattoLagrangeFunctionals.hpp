@@ -207,80 +207,23 @@ class Derivative : public LinearFunctionalSparse {
 
 private:
   gsplines::basis::BasisLagrangeGaussLobatto basis_;
-  const std::size_t nglp_;
   const std::size_t n_intervals_;
   const std::size_t codom_dim_;
   const std::size_t deg_;
 
 public:
   Derivative(std::pair<double, double> _domain, std::size_t _codom_dim,
-             std::size_t _n_glp, std::size_t _n_intervals, std::size_t _deg = 1)
-      : Derivative(_codom_dim, _n_glp, _n_intervals,
-                   Eigen::VectorXd::Ones(_n_intervals) *
-                       (_domain.second - _domain.first) / _n_intervals,
-                   _deg) {}
+             std::size_t _n_glp, std::size_t _n_intervals,
+             std::size_t _deg = 1);
 
   Derivative(std::size_t _codom_dim, std::size_t _n_glp,
-             std::size_t _n_intervals, const Eigen::VectorXd &_int_lengs,
-             std::size_t _deg = 1)
-      : LinearFunctionalSparse(_n_glp * _n_intervals * _codom_dim,
-                               _n_glp * _n_intervals * _codom_dim),
-        basis_(_n_glp), nglp_(_n_glp), n_intervals_(_n_intervals),
-        codom_dim_(_codom_dim), deg_(_deg) {
+             const Eigen::VectorXd &_int_lengs, std::size_t _deg = 1);
 
-    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
-    std::size_t total_size = _n_glp * _n_intervals * _codom_dim;
-    // ---
-    for (std::size_t uici = 0; uici < total_size; uici += _n_glp) {
-      for (std::size_t i = 0; i < _n_glp; i++) {
-        for (std::size_t j = 0; j < _n_glp; j++) {
-          mat_.block(uici, uici, _n_glp, _n_glp).coeffRef(i, j) =
-              d_mat(i, j) * std::pow(2.0 / _int_lengs(0), _deg);
-        }
-      }
-    }
-    // ---
-    mat_.makeCompressed();
-  }
+  Derivative(const GaussLobattoLagrangeSpline &_that);
 
-  Derivative(const GaussLobattoLagrangeSpline &_that)
-      : Derivative(_that.get_codom_dim(), _that.get_basis().get_dim(),
-                   _that.get_number_of_intervals(),
-                   _that.get_interval_lengths()) {}
+  void update(const Eigen::VectorXd &_int_lengs);
 
-  void update(const Eigen::VectorXd &_int_lengs) {
-
-    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
-    std::size_t total_size = nglp_ * n_intervals_ * codom_dim_;
-    // ---
-    for (std::size_t uici = 0; uici < total_size; uici += nglp_) {
-      for (std::size_t i = 0; i < nglp_; i++) {
-        for (std::size_t j = 0; j < nglp_; j++) {
-          mat_.block(uici, uici, nglp_, nglp_).coeffRef(i, j) =
-              d_mat(i, j) * std::pow(2.0 / _int_lengs(0), deg_);
-        }
-      }
-    }
-    // ---
-    mat_.makeCompressed();
-  }
-
-  void update(double _interval_length) {
-
-    const Eigen::MatrixXd &d_mat = basis_.get_derivative_matrix_block(deg_);
-    std::size_t total_size = nglp_ * n_intervals_ * codom_dim_;
-    // ---
-    for (std::size_t uici = 0; uici < total_size; uici += nglp_) {
-      for (std::size_t i = 0; i < nglp_; i++) {
-        for (std::size_t j = 0; j < nglp_; j++) {
-          mat_.block(uici, uici, nglp_, nglp_).coeffRef(i, j) =
-              d_mat(i, j) * std::pow(2.0 / _interval_length, deg_);
-        }
-      }
-    }
-    // ---
-    mat_.makeCompressed();
-  }
+  void update(double _interval_length);
 };
 
 class TransposeLeftMultiplication : public LinearFunctionalSparse {
@@ -415,7 +358,8 @@ public:
   void update(const IteratorType &_begin, const IteratorType &_end,
               const Function &_fun) {
 
-    if (std::distance(_begin, _end) != nglp_ * n_inter_) {
+    auto dis = std::distance(_begin, _end);
+    if (dis != static_cast<decltype(dis)>(nglp_ * n_inter_)) {
       throw std::runtime_error("wrong number of elements");
     }
 
@@ -482,14 +426,17 @@ public:
 };
 
 class Integral : public LinearFunctionalDense {
-  Eigen::MatrixXd glw_;
+  std::size_t nglp_;
 
 public:
   Integral(std::tuple<double, double> _domain, std::size_t _nglp,
            std::size_t _n_intervals);
   Integral(const GaussLobattoLagrangeSpline &_in);
+
   void update(std::tuple<double, double> _domain, std::size_t _nglp,
               std::size_t _n_intervals);
+
+  void update(const Eigen::VectorXd &_intervals);
 };
 
 class SobolevDistance : public Functional {

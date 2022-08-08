@@ -34,7 +34,7 @@ std::size_t wpn = uint_dist(mt);
  * P2. That the j-th lagrange polynomial is 1 at the j-th point and zero at the
  * other points.
  * */
-/*
+
 TEST(Collocation, Derivative_Operator) {
 
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
@@ -282,7 +282,7 @@ TEST(Collocation, Operations) {
   EXPECT_TRUE(tools::approx_equal(tr1_ * q2, tr2_ * q2, 1.0e-9))
       << "error " << tools::last_error << std::endl
       << "relative" << tools::last_relative_error << std::endl;
-}*/
+}
 TEST(Collocation, Value_At) {
 
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
@@ -355,6 +355,30 @@ TEST(Collocation, Matrix_Multiplication) {
   GLLSpline q2 = mat * q1;
   Eigen::MatrixXd res_1 = q2(time_spam);
   EXPECT_TRUE(tools::approx_equal(res_1, res_2, 1.0e-9));
+}
+
+TEST(Collocation, Derivative_Matrix) {
+
+  Eigen::VectorXd tau = Eigen::VectorXd::Random(n_inter).array() + 1.5;
+  GLLSpline q1 = interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
+                             basis::BasisLagrangeGaussLobatto(10));
+
+  for (std::size_t i = 1; i < 4; i++) {
+    GSpline q2 = q1.derivate(i);
+
+    Derivative dmat(q1.get_codom_dim(), q1.get_nglp(),
+                    q1.get_interval_lengths(), i);
+
+    GSpline q3 = dmat * q1;
+    EXPECT_TRUE(tools::approx_equal(q2, q3, 1.0e-9)) << "Operation Error";
+
+    GSpline q4 = q1.linear_scaling_new_execution_time(real_dist(mt) * 5.0);
+
+    dmat.update(q4.get_interval_lengths());
+    GSpline q5 = dmat * q4;
+    EXPECT_TRUE(tools::approx_equal(q4.derivate(i), q5, 1.0e-9))
+        << "Update Error";
+  }
 }
 
 int main(int argc, char **argv) {

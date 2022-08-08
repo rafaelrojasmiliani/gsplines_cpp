@@ -177,5 +177,40 @@ legendre_gauss_lobatto_weights(std::tuple<double, double> _domain,
   }
   return result;
 }
+
+Eigen::VectorXd
+legendre_gauss_lobatto_points(double _left_bound, std::size_t _nglp,
+                              const Eigen::VectorXd &_intervals) {
+
+  Eigen::VectorXd glp = legendre_gauss_lobatto_points(_nglp);
+
+  double left_bound = _left_bound;
+
+  Eigen::VectorXd result(_nglp * _intervals.size());
+
+  for (long interval = 0; interval < _intervals.size(); interval++) {
+
+    double local_left_bound = left_bound + interval * _intervals[interval];
+
+    result.segment(interval * _nglp, _nglp) =
+        (glp.array() + 1.0) * _intervals[interval] / 2.0 + local_left_bound;
+  }
+  return result;
+}
+
+Eigen::VectorXd
+legendre_gauss_lobatto_weights(std::size_t _nglp,
+                               const Eigen::VectorXd &_intervals) {
+
+  Eigen::VectorXd glw = legendre_gauss_lobatto_weights(_nglp);
+
+  Eigen::VectorXd result(_nglp * _intervals.size());
+
+  for (long interval = 0; interval < _intervals.size(); interval++) {
+
+    result.segment(interval * _nglp, _nglp) = glw * _intervals[interval] / 2.0;
+  }
+  return result;
+}
 } // namespace collocation
 } // namespace gsplines
