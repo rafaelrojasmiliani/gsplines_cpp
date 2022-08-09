@@ -418,11 +418,30 @@ public:
 class ContinuityError
     : public LinearFunctional<Eigen::SparseMatrix<double, Eigen::RowMajor>> {
 
+private:
+  gsplines::basis::BasisLagrangeGaussLobatto basis_;
+  const std::size_t codom_dim_;
+  const std::size_t deg_;
+
 public:
   ContinuityError(const GaussLobattoLagrangeSpline &_that, std::size_t _deg)
       : LinearFunctional(_that.get_basis().continuity_matrix(
             _that.get_number_of_intervals(), _that.get_codom_dim(), _deg,
-            _that.get_interval_lengths())) {}
+            _that.get_interval_lengths())),
+        basis_(_that.get_nglp()), codom_dim_(_that.get_codom_dim()),
+        deg_(_deg) {}
+
+  ContinuityError(std::size_t _nglp, const Eigen::VectorXd &_interval_lengths,
+                  std::size_t _codom_dim, std::size_t _deg)
+      : LinearFunctional(
+            basis::BasisLagrangeGaussLobatto(_nglp).continuity_matrix(
+                _interval_lengths.size(), _codom_dim, _deg, _interval_lengths)),
+        basis_(_nglp), codom_dim_(_codom_dim), deg_(_deg) {}
+
+  void update(const Eigen::VectorXd &_interval_lengths) {
+    mat_ = basis_.continuity_matrix(_interval_lengths.size(), codom_dim_, deg_,
+                                    _interval_lengths);
+  }
 };
 
 class Integral : public LinearFunctionalDense {

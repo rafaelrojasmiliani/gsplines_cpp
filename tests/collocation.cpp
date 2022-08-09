@@ -20,13 +20,14 @@ using namespace gsplines::collocation;
 std::random_device rd;
 std::mt19937 mt(rd());
 std::uniform_real_distribution<double> real_dist(0.0, 1.0);
-std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
+std::uniform_int_distribution<std::size_t> uint_dist_10(2, 10);
+std::uniform_int_distribution<std::size_t> uint_dist_5(2, 5);
 
-std::size_t dim = uint_dist(mt);
-std::size_t dim_2 = uint_dist(mt);
-std::size_t nglp = 2 * uint_dist(mt) + 2;
-std::size_t n_inter = uint_dist(mt);
-std::size_t wpn = uint_dist(mt);
+std::size_t dim = uint_dist_10(mt);
+std::size_t dim_2 = uint_dist_10(mt);
+std::size_t nglp = 2 * uint_dist_5(mt) + 2;
+std::size_t n_inter = uint_dist_10(mt);
+std::size_t wpn = uint_dist_10(mt);
 /** Test the following properties
  *
  * P1. That the sum of all the lagrange polynomials is 1.0
@@ -207,10 +208,13 @@ TEST(Collocation, MultiplicationNonConstNonConst) {
 }
 
 TEST(Collocation, Approximation) {
+  // Here we generate a GL fuction with constant intervals.
+  // Then get a second function expression by composing this GL with the
+  // idenity. Then we check if the approximation is equal.
 
   std::size_t codom_dim = 8;
   std::size_t intervals = 20;
-  std::size_t nc = 20;
+  std::size_t nc = 8;
 
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(intervals);
 
@@ -218,10 +222,14 @@ TEST(Collocation, Approximation) {
 
   GaussLobattoLagrangeSpline path =
       interpolate(tau, wp, basis::BasisLagrangeGaussLobatto(nc));
+
   GaussLobattoLagrangeSpline diffeo =
       GaussLobattoLagrangeSpline::identity({0, intervals}, nc, intervals);
+
   gsplines::functions::FunctionExpression trj = path.compose(diffeo);
+
   GLLSpline res = GLLSpline::approximate(trj, nc, intervals);
+
   GLLSpline res2({0, intervals}, codom_dim, intervals, nc);
 
   res2 = GLLSpline::approximate(trj, nc, intervals);
