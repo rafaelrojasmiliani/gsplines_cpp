@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
                     -y --no-install-recommends -o Dpkg::Options::="--force-confnew" \
             build-essential \
             cmake \
@@ -29,6 +29,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
     && rm -rf /ifopt \
     && git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git /gsplines \
     && cd /gsplines && mkdir build &&  cd build \
-    && cmake .. -CMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+    && cmake -CMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. \
     && make -j$(nproc) && make install \
     && rm -rf /gsplines
