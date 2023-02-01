@@ -10,6 +10,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
             libeigen3-dev \
             python3-dev \
             python3-pip \
+            libgtest-dev \
     && pip3 install \
             autopep8 \
             cmake-format \
