@@ -9,6 +9,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
             git \
             libeigen3-dev \
             python3-dev \
+            python3-pip \
     && pip3 install \
             autopep8 \
             cmake-format \
