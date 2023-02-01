@@ -11,7 +11,9 @@
 
 namespace gsplines {
 namespace basis {
-/** Represent a set of function used to build a GSpline */
+/** Represent a set of function used to build a GSpline.
+ * Let I be an interval of R. This class represent a set of
+ * functions f_i: I -> R and contains the tools to compute them.*/
 class Basis {
 private:
   /* Avoid copy basis **/
