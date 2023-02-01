@@ -24,7 +24,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
             matplotlib \
     && git clone https://github.com/ethz-adrl/ifopt.git /ifopt \
     && cd /ifopt && mkdir build && cd build \
-    && cmake -CMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. \
+    && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. \
     && make -j$(nproc) && make install \
     && rm -rf /ifopt \
     && git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git /gsplines \
