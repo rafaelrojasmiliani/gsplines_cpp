@@ -5,6 +5,7 @@ jobs:
     name: build image
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         docker_image:
           - file_name: "docker/noetic.dockerfile"
@@ -15,6 +16,8 @@ jobs:
             image_name: "rafa606/vim-ros-galactic-gsplines"
           - file_name: "docker/cpp.dockerfile"
             image_name: "rafa606/cpp-vim-gsplines"
+          - file_name: "docker/ubuntu22.04.dockerfile"
+            image_name: "rafa606/gsplines:ubuntu22.04"
     steps:
       - name: checkout code
         uses: actions/checkout@main
