@@ -11,6 +11,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
             python3-dev \
             python3-pip \
             libgtest-dev \
+            sudo \
     && pip3 install \
             autopep8 \
             cmake-format \
