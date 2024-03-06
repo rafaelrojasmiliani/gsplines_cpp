@@ -7,14 +7,14 @@ namespace gsplines::basis {
 /** Represent a set of function used to build a GSpline.
  * Let I be an interval of R. This class represent a set of
  * functions f_i: I -> R and contains the tools to compute them.*/
-class Basis1010 : public Basis {
+class Basis0101 : public Basis {
 
 private:
-  double k_;
-  std::vector<Eigen::MatrixXd> derivative_matrices_buffer_;
+  double alpha_;
 
 public:
-  Basis1010(double _k);
+  static std::shared_ptr<Basis0101> get(double _alpha);
+  Basis0101(double _alpha);
   void eval_on_window(double _s, double _tau,
                       Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>>
                           _buff) const override;

@@ -1,6 +1,6 @@
 
 #include <eigen3/Eigen/Core>
-#include <gsplines/Basis/Basis1010.hpp>
+#include <gsplines/Basis/Basis0101.hpp>
 
 namespace gsplines::basis {
 
@@ -19,28 +19,17 @@ void compute_Qd1_dtau_block(double _tau, double _alpha,
 void compute_Qd3_dtau_block(double _tau, double _alpha,
                             Eigen::Ref<Eigen::MatrixXd> _res);
 
-Basis1010::Basis1010(double _k) : Basis(6, "1010"), k_(_k) {
+Basis0101::Basis0101(double _alpha) : Basis(6, "Basis0101"), alpha_(_alpha) {}
 
-  Eigen::MatrixXd Q(6, 6);
-
-  compute_Q_block(2, k_, Q);
-  derivative_matrices_buffer_.emplace_back(Q);
-
-  compute_Qd1_block(2, k_, Q);
-  derivative_matrices_buffer_.emplace_back(Q);
-
-  compute_Qd2_block(2, k_, Q);
-  derivative_matrices_buffer_.emplace_back(Q);
-
-  compute_Qd3_block(2, k_, Q);
-  derivative_matrices_buffer_.emplace_back(Q);
+std::shared_ptr<Basis0101> Basis0101::get(double k) {
+  return std::shared_ptr<Basis0101>(new Basis0101(k));
 }
 
-void Basis1010::eval_on_window(
+void Basis0101::eval_on_window(
     double _s, double _tau,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
-  double p = _tau * k_ * _s;
+  double p = _tau * alpha_ * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
   double sinp = std::sin(p);
@@ -51,11 +40,11 @@ void Basis1010::eval_on_window(
   _buff[4] = p;
   _buff[5] = 1.0;
 }
-void Basis1010::eval_derivative_on_window(
+void Basis0101::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
-  double p = _tau * k_ * _s;
+  double p = _tau * alpha_ * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
   double sinp = std::sin(p);
@@ -80,24 +69,24 @@ void Basis1010::eval_derivative_on_window(
   }
 }
 
-void Basis1010::eval_derivative_wrt_tau_on_window(
+void Basis0101::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
-  double aux = std::pow(2.0 * k_, _deg);
+  double aux = std::pow(2.0 * alpha_, _deg);
   this->eval_derivative_on_window(_s, _tau, _deg, _buff);
   _buff *= aux;
 }
 
-void Basis1010::add_derivative_matrix_deriv_wrt_tau(
+void Basis0101::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
   Eigen::MatrixXd Q(6, 6);
   switch (_deg) {
   case 1:
-    compute_Qd1_dtau_block(tau, k_, Q);
+    compute_Qd1_dtau_block(tau, alpha_, Q);
     break;
   case 3:
-    compute_Qd3_dtau_block(tau, k_, Q);
+    compute_Qd3_dtau_block(tau, alpha_, Q);
     break;
   default:
     throw std::invalid_argument(
@@ -106,22 +95,22 @@ void Basis1010::add_derivative_matrix_deriv_wrt_tau(
   _mat.noalias() += Q;
 }
 
-void Basis1010::add_derivative_matrix(double tau, std::size_t _deg,
+void Basis0101::add_derivative_matrix(double tau, std::size_t _deg,
                                       Eigen::Ref<Eigen::MatrixXd> _mat) {
 
   Eigen::MatrixXd Q(6, 6);
   switch (_deg) {
   case 0:
-    compute_Q_block(tau, k_, Q);
+    compute_Q_block(tau, alpha_, Q);
     break;
   case 1:
-    compute_Qd1_block(tau, k_, Q);
+    compute_Qd1_block(tau, alpha_, Q);
     break;
   case 2:
-    compute_Qd2_block(tau, k_, Q);
+    compute_Qd2_block(tau, alpha_, Q);
     break;
   case 3:
-    compute_Qd3_block(tau, k_, Q);
+    compute_Qd3_block(tau, alpha_, Q);
     break;
   default:
     throw std::invalid_argument("");
@@ -129,28 +118,28 @@ void Basis1010::add_derivative_matrix(double tau, std::size_t _deg,
   _mat.noalias() += Q;
 }
 
-std::unique_ptr<Basis> Basis1010::clone() const {
-  return std::unique_ptr<Basis>(new Basis1010(*this));
+std::unique_ptr<Basis> Basis0101::clone() const {
+  return std::unique_ptr<Basis>(new Basis0101(*this));
 }
-std::unique_ptr<Basis> Basis1010::move_clone() {
-  return std::unique_ptr<Basis>(new Basis1010(std::move(*this)));
+std::unique_ptr<Basis> Basis0101::move_clone() {
+  return std::unique_ptr<Basis>(new Basis0101(std::move(*this)));
 }
 
-Eigen::MatrixXd Basis1010::derivative_matrix_impl(std::size_t _deg) const {
+Eigen::MatrixXd Basis0101::derivative_matrix_impl(std::size_t _deg) const {
 
   Eigen::MatrixXd Q(6, 6);
   switch (_deg) {
   case 0:
-    compute_Q_block(2, k_, Q);
+    compute_Q_block(2, alpha_, Q);
     break;
   case 1:
-    compute_Qd1_block(2, k_, Q);
+    compute_Qd1_block(2, alpha_, Q);
     break;
   case 2:
-    compute_Qd2_block(2, k_, Q);
+    compute_Qd2_block(2, alpha_, Q);
     break;
   case 3:
-    compute_Qd3_block(2, k_, Q);
+    compute_Qd3_block(2, alpha_, Q);
     break;
   default:
     throw std::invalid_argument("Basis 1010, this is not implemented");
@@ -730,7 +719,10 @@ void compute_Qd2_block(double _tau, double _alpha,
   _res(5, 5) = 0;
 }
 
-void compute_Q_block(double _tau, double k, Eigen::Ref<Eigen::MatrixXd> _res) {
+void compute_Q_block(double _tau, double _alpha,
+                     Eigen::Ref<Eigen::MatrixXd> _res) {
+  double k =
+      0.35355339059327379 * pow(_alpha, 0.25) * pow(1.0 / (1.0 - _alpha), 0.25);
   _res(0, 0) =
       0.0625 *
       (exp(4 * _tau * k) * pow(sin(_tau * k), 2) +

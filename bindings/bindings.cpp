@@ -1,5 +1,6 @@
 
 #include "gsplines/Basis/Basis.hpp"
+#include "gsplines/Basis/Basis0101.hpp"
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
@@ -48,6 +49,11 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def_static("get", [](const Eigen::Ref<const Eigen::VectorXd> _params) {
         return gsplines::basis::BasisLagrange::get(_params);
       });
+
+  py::class_<gsplines::basis::Basis0101, gsplines::basis::Basis>(
+      basis_submodule, "Basis0101")
+      .def(py::init<double>())
+      .def_static("get", &gsplines::basis::Basis0101::get);
 
   basis_submodule.def(
       "get_basis", [](const std::string &_basis_name, std::size_t _dim,
@@ -347,7 +353,8 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("linear_scaling_new_execution_time",
            &gsplines::GSpline::linear_scaling_new_execution_time);
 
-  gsplines_module.def("interpolate", &gsplines::interpolate);
+  gsplines_module.def("interpolate", &gsplines::interpolate,
+                      "iterpolates waypoints");
 
   gsplines_module.def("pw_polynomial_interpolation",
                       &gsplines::pw_polynomial_interpolation);

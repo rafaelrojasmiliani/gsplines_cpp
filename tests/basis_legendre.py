@@ -4,7 +4,7 @@ import sys
 import unittest
 import numpy as np
 from numpy.polynomial.legendre import Legendre
-#from .tools import debug_on
+# from .tools import debug_on
 try:
     from gsplines.basis import BasisLegendre
 except ImportError:
