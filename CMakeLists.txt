@@ -19,6 +19,7 @@ add_library(
   gsplines SHARED
   ${PROJECT_SOURCE_DIR}/src/Basis/BasisLegendre.cpp
   ${PROJECT_SOURCE_DIR}/src/Basis/BasisLagrange.cpp
+  ${PROJECT_SOURCE_DIR}/src/Basis/Basis1010.cpp
   ${PROJECT_SOURCE_DIR}/src/Basis/Basis.cpp
   ${PROJECT_SOURCE_DIR}/src/Interpolator.cpp
   ${PROJECT_SOURCE_DIR}/src/GSpline.cpp
