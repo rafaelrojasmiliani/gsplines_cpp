@@ -29,7 +29,9 @@ void Basis0101::eval_on_window(
     double _s, double _tau,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
-  double p = _tau * alpha_ * _s;
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
+             std::pow((1.0 - alpha_), 0.25);
+  double p = _tau * k * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
   double sinp = std::sin(p);
@@ -44,7 +46,9 @@ void Basis0101::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
 
-  double p = _tau * alpha_ * _s;
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
+             std::pow((1.0 - alpha_), 0.25);
+  double p = _tau * k * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
   double sinp = std::sin(p);
@@ -66,6 +70,7 @@ void Basis0101::eval_derivative_on_window(
     _buff[3] = v0 - v1;
     _buff[4] = _buff[5];
     _buff[5] = 0;
+    _buff *= k * 2;
   }
 }
 
@@ -126,24 +131,26 @@ std::unique_ptr<Basis> Basis0101::move_clone() {
 }
 
 Eigen::MatrixXd Basis0101::derivative_matrix_impl(std::size_t _deg) const {
+  static constexpr std::array<double, 36> d1matrix = {
+      1, -1, 0, 0,  0, 0, 1, 1, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0,
+      0, 0,  1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  0,  0, 0};
 
-  Eigen::MatrixXd Q(6, 6);
-  switch (_deg) {
-  case 0:
-    compute_Q_block(2, alpha_, Q);
-    break;
-  case 1:
-    compute_Qd1_block(2, alpha_, Q);
-    break;
-  case 2:
-    compute_Qd2_block(2, alpha_, Q);
-    break;
-  case 3:
-    compute_Qd3_block(2, alpha_, Q);
-    break;
-  default:
-    throw std::invalid_argument("Basis 1010, this is not implemented");
+  if (_deg == 0) {
+    return Eigen::MatrixXd::Identity(6, 6);
   }
+
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
+             std::pow((1.0 - alpha_), 0.25);
+  double tauk = k * 2.0;
+
+  Eigen::MatrixXd Q(Eigen::Map<const Eigen::MatrixXd>(d1matrix.data(), 6, 6));
+
+  Q *= tauk;
+
+  for (std::size_t i = 2; i <= _deg; i++) {
+    Q *= Q;
+  }
+
   return Q;
 }
 

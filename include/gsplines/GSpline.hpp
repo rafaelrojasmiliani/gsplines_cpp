@@ -4,6 +4,7 @@
 #include "gsplines/Functions/FunctionExpression.hpp"
 #include <eigen3/Eigen/Core>
 #include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/Basis0101.hpp>
 #include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 #include <stdexcept>
@@ -110,10 +111,20 @@ protected:
         for (codom_coor = 0; codom_coor < Base::get_codom_dim(); codom_coor++) {
           i0 = interval_coor * Base::basis_->get_dim() * Base::get_codom_dim() +
                Base::basis_->get_dim() * codom_coor;
+
+          double scale = 1.0;
+          /// workaround to handle Basis0101, which derivative matrix depends
+          /// on tau
+          if (dynamic_cast<const basis::Basis0101 *>(this->basis_.get())) {
+            scale = (_deg == 0) ? 0.0 : 1.0;
+          } else {
+            scale = std::pow(
+                2.0 / Base::domain_interval_lengths_(interval_coor), _deg);
+          }
+
           result_coeff.segment(i0, Base::basis_->get_dim()) =
               Base::basis_->get_derivative_matrix_block(_deg) *
-              result_coeff.segment(i0, Base::basis_->get_dim()) *
-              std::pow(2 / Base::domain_interval_lengths_(interval_coor), _deg);
+              result_coeff.segment(i0, Base::basis_->get_dim()) * scale;
         }
       }
     }
