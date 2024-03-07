@@ -6,7 +6,7 @@ RUN --mount=type=bind,source=./,target=/workspace,rw \
     && mkdir build \
     && cd build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr \
-    && make -j $(nproc) \
+    && make gsplines -j $(nproc) \
     && make install \
     && cd / \
     && rm -rf /gsplines
