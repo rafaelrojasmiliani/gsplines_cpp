@@ -59,12 +59,12 @@ jobs:
           steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.bindings ||
           steps.image_modify_date.outputs.image < steps.image_modify_date.outputs.base_image
 
-
   buildpackage:
     name: build dep package
     runs-on: ubuntu-latest
     container:
       image: ros:noetic-ros-core-focal
+    steps:
       - name: Git Sumbodule Update ad build
         run: echo "goo"
       - name: Upload binaries to release
