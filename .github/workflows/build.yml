@@ -81,6 +81,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
           asset_name: gsplines-0.0.1-amd64.deb
-          tag: ${{ guthub.ref }}
+          tag: ${{ github.ref }}
           overwrite: true
           body: "Debian pack"
