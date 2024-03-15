@@ -9,12 +9,15 @@ jobs:
       fail-fast: false
       matrix:
         docker_image:
-          - image_name: "rafa606/ros-gsplines-vim:melodic"
+          - image_name: "rafa606/ros-gsplines-vim-dev:melodic"
             base_image: "rafa606/ros-vim:melodic"
-          - image_name: "rafa606/ros-gsplines-vim:noetic"
+            ros_distro: "melodic"
+          - image_name: "rafa606/ros-gsplines-vim-dev:noetic"
             base_image: "rafa606/ros-vim:melodic"
-          - image_name: "rafa606/ros-gsplines-vim:humble"
+            ros_distro: "noetic"
+          - image_name: "rafa606/ros-gsplines-vim-dev:humble"
             base_image: "rafa606/ros-vim:humble"
+            ros_distro: "humble"
     steps:
       - name: checkout code
         uses: actions/checkout@main
@@ -50,6 +53,7 @@ jobs:
           push: true
           build-args: |
             BASEIMAGE=${{ matrix.docker_image.base_image }}
+            ROS_DISTRO=${{ matrix.docker_image.ros_distro }}
         if: |
           steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.docker_file ||
           steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.source ||
