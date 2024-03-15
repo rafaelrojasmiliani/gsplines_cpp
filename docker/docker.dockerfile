@@ -6,7 +6,7 @@ RUN --mount=type=bind,source=./,target=/workspace,rw \
     cd /workspace \
     && mkdir build \
     && cd build \
-    && source /opt/${ROS_DISTRO}/setup.bash \
+    && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr \
     && make gsplines -j $(nproc) \
     && make install \
