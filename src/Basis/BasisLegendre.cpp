@@ -10,7 +10,7 @@ std::shared_ptr<BasisLegendre> BasisLegendre::get(std::size_t _dim) {
   return std::make_shared<BasisLegendre>(_dim);
 }
 
-void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
+void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd& _dmat);
 
 BasisLegendre::BasisLegendre(std::size_t _dim)
     : Basis(_dim, "legendre"), buff_next(get_dim()) {
@@ -35,19 +35,20 @@ BasisLegendre::BasisLegendre(std::size_t _dim)
   // get_derivative_matrix(get_dim());
 }
 
-BasisLegendre::BasisLegendre(const BasisLegendre &that)
-    : Basis(that), buff_next(that.get_dim()),
+BasisLegendre::BasisLegendre(const BasisLegendre& that)
+    : Basis(that),
+      buff_next(that.get_dim()),
       derivative_matrices_buffer_(that.derivative_matrices_buffer_) {}
 
-BasisLegendre::BasisLegendre(BasisLegendre &&that)
-    : Basis(std::move(that)), buff_next(that.get_dim()),
+BasisLegendre::BasisLegendre(BasisLegendre&& that)
+    : Basis(std::move(that)),
+      buff_next(that.get_dim()),
       derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)) {
 }
 
 void BasisLegendre::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-
   double term = 0;
   double aux = 0;
   double mutiplier = 1.0;
@@ -81,7 +82,6 @@ void BasisLegendre::eval_derivative_on_window(
 void BasisLegendre::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-
   eval_derivative_on_window(_s, _tau, _deg, _buff);
   _buff *= -0.5 * _deg * (2.0 / _tau);
 }
@@ -102,13 +102,12 @@ double alpha(int i) { return ((double)(i + 1.0)) / ((double)(2.0 * i + 1.0)); }
 
 double gamma(int i) { return ((double)i) / ((double)(2.0 * i + 1.0)); }
 
-void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
-
+void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd& _dmat) {
   _dmat = Eigen::MatrixXd::Zero(_dim, _dim);
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (std::size_t i = 1; i < _dim; i++) {       // for on i
-    for (std::size_t j = 0; j < _dim - 1; j++) { // for on j
+  for (std::size_t i = 1; i < _dim; i++) {        // for on i
+    for (std::size_t j = 0; j < _dim - 1; j++) {  // for on j
       if (i == j + 1) {
         _dmat(i, j) = ((double)i) / alpha(i - 1);
       } else if (i > j + 1) {
@@ -122,37 +121,42 @@ void gsplines_legendre_dmat(size_t _dim, Eigen::MatrixXd &_dmat) {
       } else {
         _dmat(i, j) = 0.0;
       }
-    } // for on j
-  }   // for on i
+    }  // for on j
+  }  // for on i
 }
 
 void BasisLegendre::add_derivative_matrix(double tau, std::size_t _deg,
                                           Eigen::Ref<Eigen::MatrixXd> _mat) {
-
   double scale = _deg > 0 ? pow(2.0 / tau, 2 * _deg - 1) : tau / 2.0;
 
-  if (_deg < get_dim() + 1)
+  /// if the requested derivative degree is larger that the degrre od the
+  /// polynomial +1 the resuls the derivative matrix is zero.
+  /// As a consequence, we do not sum anything here
+  if (_deg < get_dim() + 1) {
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
+  }
 }
 
 void BasisLegendre::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
-
   double scale = _deg > 0 ? -0.5 * (2.0 * _deg - 1.0) * pow(2.0 / tau, 2 * _deg)
                           : 1.0 / 2.0;
 
-  if (_deg < get_dim() + 1)
+  /// if the requested derivative degree is larger that the degrre od the
+  /// polynomial +1 the resuls the derivative matrix is zero.
+  /// As a consequence, we do not sum anything here
+  if (_deg < get_dim() + 1) {
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
+  }
 }
 
 Eigen::MatrixXd BasisLegendre::derivative_matrix(std::size_t _dim) {
-
   Eigen::MatrixXd result(Eigen::MatrixXd::Zero(_dim, _dim));
 
   double firstTerm, secondTerm, thirdTerm, fourthTerm;
 
-  for (std::size_t i = 1; i < _dim; i++) {       // for on i
-    for (std::size_t j = 0; j < _dim - 1; j++) { // for on j
+  for (std::size_t i = 1; i < _dim; i++) {        // for on i
+    for (std::size_t j = 0; j < _dim - 1; j++) {  // for on j
       if (i == j + 1) {
         result(i, j) = ((double)i) / alpha(i - 1);
       } else if (i > j + 1) {
@@ -166,14 +170,13 @@ Eigen::MatrixXd BasisLegendre::derivative_matrix(std::size_t _dim) {
       } else {
         result(i, j) = 0.0;
       }
-    } // for on j
-  }   // for on i
+    }  // for on j
+  }  // for on i
 
   return result;
 }
 
 Eigen::MatrixXd BasisLegendre::derivative_matrix_impl(std::size_t _deg) const {
-
   if (_deg == 0) {
     return Eigen::MatrixXd::Identity(get_dim(), get_dim());
   }
@@ -181,11 +184,10 @@ Eigen::MatrixXd BasisLegendre::derivative_matrix_impl(std::size_t _deg) const {
   Eigen::MatrixXd dm(derivative_matrix(get_dim()));
   dm.transposeInPlace();
   result.transposeInPlace();
-  for (std::size_t i = 2; i <= _deg; i++)
-    result *= dm;
+  for (std::size_t i = 2; i <= _deg; i++) result *= dm;
   // printf("deg = %zu", _deg);
   // std::cout << "deriv matrix \n " << result << "----\n";
   return result;
 }
-} // namespace basis
-} // namespace gsplines
+}  // namespace basis
+}  // namespace gsplines

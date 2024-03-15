@@ -7,21 +7,19 @@ namespace gsplines {
 
 namespace basis {
 
-std::shared_ptr<BasisLagrange>
-BasisLagrange::get(const Eigen::Ref<const Eigen::VectorXd> &_domain_points) {
+std::shared_ptr<BasisLagrange> BasisLagrange::get(
+    const Eigen::Ref<const Eigen::VectorXd>& _domain_points) {
   return std::make_shared<BasisLagrange>(_domain_points);
 }
 
-std::shared_ptr<BasisLagrange>
-BasisLagrange::get(const std::vector<double> &_domain_points) {
+std::shared_ptr<BasisLagrange> BasisLagrange::get(
+    const std::vector<double>& _domain_points) {
   return std::make_shared<BasisLagrange>(_domain_points);
 }
 
 bool almost_equal(double _a, double _b, double _epsilon) {
-
   if (std::fabs(_a) < _epsilon or std::fabs(_b) < _epsilon) {
-    if (std::fabs(_a - _b) < _epsilon)
-      return true;
+    if (std::fabs(_a - _b) < _epsilon) return true;
     return false;
   }
   if (std::fabs(_a - _b) < _epsilon * std::fabs(_a) and
@@ -30,7 +28,7 @@ bool almost_equal(double _a, double _b, double _epsilon) {
   return false;
 }
 
-void gsplines_lagrange_dmat(size_t _dim, Eigen::MatrixXd &_dmat);
+void gsplines_lagrange_dmat(size_t _dim, Eigen::MatrixXd& _dmat);
 
 BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
     : Basis(_domain_points.size(), "lagrange", _domain_points),
@@ -60,18 +58,21 @@ BasisLagrange::BasisLagrange(Eigen::Ref<const Eigen::VectorXd> _domain_points)
   // get_derivative_matrix(get_dim());
 }
 
-BasisLagrange::BasisLagrange(const std::vector<double> &_domain_points)
+BasisLagrange::BasisLagrange(const std::vector<double>& _domain_points)
     : BasisLagrange(Eigen::Map<const Eigen::VectorXd>(_domain_points.data(),
                                                       _domain_points.size())) {}
 
-BasisLagrange::BasisLagrange(const BasisLagrange &that)
-    : Basis(that), domain_points_(that.domain_points_),
+BasisLagrange::BasisLagrange(const BasisLagrange& that)
+    : Basis(that),
+      domain_points_(that.domain_points_),
       barycentric_weights_(that.barycentric_weights_),
       derivative_matrices_buffer_(that.derivative_matrices_buffer_),
-      deriv_buff_1_(that.deriv_buff_1_), deriv_buff_2_(that.deriv_buff_2_) {}
+      deriv_buff_1_(that.deriv_buff_1_),
+      deriv_buff_2_(that.deriv_buff_2_) {}
 
-BasisLagrange::BasisLagrange(BasisLagrange &&that)
-    : Basis(std::move(that)), domain_points_(std::move(that.domain_points_)),
+BasisLagrange::BasisLagrange(BasisLagrange&& that)
+    : Basis(std::move(that)),
+      domain_points_(std::move(that.domain_points_)),
       barycentric_weights_(std::move(that.barycentric_weights_)),
       derivative_matrices_buffer_(std::move(that.derivative_matrices_buffer_)),
       deriv_buff_1_(std::move(that.deriv_buff_1_)),
@@ -81,8 +82,7 @@ void BasisLagrange::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
   eval_on_window(_s, _tau, _buff);
-  if (_deg == 0)
-    return;
+  if (_deg == 0) return;
   double term = std::pow(2.0 / _tau, _deg);
   /*
 
@@ -147,20 +147,28 @@ void BasisLagrange::add_derivative_matrix(double tau, std::size_t _deg,
                                           Eigen::Ref<Eigen::MatrixXd> _mat) {
   double scale = _deg > 0 ? pow(2.0 / tau, 2 * _deg - 1) : tau / 2.0;
 
-  if (_deg < get_dim() + 1)
+  /// if the requested derivative degree is larger that the degrre od the
+  /// polynomial +1 the resuls the derivative matrix is zero.
+  /// As a consequence, we do not sum anything here
+  if (_deg < get_dim() + 1) {
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
+  }
 }
 
 void BasisLagrange::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
   double scale = _deg > 0 ? -0.5 * (2.0 * _deg - 1.0) * pow(2.0 / tau, 2 * _deg)
                           : 1.0 / 2.0;
-  if (_deg < get_dim() + 1)
+  /// if the requested derivative degree is larger that the degrre od the
+  /// polynomial +1 the resuls the derivative matrix is zero.
+  /// As a consequence, we do not sum anything here
+  if (_deg < get_dim() + 1) {
     _mat.noalias() += derivative_matrices_buffer_[_deg] * scale;
+  }
 }
 
-Eigen::VectorXd
-BasisLagrange::barycentric_weights(Eigen::Ref<const Eigen::VectorXd> _points) {
+Eigen::VectorXd BasisLagrange::barycentric_weights(
+    Eigen::Ref<const Eigen::VectorXd> _points) {
   /*  David A. Kopriva
    *  Implementing Spectral
    *  Methods for Partial
@@ -180,8 +188,8 @@ BasisLagrange::barycentric_weights(Eigen::Ref<const Eigen::VectorXd> _points) {
   return result;
 }
 
-Eigen::MatrixXd
-BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points) {
+Eigen::MatrixXd BasisLagrange::derivative_matrix(
+    Eigen::Ref<const Eigen::VectorXd> _points) {
   /*  David A. Kopriva
    *  Implementing Spectral
    *  Methods for Partial
@@ -205,9 +213,8 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points) {
   return result;
 }
 
-Eigen::MatrixXd
-BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
-                                 std::size_t _deg) {
+Eigen::MatrixXd BasisLagrange::derivative_matrix(
+    Eigen::Ref<const Eigen::VectorXd> _points, std::size_t _deg) {
   /*  David A. Kopriva
    *  Implementing Spectral
    *  Methods for Partial
@@ -216,8 +223,7 @@ BasisLagrange::derivative_matrix(Eigen::Ref<const Eigen::VectorXd> _points,
 
   if (_deg == 0)
     return Eigen::MatrixXd::Identity(_points.size(), _points.size());
-  if (_deg == 1)
-    return derivative_matrix(_points);
+  if (_deg == 1) return derivative_matrix(_points);
 
   Eigen::MatrixXd result(derivative_matrix(_points));
   Eigen::MatrixXd buff(derivative_matrix(_points));
@@ -291,5 +297,5 @@ Eigen::MatrixXd BasisLagrange::derivative_matrix_impl(std::size_t _deg) const {
 BasisLagrangeGaussLobatto::BasisLagrangeGaussLobatto(std::size_t _dim)
     : BasisLagrange(
           gsplines::collocation::legendre_gauss_lobatto_points(_dim)) {}
-} // namespace basis
-} // namespace gsplines
+}  // namespace basis
+}  // namespace gsplines
