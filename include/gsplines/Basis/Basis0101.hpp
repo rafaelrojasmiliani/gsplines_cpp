@@ -33,6 +33,8 @@ class Basis0101 : public Basis {
   void add_derivative_matrix_deriv_wrt_tau(
       double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) override;
 
+  double get_alpha() const;
+
   std::unique_ptr<Basis> clone() const override;
   std::unique_ptr<Basis> move_clone() override;
   Eigen::MatrixXd derivative_matrix_impl(std::size_t _deg) const override;

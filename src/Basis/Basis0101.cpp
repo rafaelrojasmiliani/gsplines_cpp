@@ -25,6 +25,8 @@ std::shared_ptr<Basis0101> Basis0101::get(double k) {
   return std::shared_ptr<Basis0101>(new Basis0101(k));
 }
 
+double Basis0101::get_alpha() const { return alpha_; }
+
 void Basis0101::eval_on_window(
     double _s, double _tau,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
