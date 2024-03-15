@@ -99,15 +99,6 @@ TEST(Basis0101, IpoptDerivativeTest) {
   ipopt.Solve(nlp);
 }
 
-TEST(Basis0101, BasisDerivative) {
-  Eigen::MatrixXd matrix_ground(6, 6);
-  Eigen::MatrixXd matrix_test(6, 6);
-  gsplines::basis::Basis0101 basis(0.5);
-  std::array<double, 9> coeff = {1.0 / 280.0, -4.0 / 105.0, 1.0 / 5.0,
-                                 -4.0 / 5.0,  0.0,          4.0 / 5.0,
-                                 -1.0 / 5.0,  4.0 / 105.0,  -1.0 / 280.0};
-}
-
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
