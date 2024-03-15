@@ -19,19 +19,25 @@ void compute_Qd1_dtau_block(double _tau, double _alpha,
 void compute_Qd3_dtau_block(double _tau, double _alpha,
                             Eigen::Ref<Eigen::MatrixXd> _res);
 
-Basis0101::Basis0101(double _alpha) : Basis(6, "Basis0101"), alpha_(_alpha) {}
+Basis0101::Basis0101(double _alpha)
+    : Basis(6, "basis0101", [_alpha]() {
+        Eigen::VectorXd res(1);
+        res(0) = _alpha;
+        return res;
+      }()) {}
 
 std::shared_ptr<Basis0101> Basis0101::get(double k) {
   return std::shared_ptr<Basis0101>(new Basis0101(k));
 }
 
-double Basis0101::get_alpha() const { return alpha_; }
+double Basis0101::get_alpha() const { return this->get_parameters()(0); }
 
 void Basis0101::eval_on_window(
     double _s, double _tau,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
-             std::pow((1.0 - alpha_), 0.25);
+  double alpha = this->get_parameters()(0);
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha, 0.25) /
+             std::pow((1.0 - alpha), 0.25);
   double p = _tau * k * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
@@ -46,8 +52,9 @@ void Basis0101::eval_on_window(
 void Basis0101::eval_derivative_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
-             std::pow((1.0 - alpha_), 0.25);
+  double alpha = this->get_parameters()(0);
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha, 0.25) /
+             std::pow((1.0 - alpha), 0.25);
   double p = _tau * k * _s;
   double expp = std::exp(p);
   double cosp = std::cos(p);
@@ -77,8 +84,9 @@ void Basis0101::eval_derivative_on_window(
 void Basis0101::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
-             std::pow((1.0 - alpha_), 0.25);
+  double alpha = this->get_parameters()(0);
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha, 0.25) /
+             std::pow((1.0 - alpha), 0.25);
 
   this->eval_derivative_on_window(_s, _tau, _deg, _buff);
   double v0 = _buff[0];
@@ -97,12 +105,13 @@ void Basis0101::eval_derivative_wrt_tau_on_window(
 void Basis0101::add_derivative_matrix_deriv_wrt_tau(
     double tau, std::size_t _deg, Eigen::Ref<Eigen::MatrixXd> _mat) {
   qBuffer_.setZero();
+  double alpha = this->get_parameters()(0);
   switch (_deg) {
     case 1:
-      compute_Qd1_dtau_block(tau, alpha_, qBuffer_);
+      compute_Qd1_dtau_block(tau, alpha, qBuffer_);
       break;
     case 3:
-      compute_Qd3_dtau_block(tau, alpha_, qBuffer_);
+      compute_Qd3_dtau_block(tau, alpha, qBuffer_);
       break;
     default:
       throw std::invalid_argument(
@@ -114,18 +123,19 @@ void Basis0101::add_derivative_matrix_deriv_wrt_tau(
 void Basis0101::add_derivative_matrix(double tau, std::size_t _deg,
                                       Eigen::Ref<Eigen::MatrixXd> _mat) {
   qBuffer_.setZero();
+  double alpha = this->get_parameters()(0);
   switch (_deg) {
     case 0:
-      compute_Q_block(tau, alpha_, qBuffer_);
+      compute_Q_block(tau, alpha, qBuffer_);
       break;
     case 1:
-      compute_Qd1_block(tau, alpha_, qBuffer_);
+      compute_Qd1_block(tau, alpha, qBuffer_);
       break;
     case 2:
-      compute_Qd2_block(tau, alpha_, qBuffer_);
+      compute_Qd2_block(tau, alpha, qBuffer_);
       break;
     case 3:
-      compute_Qd3_block(tau, alpha_, qBuffer_);
+      compute_Qd3_block(tau, alpha, qBuffer_);
       break;
     default:
       throw std::invalid_argument(
@@ -146,12 +156,13 @@ Eigen::MatrixXd Basis0101::derivative_matrix_impl(std::size_t _deg) const {
       1, -1, 0, 0,  0, 0, 1, 1, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0,
       0, 0,  1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,  0,  0, 0};
 
+  double alpha = this->get_parameters()(0);
   if (_deg == 0) {
     return Eigen::MatrixXd::Identity(6, 6);
   }
 
-  double k = std::sqrt(2.0) / 4.0 * std::pow(alpha_, 0.25) /
-             std::pow((1.0 - alpha_), 0.25);
+  double k = std::sqrt(2.0) / 4.0 * std::pow(alpha, 0.25) /
+             std::pow((1.0 - alpha), 0.25);
   double tauk = k * 2.0;
 
   Eigen::MatrixXd Q(Eigen::Map<const Eigen::MatrixXd>(d1matrix.data(), 6, 6));

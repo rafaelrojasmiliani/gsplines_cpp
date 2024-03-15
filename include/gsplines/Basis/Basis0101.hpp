@@ -9,7 +9,6 @@ namespace gsplines::basis {
  * functions f_i: I -> R and contains the tools to compute them.*/
 class Basis0101 : public Basis {
  private:
-  double alpha_;
   mutable Eigen::MatrixXd qBuffer_ = Eigen::MatrixXd(6, 6);
 
  public:
