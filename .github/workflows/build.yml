@@ -9,9 +9,12 @@ jobs:
       fail-fast: false
       matrix:
         docker_image:
-          - tag: "18.04"
-          - tag: "20.04"
-          - tag: "22.04"
+          - image_name: "rafa606/ros-gsplines-vim:melodic"
+            base_image: "rafa606/ros-vim:melodic"
+          - image_name: "rafa606/ros-gsplines-vim:noetic"
+            base_image: "rafa606/ros-vim:melodic"
+          - image_name: "rafa606/ros-gsplines-vim:humble"
+            base_image: "rafa606/ros-vim:humble"
     steps:
       - name: checkout code
         uses: actions/checkout@main
@@ -19,17 +22,38 @@ jobs:
           fetch-depth: 2
           submodules: recursive
 
+      - name: Check last modified time of Foo Dockerfile
+        id: image_modify_date
+        run: |
+          echo "image=$(date -d "$(curl -s https://hub.docker.com/v2/repositories/"$(echo ${{ matrix.docker_image.image_name }} | sed 's/:/\/tags\//')" | jq -r '.last_updated')" +%s)" >> $GITHUB_OUTPUT;
+          echo "base_image=$(date -d "$(curl -s https://hub.docker.com/v2/repositories/"$(echo ${{ matrix.docker_image.base_image }} | sed 's/:/\/tags\//')" | jq -r '.last_updated')" +%s)" >> $GITHUB_OUTPUT;
+
+      - name: Check last modified time of Foo Docker image
+        id: file_modify_date
+        run: |
+          echo "docker_file=$(date -d "$(git log -1 --format=%cd --date=iso -- ./docker/docker.dockerfile)" +%s)" >> $GITHUB_OUTPUT
+          echo "source=$(date -d "$(git log -1 --format=%cd --date=iso -- ./source)" +%s)" >> $GITHUB_OUTPUT
+          echo "include=$(date -d "$(git log -1 --format=%cd --date=iso -- ./include)" +%s)" >> $GITHUB_OUTPUT
+          echo "python=$(date -d "$(git log -1 --format=%cd --date=iso -- ./python)" +%s)" >> $GITHUB_OUTPUT
+          echo "bindings=$(date -d "$(git log -1 --format=%cd --date=iso -- ./bindings)" +%s)" >> $GITHUB_OUTPUT
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: build and push rafa606/ubuntu-gsplines:${{ matrix.docker_image.tag }}
+      - name: build and push ${{ matrix.docker_image.image_name }}
         uses: docker/build-push-action@v3
         with:
-          tags: rafa606/ubuntu-gsplines:${{ matrix.docker_image.tag }}
+          tags: ${{ matrix.docker_image.image_name }}
           file: docker/docker.dockerfile
           push: true
           build-args: |
-            BASEIMAGE=rafa606/ubuntu:${{ matrix.docker_image.tag }}
+            BASEIMAGE=${{ matrix.docker_image.base_image }}
+        if: |
+          steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.docker_file ||
+          steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.source ||
+          steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.include ||
+          steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.python ||
+          steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.bindings ||
+          steps.image_modify_date.outputs.image < steps.image_modify_date.outputs.base_image
