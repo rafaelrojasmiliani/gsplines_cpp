@@ -101,5 +101,18 @@ namespace optimization {
       .linear_scaling_new_execution_time(1.0);
 }
 
+::gsplines::GSpline rojas_path(
+    const Eigen::Ref<const Eigen::MatrixXd> _waypoints, double _k) {
+  double ni = _waypoints.rows() - 1;
+
+  double execution_time = 4.0 * ni / std::sqrt(2.0);
+  double aux = 4 * ni * _k / std::sqrt(2);
+  double alpha = 1.0 / (1.0 + std::pow(execution_time / aux, 4));
+
+  return optimal_sobolev_norm(_waypoints, gsplines::basis::Basis0101(alpha),
+                              {{1, alpha}, {3, 1 - alpha}}, execution_time)
+      .linear_scaling_new_execution_time(1.0);
+}
+
 }  // namespace optimization
 }  // namespace gsplines
