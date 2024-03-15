@@ -15,9 +15,6 @@ jobs:
           - image_name: "rafa606/ros-gsplines-vim-dev:noetic"
             base_image: "rafa606/ros-vim:noetic"
             ros_distro: "noetic"
-          - image_name: "rafa606/ros-gsplines-vim-dev:humble"
-            base_image: "rafa606/ros-vim:humble"
-            ros_distro: "humble"
     steps:
       - name: checkout code
         uses: actions/checkout@main
