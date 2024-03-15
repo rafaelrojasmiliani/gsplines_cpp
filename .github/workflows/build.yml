@@ -66,7 +66,15 @@ jobs:
       image: ros:noetic-ros-core-focal
     steps:
       - name: Git Sumbodule Update ad build
-        run: echo "goo"
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
+          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+          cd gsplines_cpp
+          mkdir build
+          cd build
+          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
