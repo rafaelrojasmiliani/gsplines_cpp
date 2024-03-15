@@ -75,9 +75,21 @@ void Basis0101::eval_derivative_on_window(
 void Basis0101::eval_derivative_wrt_tau_on_window(
     double _s, double _tau, unsigned int _deg,
     Eigen::Ref<Eigen::VectorXd, 0, Eigen::InnerStride<>> _buff) const {
-  double aux = std::pow(2.0 * alpha_, _deg);
+  double k = std::sqrt(2) / 4.0 * std::pow(alpha_, 0.25) /
+             std::pow((1.0 - alpha_), 0.25);
+
   this->eval_derivative_on_window(_s, _tau, _deg, _buff);
-  _buff *= aux;
+  double v0 = _buff[0];
+  double v1 = _buff[1];
+  _buff[0] = v0 - v1;
+  _buff[1] = v0 + v1;
+  v0 = _buff[2];
+  v1 = _buff[3];
+  _buff[2] = -v0 - v1;
+  _buff[3] = v0 - v1;
+  _buff[4] = _buff[5];
+  _buff[5] = 0;
+  _buff *= _s * k;
 }
 
 void Basis0101::add_derivative_matrix_deriv_wrt_tau(
@@ -114,7 +126,8 @@ void Basis0101::add_derivative_matrix(double tau, std::size_t _deg,
       compute_Qd3_block(tau, alpha_, qBuffer_);
       break;
     default:
-      throw std::invalid_argument("");
+      throw std::invalid_argument(
+          "This derivative matrix has not been implemented");
   }
   _mat.noalias() += qBuffer_;
 }
