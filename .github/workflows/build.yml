@@ -58,3 +58,30 @@ jobs:
           steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.python ||
           steps.image_modify_date.outputs.image < steps.file_modify_date.outputs.bindings ||
           steps.image_modify_date.outputs.image < steps.image_modify_date.outputs.base_image
+
+
+  buildpackage:
+    name: build dep package
+    runs-on: ubuntu-latest
+    container:
+      image: bar/cat:foo
+    runs-on: ubuntu-latest
+      - name: Git Sumbodule Update ad build
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
+          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+          cd gsplines_cpp
+          mkdir build
+          cd build
+          bash -c "source /opt/ros/noetic/setup.bash && cmake .. && make -j2 && cpack -G DEB"
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
+          asset_name: gsplines-0.0.1-amd64.deb
+          tag: package
+          overwrite: true
+          body: "Debian pack"

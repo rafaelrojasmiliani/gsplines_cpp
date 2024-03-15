@@ -1,8 +1,9 @@
-#include <chrono>
 #include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/Basis0101.hpp>
 #include <gsplines/Basis/BasisLagrange.hpp>
 #include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/Tools.hpp>
+#include <chrono>
 #include <iostream>
 #include <math.h>
 #include <memory>
@@ -11,36 +12,42 @@ namespace gsplines {
 
 namespace basis {
 
-std::shared_ptr<Basis> get_basis(const std::string &_basis_name,
+std::shared_ptr<Basis> get_basis(const std::string& _basis_name,
                                  std::size_t _dim,
-                                 const std::vector<double> &_params) {
+                                 const std::vector<double>& _params) {
   return get_basis(
       _basis_name, _dim,
       Eigen::Map<const Eigen::VectorXd>(_params.data(), _params.size()));
 }
 
-std::shared_ptr<Basis>
-get_basis(const std::string &_basis_name, std::size_t _dim,
-          const Eigen::Ref<const Eigen::VectorXd> _params) {
+std::shared_ptr<Basis> get_basis(
+    const std::string& _basis_name, std::size_t _dim,
+    const Eigen::Ref<const Eigen::VectorXd> _params) {
   if (_basis_name == "lagrange") {
     return BasisLagrange::get(_params);
   } else if (_basis_name == "legendre") {
     return BasisLegendre::get(_dim);
+  } else if (_basis_name == "basis0101") {
+    if (_params.size() != 1) {
+      throw std::invalid_argument(
+          "You need a double parameter to instantiate basis0101");
+    }
+
+    return std::make_shared<Basis0101>(_params(0));
   }
+
   throw std::invalid_argument("basis name does not exists");
-  return std::make_shared<BasisLagrange>(_params);
+  return nullptr;
 }
 
-const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
+const Eigen::SparseMatrix<double, Eigen::RowMajor>& Basis::continuity_matrix(
     std::size_t _number_of_intervals, std::size_t _codom_dim,
     std::size_t _deriv_order,
     Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const {
-
   if (not(continuity_matrix_buff_.count(_number_of_intervals) and
           continuity_matrix_buff_[_number_of_intervals].count(_codom_dim) and
           continuity_matrix_buff_[_number_of_intervals][_codom_dim].count(
               _deriv_order))) {
-
     // for each derivative degree, this fills
     // (_number_of_intervals-1)*_codom_dim rows
 
@@ -57,7 +64,7 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     eval_derivative_on_window(1.0, 2.0, 0, right_buffer.row(0));
 
     for (std::size_t der = 1; der <= _deriv_order; der++) {
-      const Eigen::MatrixXd &dblock = get_derivative_matrix_block(der);
+      const Eigen::MatrixXd& dblock = get_derivative_matrix_block(der);
       left_buffer.row(der) = dblock.row(0);
       right_buffer.row(der) = dblock.bottomRows(1);
     }
@@ -65,20 +72,16 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
     std::size_t i0, j0;
 
     for (std::size_t der_coor = 0; der_coor <= _deriv_order; der_coor++) {
-
       for (std::size_t interval_coor = 0;
            interval_coor < _number_of_intervals - 1; interval_coor++) {
-
         i0 = _codom_dim * (_number_of_intervals - 1) * der_coor +
              interval_coor * _codom_dim;
         // fill components relative to the rhs value od the interval
         j0 = interval_coor * get_dim() * _codom_dim;
         for (std::size_t codom_coor = 0; codom_coor < _codom_dim;
              codom_coor++) {
-
           for (std::size_t basis_coor = 0; basis_coor < get_dim();
                basis_coor++) {
-
             result.insert(i0 + codom_coor,
                           j0 + basis_coor * 1.0 + get_dim() * codom_coor) =
                 right_buffer(der_coor, basis_coor);
@@ -88,10 +91,8 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
         j0 = (interval_coor + 1) * get_dim() * _codom_dim;
         for (std::size_t codom_coor = 0; codom_coor < _codom_dim;
              codom_coor++) {
-
           for (std::size_t basis_coor = 0; basis_coor < get_dim();
                basis_coor++) {
-
             result.insert(i0 + codom_coor,
                           j0 + basis_coor * 1.0 + get_dim() * codom_coor) =
                 -left_buffer(der_coor, basis_coor);
@@ -114,17 +115,16 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
                                    [_deriv_order];
                                    */
 
-  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_dest =
+  Eigen::SparseMatrix<double, Eigen::RowMajor>& mat_dest =
       continuity_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                      [_deriv_order];
-  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_src =
+  Eigen::SparseMatrix<double, Eigen::RowMajor>& mat_src =
       continuity_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order];
 
   // in our case all the rows of the matrix have at more than one non-zero cell
   // By this reason the outer index coincieds with the cols
   for (long k = _codom_dim * (_number_of_intervals - 1);
        k < mat_dest.outerSize(); ++k) {
-
     std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
 
     Eigen::VectorXd deriv_factor =
@@ -153,23 +153,21 @@ const Eigen::SparseMatrix<double, Eigen::RowMajor> &Basis::continuity_matrix(
                                         [_deriv_order];
 }
 
-const Eigen::SparseMatrix<double, Eigen::RowMajor> &
+const Eigen::SparseMatrix<double, Eigen::RowMajor>&
 Basis::gspline_derivative_matrix(
     std::size_t _number_of_intervals, std::size_t _codom_dim,
     std::size_t _deriv_order,
     Eigen::Ref<const Eigen::VectorXd> _interval_lengths) const {
-
   std::size_t matrix_size = _number_of_intervals * _codom_dim * get_dim();
 
   if (not(derivative_matrix_buff_.count(_number_of_intervals) and
           derivative_matrix_buff_[_number_of_intervals].count(_codom_dim) and
           derivative_matrix_buff_[_number_of_intervals][_codom_dim].count(
               _deriv_order))) {
-
     Eigen::SparseMatrix<double, Eigen::RowMajor> result(matrix_size,
                                                         matrix_size);
 
-    const Eigen::MatrixXd &dmat = get_derivative_matrix_block(_deriv_order);
+    const Eigen::MatrixXd& dmat = get_derivative_matrix_block(_deriv_order);
     for (std::size_t block = 0; block < _number_of_intervals * _codom_dim;
          block++) {
       std::size_t i0 = block * get_dim();
@@ -189,18 +187,17 @@ Basis::gspline_derivative_matrix(
     //    std::chrono::steady_clock::now();
   }
 
-  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_dest =
+  Eigen::SparseMatrix<double, Eigen::RowMajor>& mat_dest =
       derivative_matrix_dynamic_buff_[_number_of_intervals][_codom_dim]
                                      [_deriv_order];
 
-  Eigen::SparseMatrix<double, Eigen::RowMajor> &mat_src =
+  Eigen::SparseMatrix<double, Eigen::RowMajor>& mat_src =
       derivative_matrix_buff_[_number_of_intervals][_codom_dim][_deriv_order];
 
   Eigen::VectorXd deriv_factor =
       Eigen::pow(2.0 / _interval_lengths.array(), _deriv_order);
 
   for (long k = 0; k < mat_dest.outerSize(); ++k) {
-
     // std::size_t deg = k / (_codom_dim * (_number_of_intervals - 1));
 
     Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it_dest(
@@ -218,12 +215,9 @@ Basis::gspline_derivative_matrix(
                                         [_deriv_order];
 }
 
-bool Basis::operator==(const Basis &_that) const {
-
-  if (get_name() != _that.get_name())
-    return false;
-  if (get_dim() != _that.get_dim())
-    return false;
+bool Basis::operator==(const Basis& _that) const {
+  if (get_name() != _that.get_name()) return false;
+  if (get_dim() != _that.get_dim()) return false;
 
   if (parameters_int_.size() != _that.parameters_int_.size() or
       parameters_float_.size() != _that.parameters_float_.size())
@@ -233,5 +227,5 @@ bool Basis::operator==(const Basis &_that) const {
          gsplines::tools::approx_equal(parameters_float_,
                                        _that.parameters_float_, 1.0e-6);
 }
-} // namespace basis
-} // namespace gsplines
+}  // namespace basis
+}  // namespace gsplines
