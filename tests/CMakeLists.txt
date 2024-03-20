@@ -1,5 +1,4 @@
 include(GoogleTest)
-link_directories(${PROJECT_SOURCE_DIR}/build)
 link_libraries(${GSL_LIBRARIES} ${Eigen3_LIBRARIES} gsplines gtest pthread)
 include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
                     ${Eigen3_LIBRARIES})
@@ -28,7 +27,7 @@ foreach(file_path ${test_py_list})
     ${new_name}
     PROPERTIES
       ENVIRONMENT
-      PYTHONPATH=${PROJECT_SOURCE_DIR}/python:${PROJECT_SOURCE_DIR}/build:$ENV{PYTHONPATH}
+      PYTHONPATH=${PROJECT_SOURCE_DIR}/python:$<TARGET_FILE_DIR:pygsplines>:$ENV{PYTHONPATH}
   )
 
 endforeach()

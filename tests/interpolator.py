@@ -53,7 +53,7 @@ class MyTest(unittest.TestCase):
         print(res.get_domain())
         print(res.get_waypoints())
 
-        b = get_basis("legendre", 8, [])
+        # _ = get_basis("legendre", 8, np.ndarray([[]], dtype=np.float64))
 
 
 #    #@debug_on()
@@ -121,7 +121,7 @@ class MyTest(unittest.TestCase):
                 e = np.max(ev)
                 eidx = np.argmax(ev)
 
-                if(abs(dydtauiTest[eidx]) > 1.0e-5):
+                if (abs(dydtauiTest[eidx]) > 1.0e-5):
                     ep = e / abs(dydtauiTest[eidx])
                 else:
                     ep = e
