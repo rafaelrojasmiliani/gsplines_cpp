@@ -7,9 +7,13 @@
 #include <gsplines/Basis/Basis0101.hpp>
 #include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
+#include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <stdexcept>
+#include <vector>
 
 namespace gsplines {
 class SobolevNorm;
@@ -242,6 +246,89 @@ class GSplineInheritanceHelper
                    Base::coefficients_, new_domain_interva_lengths,
                    Base::get_name());
   }
+
+  Current linear_scaling_new_execution_time_max_velocity_max_acceleration(
+      std::optional<double> _velocity_bound,
+      std::optional<double> _acceleration_bound, double _dt = 0.01) const {
+    std::optional<std::vector<double>> velocity_bound;
+    std::optional<std::vector<double>> acceleration_bound;
+    if (_velocity_bound.has_value()) {
+      velocity_bound = std::vector<double>(_velocity_bound, this->codom_dim());
+    }
+    if (_acceleration_bound.has_value()) {
+      acceleration_bound =
+          std::vector<double>(_acceleration_bound, this->codom_dim());
+    }
+    return this
+        ->linear_scaling_new_execution_time_max_velocity_max_acceleration(
+            std::move(velocity_bound), std::move(acceleration_bound), _dt);
+  }
+
+  Current linear_scaling_new_execution_time_max_velocity_max_acceleration(
+      std::optional<std::vector<double>> _velocity_bound,
+      std::optional<std::vector<double>> _acceleration_bound,
+      double _dt = 0.01) const {
+    if (!_velocity_bound.has_value() && !_acceleration_bound.has_value()) {
+      throw std::invalid_argument(
+          "This method need a may value of velocity or acceleration");
+    }
+    if (_dt < 1.0e-8) {
+      throw std::invalid_argument("dt cannot be negative or too small");
+    }
+    if (_velocity_bound.value().size() != this->codom_dim() ||
+        _acceleration_bound.value().size() != this->codom_dim()) {
+      throw std::invalid_argument(
+          "Bounds for velocity and acceleration must correspont to codom dim");
+    }
+
+    std::size_t number_of_segments = this->get_domain_length() / _dt;
+    const double t0 = this->get_domain().first;
+    const double t1 = this->get_domain().second;
+    const Eigen::VectorXd time_spam = Eigen::VectorXd::LinSpaced(
+        static_cast<long>(number_of_segments) + 1, t0, t1);
+
+    const gsplines::functions::FunctionExpression gspline_diff_1 =
+        this->derivate();
+    const gsplines::functions::FunctionExpression gspline_diff_2 =
+        gspline_diff_1.derivate();
+
+    Eigen::MatrixXd gspline_evaluated = *this(time_spam);
+    Eigen::MatrixXd gspline_diff_1_evaluated = gspline_diff_1(time_spam);
+    Eigen::MatrixXd gspline_diff_2_evaluated = gspline_diff_2(time_spam);
+
+    const Eigen::Map<const Eigen::VectorXd> velocity_bound(
+        _velocity_bound.value().data(),
+        static_cast<long>(_velocity_bound.value().size()));
+    const Eigen::Map<const Eigen::VectorXd> acceleration_bound(
+        _acceleration_bound.value().data(),
+        static_cast<long>(_acceleration_bound.value().size()));
+
+    const double max_velocity_ratio =
+        (gspline_diff_1_evaluated.array().abs().colwise().maxCoeff() /
+         velocity_bound.transpose().array())
+            .maxCoeff();
+
+    const double max_acceleration_ratio =
+        Eigen::sqrt(
+            gspline_diff_2_evaluated.array().abs().colwise().maxCoeff() /
+            acceleration_bound.transpose().array())
+            .maxCoeff();
+
+    const double time_scale_factor =
+        std::max(max_velocity_ratio, max_acceleration_ratio);
+
+    Eigen::VectorXd new_domain_interva_lengths =
+        Base::domain_interval_lengths_ * time_scale_factor;
+
+    const std::pair<double, double> new_domain = Base::get_domain();
+    new_domain.second =
+        new_domain.first + Base::domain_interval_lengths_.array().sum();
+
+    return Current(new_domain, Base::get_codom_dim(),
+                   Base::get_number_of_intervals(), *Base::basis_,
+                   Base::coefficients_, new_domain_interva_lengths,
+                   Base::get_name());
+  }
   ~GSplineInheritanceHelper() override = default;
 };
 
@@ -268,6 +355,9 @@ GSpline operator-(GSpline&& _that);
 
 GSpline random_gspline(std::pair<double, double> _domain,
                        std::size_t _codom_dim);
+
+GSpline random_gspline(std::pair<double, double> _domain,
+                       std::size_t _codom_dim, const basis::Basis& _basis);
 
 }  // namespace gsplines
 

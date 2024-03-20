@@ -4,6 +4,7 @@
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Tools.hpp>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -222,6 +223,11 @@ GSpline operator-(GSpline&& _that) {
 
 GSpline random_gspline(std::pair<double, double> _domain,
                        std::size_t _codom_dim) {
+  return random_gspline(_domain, _codom_dim, basis::BasisLegendre(6));
+}
+
+GSpline random_gspline(std::pair<double, double> _domain,
+                       std::size_t _codom_dim, const basis::Basis& _basis) {
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_int_distribution<std::size_t> uint_dist(2, 10);
@@ -236,7 +242,7 @@ GSpline random_gspline(std::pair<double, double> _domain,
       Eigen::MatrixXd::Random(static_cast<long>(number_of_intervals) + 1,
                               static_cast<long>(_codom_dim));
 
-  const GSpline result = interpolate(tau, wp, *basis::BasisLegendre::get(6));
+  const GSpline result = interpolate(tau, wp, _basis);
   return result.linear_scaling_new_execution_time(_domain.second);
 }
 
