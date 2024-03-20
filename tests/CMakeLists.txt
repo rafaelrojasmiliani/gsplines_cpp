@@ -4,7 +4,7 @@ include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/include ${GSL_INCLUDE_DIRS}
                     ${Eigen3_LIBRARIES})
 
 file(GLOB_RECURSE test_list ${PROJECT_SOURCE_DIR}/tests/*.cpp)
-file(GLOB_RECURSE test_py_list ${CMAKE_SOURCE_DIR}/tests/*.py)
+file(GLOB_RECURSE test_py_list ${PROJECT_SOURCE_DIR}/tests/*.py)
 list(REMOVE_ITEM test_py_list "${PROJECT_SOURCE_DIR}/tests/__init__.py")
 list(REMOVE_ITEM test_py_list "${PROJECT_SOURCE_DIR}/tests/tools.py")
 

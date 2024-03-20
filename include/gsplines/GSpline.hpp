@@ -8,6 +8,7 @@
 #include <gsplines/Functions/Function.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -43,8 +44,8 @@ class GSplineBase : public functions::FunctionInheritanceHelper<
  public:
   GSplineBase(std::pair<double, double> _domain, std::size_t _codom_dim,
               std::size_t _n_intervals, const basis::Basis& _basis,
-              const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-              const Eigen::Ref<const Eigen::VectorXd> _tauv,
+              Eigen::Ref<const Eigen::VectorXd> _coefficents,
+              Eigen::Ref<const Eigen::VectorXd> _tauv,
               const std::string& _name = "GSplineBase");
 
   GSplineBase(std::pair<double, double> _domain, std::size_t _codom_dim,
@@ -253,11 +254,12 @@ class GSplineInheritanceHelper
     std::optional<std::vector<double>> velocity_bound;
     std::optional<std::vector<double>> acceleration_bound;
     if (_velocity_bound.has_value()) {
-      velocity_bound = std::vector<double>(_velocity_bound, this->codom_dim());
+      velocity_bound =
+          std::vector<double>(this->get_codom_dim(), _velocity_bound.value());
     }
     if (_acceleration_bound.has_value()) {
-      acceleration_bound =
-          std::vector<double>(_acceleration_bound, this->codom_dim());
+      acceleration_bound = std::vector<double>(this->get_codom_dim(),
+                                               _acceleration_bound.value());
     }
     return this
         ->linear_scaling_new_execution_time_max_velocity_max_acceleration(
@@ -275,8 +277,8 @@ class GSplineInheritanceHelper
     if (_dt < 1.0e-8) {
       throw std::invalid_argument("dt cannot be negative or too small");
     }
-    if (_velocity_bound.value().size() != this->codom_dim() ||
-        _acceleration_bound.value().size() != this->codom_dim()) {
+    if (_velocity_bound.value().size() != this->get_codom_dim() ||
+        _acceleration_bound.value().size() != this->get_codom_dim()) {
       throw std::invalid_argument(
           "Bounds for velocity and acceleration must correspont to codom dim");
     }
@@ -292,7 +294,6 @@ class GSplineInheritanceHelper
     const gsplines::functions::FunctionExpression gspline_diff_2 =
         gspline_diff_1.derivate();
 
-    Eigen::MatrixXd gspline_evaluated = *this(time_spam);
     Eigen::MatrixXd gspline_diff_1_evaluated = gspline_diff_1(time_spam);
     Eigen::MatrixXd gspline_diff_2_evaluated = gspline_diff_2(time_spam);
 
@@ -320,10 +321,26 @@ class GSplineInheritanceHelper
     Eigen::VectorXd new_domain_interva_lengths =
         Base::domain_interval_lengths_ * time_scale_factor;
 
-    const std::pair<double, double> new_domain = Base::get_domain();
+    std::pair<double, double> new_domain = Base::get_domain();
     new_domain.second =
-        new_domain.first + Base::domain_interval_lengths_.array().sum();
+        new_domain.first + new_domain_interva_lengths.array().sum();
 
+    /// work arround, as the basis0101 depens on tau, if we scale,
+    /// we change the basis.
+    auto* b = dynamic_cast<basis::Basis0101*>(Base::basis_.get());
+    if (b != nullptr) {
+      const double alpha_0 = b->get_alpha();
+      const double k_0 = std::sqrt(2.0) / 4.0 * std::pow(alpha_0, 0.25) /
+                         std::pow((1.0 - alpha_0), 0.25);
+      const double k = k_0 / time_scale_factor;
+      const double k4 = std::pow(k, 4);
+
+      const double alpha = k4 / (1.0 + k4);
+      return Current(new_domain, Base::get_codom_dim(),
+                     Base::get_number_of_intervals(), basis::Basis0101(alpha),
+                     Base::coefficients_, new_domain_interva_lengths,
+                     Base::get_name());
+    }
     return Current(new_domain, Base::get_codom_dim(),
                    Base::get_number_of_intervals(), *Base::basis_,
                    Base::coefficients_, new_domain_interva_lengths,

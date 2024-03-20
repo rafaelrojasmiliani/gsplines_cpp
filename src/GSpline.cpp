@@ -42,8 +42,8 @@ GSplineBase::GSplineBase(GSplineBase&& that) noexcept
 GSplineBase::GSplineBase(std::pair<double, double> _domain,
                          std::size_t _codom_dim, std::size_t _n_intervals,
                          const basis::Basis& _basis,
-                         const Eigen::Ref<const Eigen::VectorXd> _coefficents,
-                         const Eigen::Ref<const Eigen::VectorXd> _tauv,
+                         Eigen::Ref<const Eigen::VectorXd> _coefficents,
+                         Eigen::Ref<const Eigen::VectorXd> _tauv,
                          const std::string& _name)
     : FunctionInheritanceHelper(_domain, _codom_dim, _name),
       coefficients_(_coefficents),
@@ -234,13 +234,13 @@ GSpline random_gspline(std::pair<double, double> _domain,
   const std::size_t number_of_intervals = uint_dist(mt);
 
   const Eigen::VectorXd tau =
-      1.0 + (Eigen::VectorXd::Random(static_cast<long>(number_of_intervals))
+      2.0 + (Eigen::VectorXd::Random(static_cast<long>(number_of_intervals))
                  .array()) /
                 2.0;
 
   const Eigen::MatrixXd wp =
-      Eigen::MatrixXd::Random(static_cast<long>(number_of_intervals) + 1,
-                              static_cast<long>(_codom_dim));
+      3 * Eigen::MatrixXd::Random(static_cast<long>(number_of_intervals) + 1,
+                                  static_cast<long>(_codom_dim));
 
   const GSpline result = interpolate(tau, wp, _basis);
   return result.linear_scaling_new_execution_time(_domain.second);
