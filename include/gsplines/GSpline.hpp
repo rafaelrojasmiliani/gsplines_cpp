@@ -235,13 +235,28 @@ class GSplineInheritanceHelper
       throw std::invalid_argument("New time cannot be negative");
     }
 
+    double time_scale_factor = _new_exec_time / Base::get_domain_length();
+
     Eigen::VectorXd new_domain_interva_lengths =
-        Base::domain_interval_lengths_ * _new_exec_time /
-        Base::get_domain_length();
+        Base::domain_interval_lengths_ * time_scale_factor;
 
     std::pair<double, double> new_domain = Base::get_domain();
     new_domain.second = new_domain.first + _new_exec_time;
 
+    auto* b = dynamic_cast<basis::Basis0101*>(Base::basis_.get());
+    if (b != nullptr) {
+      const double alpha_0 = b->get_alpha();
+      const double k_0 = std::sqrt(2.0) / 4.0 * std::pow(alpha_0, 0.25) /
+                         std::pow((1.0 - alpha_0), 0.25);
+      const double k = k_0 / time_scale_factor;
+      const double k4 = std::pow(k, 4);
+
+      const double alpha = k4 / (1.0 + k4);
+      return Current(new_domain, Base::get_codom_dim(),
+                     Base::get_number_of_intervals(), basis::Basis0101(alpha),
+                     Base::coefficients_, new_domain_interva_lengths,
+                     Base::get_name());
+    }
     return Current(new_domain, Base::get_codom_dim(),
                    Base::get_number_of_intervals(), *Base::basis_,
                    Base::coefficients_, new_domain_interva_lengths,
