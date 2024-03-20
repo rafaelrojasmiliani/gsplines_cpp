@@ -8,6 +8,7 @@
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
+#include <vector>
 
 PYBIND11_MODULE(pygsplines, gsplines_module) {
   gsplines_module.doc() = "Generalized Splines Library with Optimization tools";
@@ -57,9 +58,11 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
 
   basis_submodule.def(
       "get_basis", [](const std::string& _basis_name, std::size_t _dim,
-                      Eigen::Ref<const Eigen::VectorXd> _params) {
-        auto basis = gsplines::basis::get_basis(_basis_name, _dim, _params);
-        return basis->clone();
+                      const std::vector<double>& _params) {
+        const Eigen::Map<const Eigen::VectorXd> params(
+            _params.data(), static_cast<long>(_params.size()));
+        auto basis = gsplines::basis::get_basis(_basis_name, _dim, params);
+        return basis->move_clone();
       });
 
   // --------------------
