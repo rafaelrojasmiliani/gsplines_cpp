@@ -36,7 +36,9 @@ std::shared_ptr<Basis> get_basis(
     return std::make_shared<Basis0101>(_params(0));
   }
 
-  throw std::invalid_argument("basis name does not exists");
+  throw std::invalid_argument((std::string("basis name \"") + _basis_name +
+                               std::string("\" does not exists"))
+                                  .c_str());
   return nullptr;
 }
 
