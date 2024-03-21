@@ -97,9 +97,9 @@ $$
     s_i(t)= 2\frac{t-t_i}{t_{i + 1}-t_i} - 1
 $$
 
-    4. Let $\mathbf{y}_i^j \in\mathbb{R}^n$.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iv. Let $\mathbf{y}_i^j \in\mathbb{R}^n$.
 
-    5. A **generalized spline** from $J$ into $\mathbb{R}^n$ is a curve given by
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v. A **generalized spline** from $J$ into $\mathbb{R}^n$ is a curve given by
 
 $$
     f_r= (y_{i}^j)^\top \mathbf{B} \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)
