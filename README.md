@@ -92,6 +92,7 @@ make install
     1. Let $J=[0, T]$ and consider the partition of  $J$ given by  $N + 1$ points $t_i\in J$, i.e. $I_1, I_2, ... ,I_N$ with $I_i=[t_i, t_{i + 1})$.
     2. Let $I_0=[-1,1]$ and $B_1, B_2, ... ,B_k$ be $k$ linearly independent functions $B_i:I_0\longrightarrow \mathbb{R}$.
     3. Let $s_i:I_i\longrightarrow I_0$ given by
+
 $$
     s_i(t)= 2\frac{t-t_i}{t_{i + 1}-t_i} - 1
 $$
@@ -104,7 +105,7 @@ $$
     f_r= (y_{i}^j)^\top \mathbf{B} \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)
 $$
 
-    where $\mathbf{B}$ is the vector constructed by stacking the basis in a colunm vector
+where $\mathbf{B}$ is the vector constructed by stacking the basis in a colunm vector
 
 # Motivation
 Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
@@ -126,7 +127,7 @@ This library provides a uniform and simple interface to formulate gradient-based
 
 # Background
 
-This library is aimed to find a trajectory passing trough a sequence of waypoints $\{\mathbf{w}_0, ...,\mathbf{w}_{N + 1}\}$ such that the following integral is minized
+This library is aimed to find a trajectory passing trough a sequence of waypoints $\mathbf{w}_0, ...,\mathbf{w}_{N + 1}$ such that the following integral is minized
 
 $$
 \Large I=\int_0^T \alpha_1\left\|\frac{\mathsf{d}\mathbf{q}}{\mathsf{d} t }\right\|^2 + \alpha_2 \left\|\frac{\mathsf{d}^2\mathbf{q}}{\mathsf{d} t^2 }\right\|^2 + \alpha_3\left\|\frac{\mathsf{d}^3\mathbf{q}}{\mathsf{d} t^3 }\right\|^2 +  \alpha_4\left\|\frac{\mathsf{d}^4\mathbf{q}}{\mathsf{d} t^4 }\right\|^2 \mathsf{d} t \ \ \ \ \ (1)
@@ -150,7 +151,7 @@ $$
 with the following boundary conditions
 
 $$
-\mathbf{q}(t_i) = \mathbf{w}_i\ \ \ \ \ \ \ \mathbf{q}(t_{i+1}) = \mathbf{w}_{i+1}\ \ \ \ \ \ \ \ \ \ \ \ \ \ (3)
+\mathbf{q}(t_i) = \mathbf{w}\_i\ \ \ \ \ \ \ \mathbf{q}(t_{i+1}) = \mathbf{w}_{i+1}\ \ \ \ \ \ \ \ \ \ \ \ \ \ (3)
 $$
 
 Because the ODE (2) is linear, we can compute its general suction depending on the value of the coefficients $\alpha_i$.
@@ -158,12 +159,12 @@ Because the ODE (2) is linear, we can compute its general suction depending on t
 In fact, the general solution of (2) may be written as a piecewise function defined at each interval as
 
 $$
-\mathbf{q} = \sum_{i=1}^{n_b} \mathbf{y}_i^j B_i(t) \ \ \ \ \text{if}\ \ \ \ t \in [t_{j}, t_{j + 1}]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (4)
+\mathbf{q} = \sum_{i=1}^{n_b} \mathbf{y}\_i^j B_i(t) \ \ \ \ \text{if}\ \ \ \ t \in [t_{j}, t_{j + 1}]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (4)
 $$
 
-where $n_b$, $B_i(t)$ depend on the coefficients $\alpha_i$ and $\mathbf{y}_i^j$ are column vectors in which represents the curve uniquely at the interval $[t_j, t_{j + 1}]$.
+where $n_b$, $B_i(t)$ depend on the coefficients $\alpha_i$ and $\mathbf{y}\_i^j$ are column vectors in which represents the curve uniquely at the interval $[t_j, t_{j + 1}]$.
 
-If we stack the column vectors $\mathbf{y}_i^j$ in a suitable way we obtain the column vector $\mathbf{y}$ used in (0). In fact, the equation (0) is obtained after applying to (4) the waypoint constrains and the boundary conditions.
+If we stack the column vectors $\mathbf{y}\_i^j$ in a suitable way we obtain the column vector $\mathbf{y}$ used in (0). In fact, the equation (0) is obtained after applying to (4) the waypoint constrains and the boundary conditions.
 
 After substituting (4) in (1) we obtain the following expression
 
