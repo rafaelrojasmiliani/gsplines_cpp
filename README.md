@@ -92,18 +92,18 @@ make install
     1. Let $J=[0, T]$ and consider the partition of  $J$ given by  $N + 1$ points $t_i\in J$, i.e. $I_1, I_2, ... ,I_N$ with $I_i=[t_i, t_{i + 1})$.
     2. Let $I_0=[-1,1]$ and $B_1, B_2, ... ,B_k$ be $k$ linearly independent functions $B_i:I_0\longrightarrow \mathbb{R}$.
     3. Let $s_i:I_i\longrightarrow I_0$ given by
-
-    $$
+$$
     s_i(t)= 2\frac{t-t_i}{t_{i + 1}-t_i} - 1
-    $$
+$$
 
     4. Let $\mathbf{y}_i^j \in\mathbb{R}^n$.
 
     5. A **generalized spline** from $J$ into $\mathbb{R}^n$ is a curve given by
 
-    $$
+$$
     f_r= (y_{i}^j)^\top \mathbf{B} \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)
-    $$
+$$
+
     where $\mathbf{B}$ is the vector constructed by stacking the basis in a colunm vector
 
 # Motivation
