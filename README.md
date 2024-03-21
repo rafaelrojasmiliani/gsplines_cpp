@@ -52,7 +52,7 @@ sudo apt-get install  python3-matplotlib ros-noetic-ifopt
 ```
 2. Download the package a install
 ```bash
-wget https://github.com/rafaelrojasmiliani/gsplines_cpp/releases/download/package/gsplines-0.0.1-amd64.deb
+wget https://github.com/rafaelrojasmiliani/gsplines_cpp/releases/download/master/gsplines-0.0.1-amd64.deb
 sudo dpkg -i gsplines-0.0.1-amd64.deb
 ```
 
