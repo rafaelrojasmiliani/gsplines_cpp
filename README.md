@@ -92,6 +92,7 @@ make install
     1. Let $J=[0, T]$ and consider the partition of  $J$ given by  $N + 1$ points $t_i\in J$, i.e. $I_1, I_2, ... ,I_N$ with $I_i=[t_i, t_{i + 1})$.
     2. Let $I_0=[-1,1]$ and $B_1, B_2, ... ,B_k$ be $k$ linearly independent functions $B_i:I_0\longrightarrow \mathbb{R}$.
     3. Let $s_i:I_i\longrightarrow I_0$ given by
+
     $$
     s_i(t)= 2\frac{t-t_i}{t_{i + 1}-t_i} - 1
     $$
@@ -99,6 +100,7 @@ make install
     4. Let $\mathbf{y}_i^j \in\mathbb{R}^n$.
 
     5. A **generalized spline** from $J$ into $\mathbb{R}^n$ is a curve given by
+
     $$
     f_r= (y_{i}^j)^\top \mathbf{B} \circ s_j(t) \text{ if } t\in I_j\ \ \ \ \ \ \ \ \ \ \ \ \ (\star)
     $$
@@ -110,6 +112,7 @@ In other words, if we desire to optimize a motion which pass trough a sequence o
 
 Generalized splines trajectories arising in such kind of optimization problems are uniquely characterized by the waypoints that they attain, the time intervals between waypoints and the speed, and possible higher order derivatives at the boundaries.
 Moreover, such a relation is synthesised in the expression of the type
+
 $$
 \mathbf{A}(\boldsymbol\tau)\mathbf{y} = \mathbf{b}(\mathbf{w})\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0)
 $$
@@ -124,9 +127,11 @@ This library provides a uniform and simple interface to formulate gradient-based
 # Background
 
 This library is aimed to find a trajectory passing trough a sequence of waypoints $\{\mathbf{w}_0, ...,\mathbf{w}_{N + 1}\}$ such that the following integral is minized
+
 $$
 \Large I=\int_0^T \alpha_1\left\|\frac{\mathsf{d}\mathbf{q}}{\mathsf{d} t }\right\|^2 + \alpha_2 \left\|\frac{\mathsf{d}^2\mathbf{q}}{\mathsf{d} t^2 }\right\|^2 + \alpha_3\left\|\frac{\mathsf{d}^3\mathbf{q}}{\mathsf{d} t^3 }\right\|^2 +  \alpha_4\left\|\frac{\mathsf{d}^4\mathbf{q}}{\mathsf{d} t^4 }\right\|^2 \mathsf{d} t \ \ \ \ \ (1)
 $$
+
 It may be proven that such a problem can be subdivided in two steps
 
  1. Find the family of optimal curves that joint waypoints
@@ -137,17 +142,21 @@ The step 1. is done by solving a linear ordinary differential equation. One meth
 ## Optimal curves
 We underline that this library leverages on the [general theory of linear ODEs](https://en.wikipedia.org/wiki/Linear_differential_equation).
 It may be proven that any optimal of (1) solves the following linear ODE, which turn out to be the Euler-Lagrange equations at each interval $[t_i, t_{i + 1}]$
+
 $$
 -\alpha_1\frac{\mathsf{d}^2\mathbf{q}}{\mathsf{d} t^2 } + \alpha_2 \frac{\mathsf{d}^4\mathbf{q}}{\mathsf{d} t^4 } - \alpha_3\frac{\mathsf{d}^6\mathbf{q}}{\mathsf{d} t^6 } +  \alpha_4 \frac{\mathsf{d}^8\mathbf{q}}{\mathsf{d} t^8 } = 0\ \ \ \ \ (2)
 $$
 
 with the following boundary conditions
+
 $$
 \mathbf{q}(t_i) = \mathbf{w}_i\ \ \ \ \ \ \ \mathbf{q}(t_{i+1}) = \mathbf{w}_{i+1}\ \ \ \ \ \ \ \ \ \ \ \ \ \ (3)
 $$
+
 Because the ODE (2) is linear, we can compute its general suction depending on the value of the coefficients $\alpha_i$.
 
 In fact, the general solution of (2) may be written as a piecewise function defined at each interval as
+
 $$
 \mathbf{q} = \sum_{i=1}^{n_b} \mathbf{y}_i^j B_i(t) \ \ \ \ \text{if}\ \ \ \ t \in [t_{j}, t_{j + 1}]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (4)
 $$
@@ -157,6 +166,7 @@ where $n_b$, $B_i(t)$ depend on the coefficients $\alpha_i$ and $\mathbf{y}_i^j$
 If we stack the column vectors $\mathbf{y}_i^j$ in a suitable way we obtain the column vector $\mathbf{y}$ used in (0). In fact, the equation (0) is obtained after applying to (4) the waypoint constrains and the boundary conditions.
 
 After substituting (4) in (1) we obtain the following expression
+
 $$
 I=\mathbf{y}^\top \mathbf{Q}(\boldsymbol{\tau}) \mathbf{y}\ \ \ \ \ \ \ \ \ \ \ \ \ (5)
 $$
