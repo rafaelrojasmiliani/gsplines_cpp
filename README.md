@@ -127,7 +127,7 @@ This library provides a uniform and simple interface to formulate gradient-based
 
 # Background
 
-This library is aimed to find a trajectory passing trough a sequence of waypoints $\mathbf{w}_0, ...,\mathbf{w}_{N + 1}$ such that the following integral is minized
+This library is aimed to find a trajectory passing trough a sequence of waypoints $\mathbf{w}\_0, ...,\mathbf{w}_{N + 1}$ such that the following integral is minized
 
 $$
 \Large I=\int_0^T \alpha_1\left\|\frac{\mathsf{d}\mathbf{q}}{\mathsf{d} t }\right\|^2 + \alpha_2 \left\|\frac{\mathsf{d}^2\mathbf{q}}{\mathsf{d} t^2 }\right\|^2 + \alpha_3\left\|\frac{\mathsf{d}^3\mathbf{q}}{\mathsf{d} t^3 }\right\|^2 +  \alpha_4\left\|\frac{\mathsf{d}^4\mathbf{q}}{\mathsf{d} t^4 }\right\|^2 \mathsf{d} t \ \ \ \ \ (1)
