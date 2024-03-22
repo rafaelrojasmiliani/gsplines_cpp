@@ -262,3 +262,17 @@ This architecture allow to implement complex algebraic expressions by recursivel
   publisher={Multidisciplinary Digital Publishing Institute}
 }
 ```
+
+- Rojas, Rafael A., Andrea Giusti, and Renato Vidoni. "Online Computation of Time-Optimization-Based, Smooth and Path-Consistent Stop Trajectories for Robots." Robotics 11.4 (2022): 70.
+```
+@article{rojas2022online,
+  title={Online Computation of Time-Optimization-Based, Smooth and Path-Consistent Stop Trajectories for Robots},
+  author={Rojas, Rafael A and Giusti, Andrea and Vidoni, Renato},
+  journal={Robotics},
+  volume={11},
+  number={4},
+  pages={70},
+  year={2022},
+  publisher={MDPI}
+}
+```
