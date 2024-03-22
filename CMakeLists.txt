@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_INSTALL_PREFIX /usr)
 set(PYTHON_VERSION
-    3.6
+    3.8
     CACHE STRING "Build bindings for Python version")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # include ifopt with custon ROS installation
@@ -59,7 +59,7 @@ set_target_properties(
 link_directories(${PROJECT_SOURCE_DIR}/build)
 
 if(NOT TARGET pybind11)
-  set(PYBIND11_PYTHON_VERSION "3.6")
+  set(PYBIND11_PYTHON_VERSION "3.8")
   add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
 endif()
 
