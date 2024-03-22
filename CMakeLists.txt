@@ -58,7 +58,7 @@ set_target_properties(
 
 link_directories(${PROJECT_SOURCE_DIR}/build)
 
-if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT TARGET pybind11)
   set(PYBIND11_PYTHON_VERSION "3.6")
   add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
 endif()
