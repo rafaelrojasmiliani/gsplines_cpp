@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(gsplines VERSION "0.0.1")
 include(CTest)
 find_program(CTEST_MEMORYCHECK_COMMAND valgrind)
@@ -8,9 +8,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g3 -pthread ")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_INSTALL_PREFIX /usr)
-set(PYTHON_VERSION
+set(PYBIND11_FINDPYTHON OFF)
+set(PYBIND11_PYTHON_VERSION
     3.8
-    CACHE STRING "Build bindings for Python version")
+    CACHE STRING "")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # include ifopt with custon ROS installation
 find_package(ifopt REQUIRED)
@@ -60,7 +61,6 @@ set_target_properties(
 link_directories(${PROJECT_SOURCE_DIR}/build)
 
 if(NOT TARGET pybind11)
-  set(PYBIND11_PYTHON_VERSION "3.8")
   add_subdirectory(${PROJECT_SOURCE_DIR}/modules/pybind11)
 endif()
 
