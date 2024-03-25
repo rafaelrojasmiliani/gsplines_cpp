@@ -43,12 +43,13 @@ add_library(
   # --
 )
 
-target_link_libraries(gsplines ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES})
+target_link_libraries(gsplines ${EIGEN3_LIBRARIES} ${ifopt_LIBRARIES})
 target_include_directories(
   gsplines
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include> ${Eigen3_INCLUDE_DIRS}
-         ${ifopt_INCLUDE_DIRS} /usr/include/eigen3)
+         $<INSTALL_INTERFACE:include> ${EIGEN3_INCLUDE_DIRS}
+         ${ifopt_INCLUDE_DIRS})
+
 set_target_properties(
   gsplines
   PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON
@@ -64,11 +65,13 @@ if(NOT TARGET pybind11)
 endif()
 
 pybind11_add_module(pygsplines ${PROJECT_SOURCE_DIR}/bindings/bindings.cpp)
-target_include_directories(pygsplines PUBLIC include /usr/include/eigen3)
-target_link_libraries(pygsplines PUBLIC ${Eigen3_LIBRARIES} ${ifopt_LIBRARIES}
-                                        gsplines)
 
-# set_target_properties(pygsplines PROPERTIES OUTPUT_NAME pygsplines)
+target_include_directories(
+  pygsplines PUBLIC ${EIGEN3_INCLUDE_DIRS}
+                    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/modules/pybind11>)
+
+target_link_libraries(pygsplines PUBLIC ${EIGEN3_LIBRARIES} ${ifopt_LIBRARIES}
+                                        gsplines)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   enable_testing()
