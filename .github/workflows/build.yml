@@ -9,9 +9,6 @@ jobs:
       fail-fast: false
       matrix:
         docker_image:
-          - image_name: "rafa606/ros-gsplines-vim-dev:melodic"
-            base_image: "rafa606/ros-vim:melodic"
-            ros_distro: "melodic"
           - image_name: "rafa606/ros-gsplines-vim-dev:noetic"
             base_image: "rafa606/ros-vim:noetic"
             ros_distro: "noetic"
@@ -86,7 +83,7 @@ jobs:
           body: "Debian pack compiled with standard ros noetic docker image"
 
   buildpackage2:
-    name: build dep package
+    name: build dep package with g++-11
     runs-on: ubuntu-latest
     container:
       image: ros:noetic-ros-core-focal
