@@ -85,7 +85,7 @@ jobs:
           overwrite: true
           body: "Debian pack compiled with standard ros noetic docker image"
 
-   buildpackage2:
+  buildpackage2:
     name: build dep package
     runs-on: ubuntu-latest
     container:
