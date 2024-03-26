@@ -1,13 +1,10 @@
+import sys
+import inspect
 try:
-    import inspect
-    import sys
     from .pygsplines import *  # noqa
-    # ---
-    from .plot import *  # noqa
 except ImportError:
     import pygsplines
     from pygsplines import *  # noqa
-    from .plot import *  # noqa
 
 
 submodules = inspect.getmembers(pygsplines, inspect.ismodule)
