@@ -87,9 +87,14 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
            })
       .def("print", &gsplines::functions::FunctionBase::print,
            py::arg("_indent") = 0)
-      .def("compose", [](const gsplines::functions::FunctionBase& _self,
-                         const gsplines::functions::FunctionBase& _other) {
-        return _self.compose(_other.to_expression());
+      .def("compose",
+           [](const gsplines::functions::FunctionBase& _self,
+              const gsplines::functions::FunctionBase& _other) {
+             return _self.compose(_other.to_expression());
+           })
+      .def("concat", [](const gsplines::functions::FunctionBase& _self,
+                        const gsplines::functions::FunctionBase& _other) {
+        return _self.concat(_other.to_expression());
       });
 
   py::class_<gsplines::GSplineBase, gsplines::functions::PyGSplineBase,
