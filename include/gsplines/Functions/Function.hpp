@@ -1,26 +1,21 @@
 #ifndef FUNCTION
 #define FUNCTION
 
-#include <cstddef>
 #include <eigen3/Eigen/Core>
 #include <gsplines/Functions/FunctionBase.hpp>
-#include <memory>
-#include <utility>
-#include <vector>
 
 namespace gsplines {
 namespace functions {
 
 class FunctionExpression;
 class Function : public FunctionBase {
-
-public:
+ public:
   using FunctionBase::FunctionBase;
-  Function(const Function &_that) : FunctionBase(_that) {}
-  Function(Function &&_that) : FunctionBase(std::move(_that)) {}
-  ~Function() = default;
+  Function(const Function& _that) = default;
+  Function(Function&& _that) = default;
+  ~Function() override = default;
 };
 
-} // namespace functions
-} // namespace gsplines
+}  // namespace functions
+}  // namespace gsplines
 #endif
