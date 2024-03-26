@@ -1,8 +1,8 @@
 
-#include "gsplines/Basis/Basis.hpp"
-#include "gsplines/Basis/Basis0101.hpp"
 #include "pybasis.hpp"
 #include "pyfunctions.hpp"
+#include <gsplines/Basis/Basis.hpp>
+#include <gsplines/Basis/Basis0101.hpp>
 #include <gsplines/Collocation/GaussLobattoPointsWeights.hpp>
 #include <gsplines/FunctionalAnalysis/Sobolev.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
@@ -86,7 +86,11 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
              return _self.dot(_that);
            })
       .def("print", &gsplines::functions::FunctionBase::print,
-           py::arg("_indent") = 0);
+           py::arg("_indent") = 0)
+      .def("compose", [](const gsplines::functions::FunctionBase& _self,
+                         const gsplines::functions::FunctionBase& _other) {
+        return _self.compose(_other.to_expression());
+      });
 
   py::class_<gsplines::GSplineBase, gsplines::functions::PyGSplineBase,
              gsplines::functions::FunctionBase>(gsplines_module, "GSplineBase")
