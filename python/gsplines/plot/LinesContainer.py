@@ -2,6 +2,7 @@ from matplotlib.lines import Line2D
 import gsplines
 import numpy as np
 import copy
+import matplotlib
 
 
 class VerticalLines:
@@ -27,14 +28,19 @@ class VerticalLines:
 
 
 class CurveVsTime:
-    """ Container of lines """
+    """ Container of lines for a vertical array of plots
+
+        This class contains two arrays, one of Line2D and one of Axis. It is
+        constructed with an array of axis, so that it create a Line2D for each
+        axis. This class exposes functions that can update the plot.
+    """
 
     def __init__(self, _codom_dim, **args):
 
         self.lines_ = np.array([Line2D([], [], **args)
                                 for i in range(_codom_dim)])
 
-    def associate_axis(self, _axes):
+    def associate_axis(self, _axes: matplotlib.axes.Axes):
         """ call axis.add_line"""
         if self.lines_.shape != _axes.shape:
             raise ValueError(
@@ -55,3 +61,8 @@ class CurveVsTime:
         """ Update data """
         for j, line in enumerate(self.lines_):
             line.set_data(_time_spam, _points[:, j])
+
+    def update_legend(self, _legend):
+        """ Update legend """
+        for i in range(self.lines_.shape[0]):
+            self.axes_[i].legend([self.lines_[i]], [_legend])

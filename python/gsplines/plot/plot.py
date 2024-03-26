@@ -1,4 +1,3 @@
-
 from typing import List
 
 import matplotlib.pyplot as plt
@@ -29,6 +28,7 @@ def plot_derivatives_in_axes(_q,
         cvt = CurveVsTime(curve.get_codom_dim(), color=color)
         cvt.associate_axis(_axis[i, :])
         cvt.update(curve, _dt)
+
         for j in range(_q.get_codom_dim()):
             fix_to_lines(_axis[i, j])
 
@@ -54,18 +54,33 @@ def plot(_q, _up_to_deriv: int = 3,
 
     plot_derivatives_in_axes(_q, axis)
 
-    plt.show()
+    if (_show):
+        plt.show()
 
 
-def plot_compare(_q: List, _colors: List, _up_to_deriv=3, _dt=0.1, _wp=None, _title='', _show=True):
+def plot_compare(_q: List, _colors: List = [], _legends: List = [],
+                 _up_to_deriv=3,
+                 _dt=0.1, _wp=None, _title='', _show=True):
 
     fig, axis = plt.subplots(_up_to_deriv + 1, _q[0].get_codom_dim())
 
-    for curve in _q:
-        plot_derivatives_in_axes(curve, axis)
+    for curve, color in zip(_q, _colors):
+        plot_derivatives_in_axes(
+            curve, axis, color=color, _up_to_deriv=_up_to_deriv)
 
+    for j in range(0, _q[0].get_codom_dim()):
+        axis[0, j].set_title('coordinate {:d}'.format(j))
+
+    for i in range(1, _up_to_deriv+1):
+        axis[i, 0].set_ylabel('derivative {:d}'.format(i))
+
+    if len(_legends) != 0:
+        for i in range(0, _up_to_deriv+1):
+            for j in range(0, _q[0].get_codom_dim()):
+                axis[i, j].legend(axis[i, j].get_lines(),
+                                  _legends, loc='lower right', fontsize=8)
     plt.subplots_adjust(
-        left=0.025,
+        left=0.05,
         bottom=0.05,
         right=0.975,
         top=0.95,
