@@ -83,4 +83,45 @@ jobs:
           asset_name: gsplines-0.0.1-amd64.deb
           tag: ${{ github.ref }}
           overwrite: true
-          body: "Debian pack"
+          body: "Debian pack compiled with standard ros noetic docker image"
+
+   buildpackage2:
+    name: build dep package
+    runs-on: ubuntu-latest
+    container:
+      image: ros:noetic-ros-core-focal
+    steps:
+      - name: Git Sumbodule Update ad build
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  software-properties-common
+          add-apt-repository ppa:ubuntu-toolchain-r/test
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev cmake build-essential libeigen3-dev gcc-11 g++-11
+          bash -c 'update-alternatives \
+                --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 \
+                --slave /usr/bin/g++ g++ /usr/bin/g++-9 \
+                --slave /usr/bin/gcov gcov /usr/bin/gcov-9 \
+                --slave /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-9 \
+                --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-9 &&
+                update-alternatives \
+                    --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 \
+                    --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
+                    --slave /usr/bin/gcov gcov /usr/bin/gcov-11 \
+                    --slave /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-11 \
+                    --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-11'
+          git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
+          cd gsplines_cpp
+          mkdir build
+          cd build
+          bash -c "source /opt/ros/noetic/setup.bash && cmake ..  -DBUILD_TESTING=OFF && make -j2 && cpack -G DEB"
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: gsplines_cpp/build/gsplines-0.0.1-amd64.deb
+          asset_name: gsplines-0.0.1-gcc-11-amd64.deb
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "Debian pack compiled with g++-11"
