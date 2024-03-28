@@ -8,12 +8,17 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g3 -pthread ")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_INSTALL_PREFIX /usr)
-set(PYBIND11_FINDPYTHON OFF)
+set(PYBIND11_FINDPYTHON
+    OFF
+    CACHE BOOL "")
+
 set(PYBIND11_PYTHON_VERSION
     3.8
     CACHE STRING "")
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# include ifopt with custon ROS installation
+
+
 find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
@@ -114,6 +119,7 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfigVersion.cmake
   COMPATIBILITY SameMajorVersion)
+
 configure_package_config_file(
   cmake/GSplinesConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfig.cmake
   INSTALL_DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
@@ -121,6 +127,7 @@ configure_package_config_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/GSplinesConfigVersion.cmake
         DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
+
 install(EXPORT GSplinesTargets DESTINATION ${INSTALL_CMAKE_CONFIG_DIR})
 
 # Packaging
