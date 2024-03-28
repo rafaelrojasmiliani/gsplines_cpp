@@ -7,8 +7,13 @@ Library to represent and formulate motion and trajectory planning problems with 
 - **Analitical consistenc** `GSpline` provide a `derivate` method which returns the its derivative as a new `GSpline` instance. This library provides automatic **exact** (and fast) differentiation of the generalized splines implemented.
 - **Algebraic consistence**: This library implement basic operations between `GSplines` inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
-- ROS implementation [here](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
-- MoveIt implementation [here](https://github.com/rafaelrojasmiliani/gsplines_moveit)
+- **ROS implementation** [here](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
+- **MoveIt implementation** [here](https://github.com/rafaelrojasmiliani/gsplines_moveit)
+- Contact: Rafael A. Rojas rafaelrojasmiliani@gmail.com
+- **Docker containers with this library installed**
+    - *vim awesome plugins for development and moveit*  rafa606/moveit-gsplines-vim-dev:noetic
+    - *vim awesome plugins for development and awesome ros packages*  rafa606/ros-gsplines-vim-dev:noetic
+
 
 # Examples
 
