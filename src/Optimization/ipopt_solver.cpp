@@ -6,6 +6,7 @@
 #include <gsplines/GSpline.hpp>
 #include <gsplines/Interpolator.hpp>
 #include <gsplines/Optimization/ipopt_interface.hpp>
+#include <gsplines/Optimization/ipopt_solver.hpp>
 #include <ifopt/ipopt_solver.h>
 #include <ifopt/problem.h>
 #include <iostream>
@@ -13,6 +14,52 @@
 
 namespace gsplines {
 namespace optimization {
+
+std::optional<IpoptSolverOptions> IpoptSolverOptions::instance_ = std::nullopt;
+
+IpoptSolverOptions::IpoptSolverOptions() = default;
+
+IpoptSolverOptions& IpoptSolverOptions::instance() {
+  if (!instance_.has_value()) {
+    instance_ = IpoptSolverOptions();
+  }
+  return instance_.value();
+}
+
+void IpoptSolverOptions::set_option(const std::string& _option_name,
+                                    const std::string& _option_value) {
+  auto iter = std::find_if(
+      instance().string_options_.begin(), instance().string_options_.end(),
+      [_option_name](const auto& in) { return in.first == _option_name; });
+
+  if (iter == instance().string_options_.end()) {
+    instance().string_options_.emplace_back(_option_name, _option_value);
+  } else {
+    iter->second = _option_value;
+  }
+}
+
+void IpoptSolverOptions::set_option(const std::string& _option_name,
+                                    int _option_value) {
+  auto iter = std::find_if(
+      instance().int_options_.begin(), instance().int_options_.end(),
+      [_option_name](const auto& in) { return in.first == _option_name; });
+
+  if (iter == instance().int_options_.end()) {
+    instance().int_options_.emplace_back(_option_name, _option_value);
+  } else {
+    iter->second = _option_value;
+  }
+}
+void IpoptSolverOptions::set_options_on_interface(ifopt::IpoptSolver& solver) {
+  for (const auto& p : instance().string_options_) {
+    solver.SetOption(p.first, p.second);
+  }
+
+  for (const auto& p : instance().int_options_) {
+    solver.SetOption(p.first, p.second);
+  }
+}
 
 ::gsplines::GSpline optimal_sobolev_norm(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
@@ -49,14 +96,9 @@ namespace optimization {
 
   // 3. Instantiate ipopt solver
   ifopt::IpoptSolver ipopt;
+
   // 3.1 Customize the solver
-  ipopt.SetOption("linear_solver", "mumps");
-  ipopt.SetOption("jacobian_approximation", "exact");
-  ipopt.SetOption("fast_step_computation", "yes");
-  // ipopt.SetOption("derivative_test", "first-order");
-  ipopt.SetOption("hessian_approximation", "limited-memory");
-  ipopt.SetOption("jac_c_constant", "yes");
-  ipopt.SetOption("print_level", 0);
+  IpoptSolverOptions::set_options_on_interface(ipopt);
 
   // 4. Ask the solver to solve the problem
   ipopt.Solve(nlp);
