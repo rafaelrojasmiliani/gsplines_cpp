@@ -15,9 +15,10 @@ namespace gsplines {
 namespace optimization {
 
 ::gsplines::GSpline optimal_sobolev_norm(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
     const gsplines::basis::Basis& _basis,
-    std::vector<std::pair<std::size_t, double>> _weights, double _exec_time) {
+    const std::vector<std::pair<std::size_t, double>>& _weights,
+    double _exec_time) {
   ifopt::Problem nlp;
   std::size_t num_intervals = _waypoints.rows() - 1;
   std::size_t codom_dim = _waypoints.cols();
@@ -67,43 +68,48 @@ namespace optimization {
 }
 
 ::gsplines::GSpline broken_lines_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(2),
-                              {{1, 1.0}}, _waypoints.rows() - 1)
+                              {{1, 1.0}},
+                              static_cast<double>(_waypoints.rows() - 1))
       .linear_scaling_new_execution_time(1.0);
 }
 
 ::gsplines::GSpline minimum_acceleration_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(4),
-                              {{2, 1.0}}, _waypoints.rows() - 1)
+                              {{2, 1.0}},
+                              static_cast<double>(_waypoints.rows() - 1))
       .linear_scaling_new_execution_time(1.0);
 }
 
 ::gsplines::GSpline minimum_jerk_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(6),
-                              {{3, 1.0}}, _waypoints.rows() - 1)
+                              {{3, 1.0}},
+                              static_cast<double>(_waypoints.rows() - 1))
       .linear_scaling_new_execution_time(1.0);
 }
 
 ::gsplines::GSpline minimum_snap_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(8),
-                              {{4, 1.0}}, _waypoints.rows() - 1)
+                              {{4, 1.0}},
+                              static_cast<double>(_waypoints.rows() - 1))
       .linear_scaling_new_execution_time(1.0);
 }
 
 ::gsplines::GSpline minimum_crackle_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   return optimal_sobolev_norm(_waypoints, gsplines::basis::BasisLegendre(10),
-                              {{5, 1.0}}, _waypoints.rows() - 1)
+                              {{5, 1.0}},
+                              static_cast<double>(_waypoints.rows() - 1))
       .linear_scaling_new_execution_time(1.0);
 }
 
 ::gsplines::GSpline rojas_path(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints, double _k) {
-  double ni = _waypoints.rows() - 1;
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints, double _k) {
+  auto ni = static_cast<double>(_waypoints.rows() - 1);
 
   double execution_time = 4.0 * ni / std::sqrt(2.0);
   double aux = 4 * ni * _k / std::sqrt(2);
