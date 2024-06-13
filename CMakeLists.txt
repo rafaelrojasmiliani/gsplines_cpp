@@ -18,7 +18,6 @@ set(PYBIND11_PYTHON_VERSION
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
 find_package(ifopt REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_library(
@@ -78,7 +77,8 @@ target_include_directories(
 target_link_libraries(pygsplines PUBLIC ${EIGEN3_LIBRARIES} ${ifopt_LIBRARIES}
                                         gsplines)
 
-if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}
+   AND ${BUILD_TESTING})
   enable_testing()
   add_subdirectory(tests)
 endif()
