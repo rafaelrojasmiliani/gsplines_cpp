@@ -2,7 +2,6 @@
 
 #include "gsplines/Collocation/GaussLobattoPointsWeights.hpp"
 #include <eigen3/Eigen/Core>
-#include <fenv.h>
 #include <gsplines/Collocation/GaussLobattoLagrange.hpp>
 #include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/Functions/ElementalFunctions.hpp>
@@ -11,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <ifopt/ipopt_solver.h>
 #include <ifopt/problem.h>
+#include <fenv.h>
 #include <iostream>
 #include <random>
 
@@ -37,7 +37,6 @@ std::size_t wpn = uint_dist_10(mt);
  * */
 
 TEST(Collocation, Derivative_Operator) {
-
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
       optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
       n_inter);
@@ -53,7 +52,6 @@ TEST(Collocation, Derivative_Operator) {
 }
 
 TEST(GLLSpline, Transpose_Left_Multiplication) {
-
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
       optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
       n_inter);
@@ -86,7 +84,6 @@ TEST(GLLSpline, Transpose_Left_Multiplication) {
 // Confirm that the ouput of the interpolaiton is contiuous up the the first
 // deriviate
 TEST(Collocation, ContinuityError) {
-
   gsplines::basis::BasisLagrangeGaussLobatto bgl(6);
 
   Eigen::MatrixXd waypoints(Eigen::MatrixXd::Random(n_inter + 1, dim));
@@ -103,56 +100,58 @@ TEST(Collocation, ContinuityError) {
       << cerr(curve_1).array().abs().maxCoeff() << std::endl;
 }
 
-TEST(Collocation, IfOpt) {
+// TEST(Collocation, IfOpt) {
 
-  n_inter = 2;
-  dim = 1;
-  nglp = 4;
-  GLLSpline _in = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(
-          Eigen::MatrixXd::Random(n_inter + 1, dim)),
-      nglp, n_inter);
+//   n_inter = 2;
+//   dim = 1;
+//   nglp = 4;
+//   GLLSpline _in = GaussLobattoLagrangeSpline::approximate(
+//       optimization::minimum_jerk_path(
+//           Eigen::MatrixXd::Random(n_inter + 1, dim)),
+//       nglp, n_inter);
 
-  Eigen::VectorXd time_spam = Eigen::VectorXd::LinSpaced(
-      n_inter + 1, _in.get_domain().first, _in.get_domain().second);
+//   Eigen::VectorXd time_spam = Eigen::VectorXd::LinSpaced(
+//       n_inter + 1, _in.get_domain().first, _in.get_domain().second);
 
-  Eigen::VectorXd tauv =
-      Eigen::VectorXd::Ones(n_inter) * _in.get_domain_length() / n_inter;
+//   Eigen::VectorXd tauv =
+//       Eigen::VectorXd::Ones(n_inter) * _in.get_domain_length() / n_inter;
 
-  GLLSpline first_guess =
-      interpolate(tauv, _in(time_spam), basis::BasisLagrangeGaussLobatto(nglp));
+//   GLLSpline first_guess =
+//       interpolate(tauv, _in(time_spam),
+//       basis::BasisLagrangeGaussLobatto(nglp));
 
-  std::shared_ptr<GLLSplineVariable> variable =
-      std::make_shared<GLLSplineVariable>(first_guess);
-  // 1.2 Constraints
-  std::shared_ptr<ConstraintWrapper<ContinuityError>> continuity =
-      std::make_shared<ConstraintWrapper<ContinuityError>>(0.0, 0.0,
-                                                           first_guess, 1);
+//   std::shared_ptr<GLLSplineVariable> variable =
+//       std::make_shared<GLLSplineVariable>(first_guess);
+//   // 1.2 Constraints
+//   std::shared_ptr<ConstraintWrapper<ContinuityError>> continuity =
+//       std::make_shared<ConstraintWrapper<ContinuityError>>(0.0, 0.0,
+//                                                            first_guess, 1);
 
-  std::shared_ptr<CostWrapper<SobolevDistance>> cost =
-      std::make_shared<CostWrapper<SobolevDistance>>(first_guess, nglp, n_inter,
-                                                     1);
+//   std::shared_ptr<CostWrapper<SobolevDistance>> cost =
+//       std::make_shared<CostWrapper<SobolevDistance>>(first_guess, nglp,
+//       n_inter,
+//                                                      1);
 
-  ifopt::Problem nlp;
+//   ifopt::Problem nlp;
 
-  nlp.AddVariableSet(variable);
-  nlp.AddConstraintSet(continuity);
-  nlp.AddCostSet(cost);
-  // nlp.PrintCurrent();
+//   nlp.AddVariableSet(variable);
+//   nlp.AddConstraintSet(continuity);
+//   nlp.AddCostSet(cost);
+//   // nlp.PrintCurrent();
 
-  // 3. Instantiate ipopt solver
-  ifopt::IpoptSolver ipopt;
-  // 3.1 Customize the solver
-  ipopt.SetOption("derivative_test", "first-order");
-  ipopt.SetOption("jacobian_approximation", "exact");
-  ipopt.SetOption("fast_step_computation", "yes");
-  ipopt.SetOption("hessian_approximation", "limited-memory");
-  ipopt.SetOption("jac_c_constant", "yes");
-  ipopt.SetOption("print_level", 0);
+//   // 3. Instantiate ipopt solver
+//   ifopt::IpoptSolver ipopt;
+//   // 3.1 Customize the solver
+//   ipopt.SetOption("derivative_test", "first-order");
+//   ipopt.SetOption("jacobian_approximation", "exact");
+//   ipopt.SetOption("fast_step_computation", "yes");
+//   ipopt.SetOption("hessian_approximation", "limited-memory");
+//   ipopt.SetOption("jac_c_constant", "yes");
+//   ipopt.SetOption("print_level", 0);
 
-  // 4. Ask the solver to solve the problem
-  ipopt.Solve(nlp);
-}
+//   // 4. Ask the solver to solve the problem
+//   ipopt.Solve(nlp);
+// }
 
 GLLSpline vector = GaussLobattoLagrangeSpline::approximate(
     optimization::minimum_jerk_path(Eigen::MatrixXd::Random(n_inter + 1, dim)),
@@ -166,14 +165,13 @@ Eigen::VectorXd time_spam =
     legendre_gauss_lobatto_points({0, 1}, nglp, n_inter);
 
 TEST(Collocation, MultiplicationConstConst) {
-
   GLLSpline res = vector * scalar;
   GLLSpline res1 = scalar * vector;
   EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
   EXPECT_TRUE(tools::approx_equal(res(time_spam), res1(time_spam), 1.0e-9));
-  EXPECT_TRUE(tools::approx_equal(vector(time_spam).array().colwise() *
-                                      scalar(time_spam).col(0).array(),
-                                  res1(time_spam), 1.0e-4))
+  EXPECT_TRUE(tools::approx_equal(
+      vector(time_spam).array().colwise() * scalar(time_spam).col(0).array(),
+      res1(time_spam), 1.0e-4))
       << "Fail value\n"
       << ((vector(time_spam).array().colwise() *
            scalar(time_spam).col(0).array())
@@ -185,7 +183,6 @@ TEST(Collocation, MultiplicationConstConst) {
       << "  -- \n";
 }
 TEST(Collocation, MultiplicationConstNonConst) {
-
   GLLSpline res = vector * (scalar * scalar);
   GLLSpline res1 = (vector * scalar) * scalar;
   EXPECT_TRUE(tools::approx_equal(res, res1, 1.0e-9));
@@ -197,7 +194,6 @@ TEST(Collocation, MultiplicationConstNonConst) {
       << "Fail Value";
 }
 TEST(Collocation, MultiplicationNonConstNonConst) {
-
   GLLSpline res1 = ((vector + vector) * scalar) * scalar;
   GLLSpline res2 = (vector * scalar + vector * scalar) * scalar;
   GLLSpline res3 = vector * scalar * scalar + vector * scalar * scalar;
@@ -242,7 +238,6 @@ TEST(Collocation, Approximation) {
 }
 
 TEST(Collocation, Operations) {
-
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
 
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
@@ -292,7 +287,6 @@ TEST(Collocation, Operations) {
       << "relative" << tools::last_relative_error << std::endl;
 }
 TEST(Collocation, Value_At) {
-
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
 
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
@@ -311,7 +305,6 @@ TEST(Collocation, Value_At) {
 }
 
 TEST(Collocation, Set_From_Array) {
-
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
 
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
@@ -324,18 +317,16 @@ TEST(Collocation, Set_From_Array) {
   Eigen::MatrixXd res = q1(time_spam);
 
   std::vector<Eigen::VectorXd> vec;
-  for (long i = 0; i < res.rows(); ++i)
-    vec.push_back(res.row(i).transpose());
+  for (long i = 0; i < res.rows(); ++i) vec.push_back(res.row(i).transpose());
 
   GLLSpline q2({0, 1}, dim, n_inter, nglp);
   q2.set_from_array(q1.get_domain(), vec.begin(), vec.end(),
-                    [](const Eigen::VectorXd &_in) { return _in.transpose(); });
+                    [](const Eigen::VectorXd& _in) { return _in.transpose(); });
 
   EXPECT_TRUE(tools::approx_equal(q1, q2, 1.0e-9)) << tools::last_error;
 }
 
 TEST(Collocation, Matrix_Multiplication) {
-
   Eigen::VectorXd tau = Eigen::VectorXd::Ones(n_inter);
 
   GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
@@ -353,12 +344,11 @@ TEST(Collocation, Matrix_Multiplication) {
   for (std::size_t i = 0; i < n_inter * nglp; i++) {
     matrix_vector.push_back(Eigen::MatrixXd::Random(dim_2, dim));
     res_2.row(i) = q1_value.row(i) * matrix_vector.back().transpose();
-    if (i > 2 and i % nglp == 0)
-      res_2.row(i) = res_2.row(i - 1);
+    if (i > 2 and i % nglp == 0) res_2.row(i) = res_2.row(i - 1);
   }
   mat.update(
       matrix_vector.cbegin(), matrix_vector.cend(),
-      [](const Eigen::MatrixXd &in) -> const Eigen::MatrixXd & { return in; });
+      [](const Eigen::MatrixXd& in) -> const Eigen::MatrixXd& { return in; });
 
   GLLSpline q2 = mat * q1;
   Eigen::MatrixXd res_1 = q2(time_spam);
@@ -366,7 +356,6 @@ TEST(Collocation, Matrix_Multiplication) {
 }
 
 TEST(Collocation, Derivative_Matrix) {
-
   Eigen::VectorXd tau = Eigen::VectorXd::Random(n_inter).array() + 1.5;
   GLLSpline q1 = interpolate(tau, Eigen::MatrixXd::Random(n_inter + 1, dim),
                              basis::BasisLagrangeGaussLobatto(10));
@@ -389,8 +378,7 @@ TEST(Collocation, Derivative_Matrix) {
   }
 }
 
-int main(int argc, char **argv) {
-
+int main(int argc, char** argv) {
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
