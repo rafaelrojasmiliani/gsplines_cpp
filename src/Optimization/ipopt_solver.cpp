@@ -55,11 +55,11 @@ void IpoptSolverOptions::set_option(const std::string& _option_name,
 void IpoptSolverOptions::set_option(const std::string& _option_name,
                                     double _option_value) {
   auto iter = std::find_if(
-      instance().int_options_.begin(), instance().int_options_.end(),
+      instance().double_options_.begin(), instance().double_options_.end(),
       [_option_name](const auto& in) { return in.first == _option_name; });
 
-  if (iter == instance().int_options_.end()) {
-    instance().int_options_.emplace_back(_option_name, _option_value);
+  if (iter == instance().double_options_.end()) {
+    instance().double_options_.emplace_back(_option_name, _option_value);
   } else {
     iter->second = _option_value;
   }
