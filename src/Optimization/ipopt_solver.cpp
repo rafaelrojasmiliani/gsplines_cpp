@@ -51,12 +51,29 @@ void IpoptSolverOptions::set_option(const std::string& _option_name,
     iter->second = _option_value;
   }
 }
+
+void IpoptSolverOptions::set_option(const std::string& _option_name,
+                                    double _option_value) {
+  auto iter = std::find_if(
+      instance().int_options_.begin(), instance().int_options_.end(),
+      [_option_name](const auto& in) { return in.first == _option_name; });
+
+  if (iter == instance().int_options_.end()) {
+    instance().int_options_.emplace_back(_option_name, _option_value);
+  } else {
+    iter->second = _option_value;
+  }
+}
 void IpoptSolverOptions::set_options_on_interface(ifopt::IpoptSolver& solver) {
   for (const auto& p : instance().string_options_) {
     solver.SetOption(p.first, p.second);
   }
 
   for (const auto& p : instance().int_options_) {
+    solver.SetOption(p.first, p.second);
+  }
+
+  for (const auto& p : instance().double_options_) {
     solver.SetOption(p.first, p.second);
   }
 }
