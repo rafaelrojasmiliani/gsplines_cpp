@@ -35,7 +35,7 @@ class IpoptSolverOptions {
 
   std::vector<std::pair<std::string, int>> int_options_ = {{"print_level", 0}};
 
-  std::vector<std::pair<std::string, int>> double_options_ = {{"tol", 1.0e-3}};
+  std::vector<std::pair<std::string, double>> double_options_ = {{"tol", 1.0e-3}};
 
  public:
   static IpoptSolverOptions& instance();
