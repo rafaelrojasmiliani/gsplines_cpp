@@ -113,17 +113,24 @@ $$
 where $\mathbf{B}$ is the vector constructed by stacking the basis in a colunm vector
 
 # Motivation
-Generalized splines appear naturally in problems of trajectory optimization when waypoint constraints are added.
-In other words, if we desire to optimize a motion which pass trough a sequence of positions we will meet with generalized splines.
 
-Generalized splines trajectories arising in such kind of optimization problems are uniquely characterized by the waypoints that they attain, the time intervals between waypoints and the speed, and possible higher order derivatives at the boundaries.
+The term 'generalized splines' is borrowed from E. W. Cheney's book, *Introduction to Approximation Theory*, where he introduces generalized polynomials.
+A generalized spline is to a generalized polynomial what a spline is to a polynomial.
+Essentially, a gspline is a continuous piecewise function that passes through a sequence of points $\(\{q_1, \ldots, q_{N+1}\}\)$ at times $\(\{t_1, \ldots, t_{N+1}\}\)$.
+Between each time interval $\([t_i, t_{i+1}]\)$, there is an arbitrary function $\(f_i: [t_i, t_{i+1}] \to \mathbb{R}^n\)$ that defines the gspline on $\([t_i, t_{i+1}]\)$.
+
+
+Generalized splines appear naturally in trajectory optimization problems when waypoint constraints without prescribed times are added.
+In other words, if we aim to optimize a motion that passes through a sequence of positions without specifying the times at which the motion meets each point, we will encounter generalized splines.
+
+Generalized splines trajectories arising in such kind of optimization problems are uniquely characterized by the waypoints that they attain, the time at which each waypoint is meet and the speed, and possible higher order derivatives at the boundaries of the time interval, i.e, $t_0$ and $t_{N+1}$.
 Moreover, such a relation is synthesised in the expression of the type
 
 $$
 \mathbf{A}(\boldsymbol\tau)\mathbf{y} = \mathbf{b}(\mathbf{w})\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0)
 $$
 
-where $\mathbf{A}(\boldsymbol\tau)$ is a matrix which depends on the time intervals $\boldsymbol\tau$, $\mathbf{b}(\mathbf{w})$ is a column vector which depends on the waypoints $\mathbf{w}$, the speed, and possible higher order derivatives at the boundaries, and $\mathbf{y}$ is a column vector which represents uniquely the curve at each interval.
+where $\boldsymbol{\tau} \in \mathbb{R}^N$ is a column vector representing the lenght of the time interval between consecutive waypoints, $\tau_i = t_{i+1} - t_i$. $\mathbf{A}(\boldsymbol{\tau})$ is a matrix dependent on the time intervals $\boldsymbol{\tau}$, $\mathbf{b}(\mathbf{w})$ is a column vector dependent on the waypoints $\mathbf{w}$, the speed, and possibly higher-order derivatives at the boundaries, and $\mathbf{y}$ is a column vector that uniquely represents the curve at each interval.
 
 The main challenge to build into a computer a trajectory optimization problems with waypoint constraints is to compute the derivatives of $\mathbf{y}$ with respect to $\mathbf{\tau}$.
 
@@ -143,7 +150,7 @@ It may be proven that such a problem can be subdivided in two steps
  1. Find the family of optimal curves that joint waypoints
  2. Compute time instants $\{t_0, t_1,  ...,t_N, t_{N + 1}\}$ where the optimal curves must be attached
 
-The step 1. is done by solving a linear ordinary differential equation. One method to achieve 2. is to formulate an optimization problem (e.g. a gradient based one).
+The step 1. is done by solving a linear ordinary differential equation, regarless the fact that the times $t_i$ are unknown. One method to achieve 2. is to formulate an optimization problem (e.g. a gradient based one) for which decission variable is the times at which each waypoint is acchived.
 
 ## Optimal curves
 We underline that this library leverages on the [general theory of linear ODEs](https://en.wikipedia.org/wiki/Linear_differential_equation).
