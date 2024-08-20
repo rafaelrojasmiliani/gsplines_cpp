@@ -319,21 +319,15 @@ class GSplineInheritanceHelper
         _acceleration_bound.value().data(),
         static_cast<long>(_acceleration_bound.value().size()));
 
-    // d / d t {f (\alpha t)} = df/dt \alpha
-    // the best value of alpha is
-    //
-    // {df/dt}_max \alpha = v_bound
-    //
-    // alpha =  v_bound / {df/dt}_max
-    //
     const double max_velocity_ratio =
-        (velocity_bound.transpose().array() /
-         gspline_diff_1_evaluated.array().abs().colwise().maxCoeff())
+        (gspline_diff_1_evaluated.array().abs().colwise().maxCoeff() /
+         velocity_bound.transpose().array())
             .maxCoeff();
 
     const double max_acceleration_ratio =
-        Eigen::sqrt(acceleration_bound.transpose().array() /
-                    gspline_diff_2_evaluated.array().abs().colwise().maxCoeff())
+        Eigen::sqrt(
+            gspline_diff_2_evaluated.array().abs().colwise().maxCoeff() /
+            acceleration_bound.transpose().array())
             .maxCoeff();
 
     const double time_scale_factor =
