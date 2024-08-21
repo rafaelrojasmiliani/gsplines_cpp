@@ -249,7 +249,7 @@ class GSplineInheritanceHelper
       const double k_0 = std::sqrt(2.0) / 4.0 * std::pow(alpha_0, 0.25) /
                          std::pow((1.0 - alpha_0), 0.25);
       const double k = k_0 / time_scale_factor;
-      const double k4 = std::pow(k, 4);
+      const double k4 = std::pow(k, 4) * 32;
 
       const double alpha = k4 / (1.0 + k4);
       return Current(new_domain, Base::get_codom_dim(),
