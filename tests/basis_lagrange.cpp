@@ -19,7 +19,6 @@ using namespace gsplines;
  * other points.
  * */
 TEST(BasisLagrange, Value_Properties) {
-
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> real_dist(0.0, 1.0);
@@ -64,7 +63,6 @@ TEST(BasisLagrange, Value_Properties) {
  * must be equal.
  * */
 TEST(BasisLagrange, GSpline_Value_Different_Basis) {
-
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> real_dist(0.0, 1.0);
@@ -99,7 +97,6 @@ TEST(BasisLagrange, GSpline_Value_Different_Basis) {
 }
 
 TEST(BasisLagrange, GSpline_Value_GSpline_Identity) {
-
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> real_dist(0.0, 1.0);
@@ -126,7 +123,6 @@ TEST(BasisLagrange, GSpline_Value_GSpline_Identity) {
 /*Here we test that the coefficinets of the GSpling at the Gauss-Lobatto points
  * coincide with the values that the GSpline take at the Gauss-Lobatto points.*/
 TEST(BasisLagrange, GSpline_Value_GSpline_Value) {
-
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_real_distribution<double> real_dist(0.0, 1.0);
@@ -136,10 +132,12 @@ TEST(BasisLagrange, GSpline_Value_GSpline_Value) {
   std::size_t n_intervals = uint_dist(mt);
   std::size_t wpn = n_intervals + 1;
 
+  auto mimjerkpathopt = optimization::minimum_jerk_path(
+      Eigen::MatrixXd::Random(static_cast<long>(wpn), 1));
+  EXPECT_TRUE(mimjerkpathopt);
   collocation::GLLSpline q1 =
       collocation::GaussLobattoLagrangeSpline::approximate(
-          optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, 1)), dim,
-          n_intervals);
+          mimjerkpathopt.value(), dim, n_intervals);
   Eigen::VectorXd glp = gsplines::collocation::legendre_gauss_lobatto_points(
       q1.get_domain(), dim, n_intervals);
   /* Test equality */
@@ -150,8 +148,7 @@ TEST(BasisLagrange, GSpline_Value_GSpline_Value) {
   /* Test equality after dilation*/
   EXPECT_TRUE(tools::approx_equal(q2.get_coefficients(), q2(glp2), 1.0e-9));
 }
-int main(int argc, char **argv) {
-
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

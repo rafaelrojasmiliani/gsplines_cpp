@@ -35,7 +35,8 @@ class IpoptSolverOptions {
 
   std::vector<std::pair<std::string, int>> int_options_ = {{"print_level", 0}};
 
-  std::vector<std::pair<std::string, double>> double_options_ = {{"tol", 1.0e-3}};
+  std::vector<std::pair<std::string, double>> double_options_ = {
+      {"tol", 1.0e-3}};
 
  public:
   static IpoptSolverOptions& instance();
@@ -50,31 +51,32 @@ class IpoptSolverOptions {
   static void set_options_on_interface(ifopt::IpoptSolver& solver);
 };
 
-gsplines::GSpline optimal_sobolev_norm(
+std::optional<gsplines::GSpline> optimal_sobolev_norm(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
     const gsplines::basis::Basis& _basis,
     const std::vector<std::pair<std::size_t, double>>& _weights,
     double _exec_time);
 
-gsplines::GSpline broken_lines_path(
+std::optional<gsplines::GSpline> broken_lines_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints);
 
-gsplines::GSpline minimum_acceleration_path(
+std::optional<gsplines::GSpline> minimum_acceleration_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints);
 
-gsplines::GSpline minimum_jerk_path(
+std::optional<gsplines::GSpline> minimum_jerk_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints);
 
-gsplines::GSpline minimum_snap_path(
+std::optional<gsplines::GSpline> minimum_snap_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints);
 
-gsplines::GSpline minimum_crackle_path(
+std::optional<gsplines::GSpline> minimum_crackle_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints);
 
-gsplines::GSpline best_approximation(const functions::FunctionBase& _in,
-                                     std::size_t _n_glp, std::size_t _n_inter);
+std::optional<gsplines::GSpline> best_approximation(
+    const functions::FunctionBase& _in, std::size_t _n_glp,
+    std::size_t _n_inter);
 
-gsplines::GSpline rojas_path(
+std::optional<gsplines::GSpline> rojas_path(
     const Eigen::Ref<const Eigen::MatrixXd>& _waypoints, double _k);
 }  // namespace optimization
 }  // namespace gsplines

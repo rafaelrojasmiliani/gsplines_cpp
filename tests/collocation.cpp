@@ -37,9 +37,11 @@ std::size_t wpn = uint_dist_10(mt);
  * */
 
 TEST(Collocation, Derivative_Operator) {
-  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
-      n_inter);
+  auto mimjerkpathopt =
+      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim));
+  EXPECT_TRUE(mimjerkpathopt);
+  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(mimjerkpathopt.value(),
+                                                         nglp, n_inter);
 
   Derivative dmat(q1);
 
@@ -52,13 +54,17 @@ TEST(Collocation, Derivative_Operator) {
 }
 
 TEST(GLLSpline, Transpose_Left_Multiplication) {
-  GLLSpline q1 = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
-      n_inter);
+  auto mim1 =
+      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim));
+  EXPECT_TRUE(mim1);
+  GLLSpline q1 =
+      GaussLobattoLagrangeSpline::approximate(mim1.value(), nglp, n_inter);
 
-  GLLSpline q2 = GaussLobattoLagrangeSpline::approximate(
-      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim)), nglp,
-      n_inter);
+  auto mim2 =
+      optimization::minimum_jerk_path(Eigen::MatrixXd::Random(wpn, dim));
+  EXPECT_TRUE(mim2);
+  GLLSpline q2 =
+      GaussLobattoLagrangeSpline::approximate(mim2.value(), nglp, n_inter);
 
   GLLSpline q_nom =
       GaussLobattoLagrangeSpline::approximate(q1.dot(q2), nglp, n_inter);
@@ -154,11 +160,13 @@ TEST(Collocation, ContinuityError) {
 // }
 
 GLLSpline vector = GaussLobattoLagrangeSpline::approximate(
-    optimization::minimum_jerk_path(Eigen::MatrixXd::Random(n_inter + 1, dim)),
+    optimization::minimum_jerk_path(Eigen::MatrixXd::Random(n_inter + 1, dim))
+        .value(),
     nglp, n_inter);
 
 GLLSpline scalar = GaussLobattoLagrangeSpline::approximate(
-    optimization::minimum_jerk_path(Eigen::MatrixXd::Random(n_inter + 1, 1)),
+    optimization::minimum_jerk_path(Eigen::MatrixXd::Random(n_inter + 1, 1))
+        .value(),
     nglp, n_inter);
 
 Eigen::VectorXd time_spam =
