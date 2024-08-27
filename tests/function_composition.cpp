@@ -1,9 +1,8 @@
-#include <cmath>
 #include <gsplines/Functions/ElementalFunctions.hpp>
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Tools.hpp>
 #include <gtest/gtest.h>
-#include <iostream>
+#include <cmath>
 using namespace gsplines::functions;
 
 TEST(Function, Composition) {
@@ -23,7 +22,7 @@ TEST(Function, Composition) {
   EXPECT_TRUE(
       (f(time_span) - Eigen::cos(2 * time_span.array()).matrix()).norm() <
       1.0e-9);
-  identity.value(time_span);
+  (void)identity.value(time_span);
 
   EXPECT_TRUE((f.derivate().value(time_span) -
                -2 * Eigen::sin(2 * time_span.array()).matrix())
@@ -41,8 +40,7 @@ TEST(Function, Composition) {
   EXPECT_TRUE((g.derivate().value(time_span) - g_dot(time_span)).norm() <
               1.0e-9);
 }
-int main(int argc, char **argv) {
-
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
