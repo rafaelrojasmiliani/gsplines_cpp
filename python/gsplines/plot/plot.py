@@ -62,6 +62,10 @@ def plot_compare(_q: List, _colors: List = [], _legends: List = [],
                  _up_to_deriv=3,
                  _dt=0.1, _wp=None, _title='', _show=True):
 
+    if not _colors:
+        cmap = plt.get_cmap('viridis')
+        _colors = [cmap(val) for val in np.linspace(0, 1, len(_q))]
+
     fig, axis = plt.subplots(_up_to_deriv + 1, _q[0].get_codom_dim())
 
     for curve, color in zip(_q, _colors):
