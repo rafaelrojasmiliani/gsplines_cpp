@@ -28,9 +28,8 @@ class IpoptSolverOptions {
       {"derivative_test", "none"},
       {"hessian_approximation", "limited-memory"},
       {"jac_c_constant", "yes"},
-      {"linear_solver", "mumps"},
       {"print_timing_statistics", "no"},
-      {"dependency_detector", "mumps"},
+      {"dependency_detector", "none"},
       {"dependency_detection_with_rhs", "no"}};
 
   std::vector<std::pair<std::string, int>> int_options_ = {{"print_level", 0}};
