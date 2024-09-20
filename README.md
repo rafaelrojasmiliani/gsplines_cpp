@@ -65,7 +65,7 @@ sudo dpkg -i gsplines-0.0.1-amd64.deb
 
 1. Install the requirements
 ```bash
-sudo apt-get install  python3-matplotlib libgtest-dev cmake libeigen3-dev coinor-libipopt-dev
+sudo apt-get install  python3-matplotlib libgtest-dev cmake libeigen3-dev coinor-libipopt-dev python3-dev
 ```
 
 2. Install `ifopt`
