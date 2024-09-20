@@ -84,7 +84,7 @@ git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
 cd gsplines_cpp
 mkdir build
 cd build
-cmake ..
+cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(nproc)
 make install
 ```
