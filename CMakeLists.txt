@@ -50,6 +50,11 @@ add_library(
 
 target_link_libraries(gsplines PUBLIC ${ifopt_LIBRARIES})
 
+find_package(ruckig REQUIRED)
+if(ruckig_FOUND)
+  target_compile_definitions(gsplines PUBLIC HAS_RUCKIG)
+  target_link_libraries(gsplines PUBLIC ruckig::ruckig)
+endif()
 target_include_directories(
   gsplines
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -77,6 +82,10 @@ target_include_directories(
 
 target_link_libraries(pygsplines PUBLIC ${EIGEN3_LIBRARIES} ${ifopt_LIBRARIES}
                                         gsplines)
+if(ruckig_FOUND)
+  target_compile_definitions(pygsplines PUBLIC HAS_RUCKIG)
+  target_link_libraries(pygsplines PUBLIC ruckig::ruckig)
+endif()
 # Generate the environment setup script
 add_custom_command(
   OUTPUT ${CMAKE_SOURCE_DIR}/setup_python_env.sh
