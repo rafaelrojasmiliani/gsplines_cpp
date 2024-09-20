@@ -2,13 +2,13 @@
 Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
 - Generalized splines as a `GSpline` class. They can represent
-    - Piecewise polynomial curves representation
-    - Piece-wise Lagrange polynomials at (interpolation at Gauss-Lobatto points already implemented).
-- **Analitical consistenc** `GSpline` provide a `derivate` method which returns the its derivative as a new `GSpline` instance. This library provides automatic **exact** (and fast) differentiation of the generalized splines implemented.
-- **Algebraic consistence**: This library implement basic operations between `GSplines` inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
+    - [Piecewise](https://en.wikipedia.org/wiki/Piecewise_function) polynomial curves representation
+    - [Piecewise](https://en.wikipedia.org/wiki/Piecewise_function) Lagrange polynomials at (interpolation at Gauss-Lobatto points already implemented).
+    - **Analytically consistency** `GSpline` provide a `derivate` method which returns its derivative as a new `GSpline` instance. This library provides automatic **exact** ($\matcal{O}(n^2)$) differentiation of the generalized splines implemented.
+    - **Algebraic consistency**: This library implements basic operations between `GSplines` inner product, norms, addition, multiplication, composition and concatenation of curves (allows only when it has mathematical sense).
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
-- **ROS implementation** [here](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
-- **MoveIt implementation** [here](https://github.com/rafaelrojasmiliani/gsplines_moveit)
+- **ROS 1 implementation** [visit this link](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
+- **MoveIt implementation** [visit this link](https://github.com/rafaelrojasmiliani/gsplines_moveit)
 - Contact: Rafael A. Rojas rafaelrojasmiliani@gmail.com
 - **Docker containers with this library installed**
     - *vim awesome plugins for development and moveit*  rafa606/moveit-gsplines-vim-dev:noetic
@@ -49,7 +49,7 @@ expression = trajectory + trajectory_jerk + trajectory_derivative
 # Installation
 
 ## In Ubuntu using deb packages and ROS
-To install using debian packages it is needed to have access to the ROS repos ([read here](http://wiki.ros.org/it/hydro/Installation/Ubuntu)).
+The installation using debian packages requires to have access to the ROS 1 repos ([visit this link](http://wiki.ros.org/it/noetic/Installation/Ubuntu)).
 The reason to use ros packages is that this library depends on [`ifopt`](https://github.com/ethz-adrl/ifopt), and its deb package is available with ros.
 1. Install the requirements
 ```bash
@@ -76,7 +76,7 @@ sudo apt-get install  python3-matplotlib libgtest-dev cmake libeigen3-dev coinor
    cd build
    cmake .. -DCMAKE_INSTALL_PREFIX=/usr
    make -j$(nproc)
-   make install
+   sudo make install
 ```
 3. Download the repo with recursive mode and compile
 ```bash
@@ -86,13 +86,13 @@ mkdir build
 cd build
 cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(nproc)
-make install
+sudo make install
 ```
 
 # Definition
 - **Definition** A **generalized spline** is a piece-wise defined curve such that in each interval it is the linear combination of certain linearly independent functions $B_1, B_2, ... ,B_k$
 - **Formal Definition**
-    1. Let $J=[0, T]$ and consider the partition of  $J$ given by  $N + 1$ points $t_i\in J$, i.e. $I_1, I_2, ... ,I_N$ with $I_i=[t_i, t_{i + 1})$.
+    1. Let $J=[0, T]$ and consider the partition of  $J$ given by  $N + 1$ points $t_i\in J$, i.e. $I_1, I_2, ... ,I_N$ with $I_i=[t_i, t_{i + 1})$, $t_0=0$ and $t_{N + 1}=T$
     2. Let $I_0=[-1,1]$ and $B_1, B_2, ... ,B_k$ be $k$ linearly independent functions $B_i:I_0\longrightarrow \mathbb{R}$.
     3. Let $s_i:I_i\longrightarrow I_0$ given by
 
