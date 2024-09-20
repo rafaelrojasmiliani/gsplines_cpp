@@ -4,6 +4,8 @@
 __pycache__
 *.pyc
 build/*
+build2/*
+cmake-*
 dist/*
 gsplines.egg-info/*
 *.stats
@@ -15,3 +17,7 @@ compile_commands.json
 tests/CMakeCache.txt
 tests/CMakeFiles/*
 tests/Testing/*
+GPATH
+GRTAGS
+GTAGS
+tags
