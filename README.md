@@ -75,19 +75,17 @@ sudo apt-get install  python3-matplotlib libgtest-dev cmake libeigen3-dev coinor
    mkdir build
    cd build
    cmake .. -DCMAKE_INSTALL_PREFIX=/usr
-   make
+   make -j$(nproc)
    make install
 ```
 3. Download the repo with recursive mode and compile
 ```bash
-apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-confnew"  git ros-noetic-ifopt libgtest-dev
 git clone --recursive https://github.com/rafaelrojasmiliani/gsplines_cpp.git
 cd gsplines_cpp
 mkdir build
 cd build
 cmake ..
-make
+make -j$(nproc)
 make install
 ```
 
