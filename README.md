@@ -17,33 +17,30 @@ Library to represent and formulate motion and trajectory planning problems with 
 
 # Examples
 
-Get your minimum jerk trajectory passing through random waypoints
+Get your minimum-X  trajectory passing through random waypoints
 ```PYTHON
 import numpy as np
-from gsplines.optimization import minimum_jerk_path
-dim = 7  # number of joint of the robot
-waypoint_number = 4 # number of waypoints
-waypoints = np.random.rand(waypoint_number, dim) # random waypoints
-
-# get the minimum jerk path inn [0, 1]
-path = minimum_jerk_path(waypoints)
-
-#get the minimum jerk trajectory with execution time of 10.0 seconds
-trajectory  = path.linear_scaling_new_execution_time(10.0)
-
-# Evaluate your trajectory
-trajectory_points = trajectory([0.0, 5.0, 10.0]) # matrix, rows are points
-
-# Get the derivative
-trajectory_derivative = trajectory.deriv()
-# Get the jerk
-trajectory_jerk = trajectory.deriv(3)
-# Evaluate the jerk at points
-trajectory_jerk_at_instants = trajectory_jerk([0.0, 5.0, 10.0])
+import gsplines
+import gsplines.plot
+import gsplines.optimization
 
 
-# Algebraic operations
-expression = trajectory + trajectory_jerk + trajectory_derivative
+numberOfWaypoints = 4
+dimensionOfAmbientSpace = 2
+
+waypoints = np.random.rand(numberOfWaypoints, dimensionOfAmbientSpace)
+
+c1 = gsplines.optimization.broken_lines_path(waypoints)
+c2 = gsplines.optimization.minimum_acceleration_path(waypoints)
+c3 = gsplines.optimization.minimum_jerk_path(waypoints)
+c4 = gsplines.optimization.minimum_snap_path(waypoints)
+c5 = gsplines.optimization.minimum_crackle_path(waypoints) # Numerically unstable !
+
+gsplines.plot.plot2d_compare([c1, c2, c3, c4, c5], [
+                             'green', 'blue', 'magenta', 'red', 'black'],
+                             ['min vel', 'min acceleration', 'min jerk',
+                              'min snap', 'min crackle'])
+
 ```
 
 # Installation
