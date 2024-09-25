@@ -9,6 +9,7 @@ Library to represent and formulate motion and trajectory planning problems with 
 - Optimization with waypoint (via-point) constraints: minimum jerk, snap, crank, etc.
 - **ROS 1 implementation** [visit this link](https://github.com/rafaelrojasmiliani/gsplines_cpp_ros)
 - **MoveIt implementation** [visit this link](https://github.com/rafaelrojasmiliani/gsplines_moveit)
+- **Minimum time path-consistent stop** [visit this link](https://github.com/rafaelrojasmiliani/opstop_cpp)
 - Contact: Rafael A. Rojas rafaelrojasmiliani@gmail.com
 - **Docker containers with this library installed**
     - *vim awesome plugins for development and moveit*  rafa606/moveit-gsplines-vim-dev:noetic
