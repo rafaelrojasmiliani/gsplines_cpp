@@ -44,6 +44,8 @@ gsplines.plot.plot2d_compare([c1, c2, c3, c4, c5], [
 
 ```
 
+![alt text](img/plot.png)
+
 # Installation
 
 ## In Ubuntu using deb packages and ROS
