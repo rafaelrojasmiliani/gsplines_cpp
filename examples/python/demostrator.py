@@ -39,13 +39,14 @@ def main():
     waypoints = []
     prev_waypoints = None
     trj_array = []
+    slider = None
     optimization_function_array =\
         [gsplines.optimization.broken_lines_path,
          gsplines.optimization.minimum_acceleration_path,
          gsplines.optimization.minimum_jerk_path,
          gsplines.optimization.minimum_snap_path,
          gsplines.optimization.minimum_crackle_path,
-         gsplines.optimization.rojas_path]
+         lambda x: gsplines.optimization.rojas_path(x, slider.val)]
     optimization_function = optimization_function_array[0]
 
     fig = plt.figure(figsize=(10, 6))
@@ -116,10 +117,7 @@ def main():
             print('optimization function is emtpy')
             return
 
-        try:
-            gspline = optimization_function(wp)
-        except:
-            gspline = optimization_function(wp, slider.val)
+        gspline = optimization_function(wp)
 
         if not gspline:
             prev_waypoints = copy.deepcopy(waypoints)
