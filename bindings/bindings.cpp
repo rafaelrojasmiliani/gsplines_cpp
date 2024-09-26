@@ -332,6 +332,7 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
                              &gsplines::optimization::minimum_snap_path);
   optimization_submodule.def("minimum_crackle_path",
                              &gsplines::optimization::minimum_crackle_path);
+  optimization_submodule.def("rojas_path", &gsplines::optimization::rojas_path);
 
   optimization_submodule.def("optimal_sobolev_norm",
                              &gsplines::optimization::optimal_sobolev_norm);
