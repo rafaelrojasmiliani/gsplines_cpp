@@ -22,9 +22,14 @@ class VerticalLines:
 
     def update(self, _bplist: np.ndarray):
         for i in range(self.lines_.shape[0]):
+            lines = self.axes_[i].get_lines()
+
+            ymax = max([np.max(line.get_ydata())
+                       for line in lines if len(line.get_ydata()) != 0])
+            ymin = min([np.min(line.get_ydata())
+                       for line in lines if len(line.get_ydata()) != 0])
             for k, bp in enumerate(_bplist):
-                lower, upper = self.axes_[i].get_ylim()
-                self.lines_[i, k].set_data([bp, bp], [lower, upper])
+                self.lines_[i, k].set_data([bp, bp], [ymin, ymax])
 
 
 class CurveVsTime:

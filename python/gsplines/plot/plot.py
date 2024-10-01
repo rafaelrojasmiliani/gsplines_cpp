@@ -16,22 +16,25 @@ def fix_to_lines(_ax):
     ymax = max([np.max(line.get_ydata()) for line in lines])
     ymin = min([np.min(line.get_ydata()) for line in lines])
 
-    _ax.set_xlim(1.01*xmin, 1.01*xmax)
-    _ax.set_ylim(1.01*ymin, 1.01*ymax)
+    xcenter = 0.5*(xmin + xmax)
+    dx = xmax - xmin
+    ycenter = 0.5*(ymin + ymax)
+    dy = ymax - ymin
+
+    _ax.set_xlim(xcenter - 1.02*dx/2, xcenter + 1.02*dx/2)
+    _ax.set_ylim(ycenter - 1.02*dy/2, ycenter + 1.02*dy/2)
 
 
 def plot_derivatives_in_axes(_q,
-                             _axis, _dt: float = 0.01,
+                             _axis: np.array, _dt: float = 0.01,
                              _up_to_deriv: int = 3, color='blue'):
 
+    _axis = np.atleast_2d(_axis)
     for i in range(_up_to_deriv+1):
         curve = _q.deriv(i)
         cvt = CurveVsTime(curve.get_codom_dim(), color=color)
         cvt.associate_axis(_axis[i, :])
         cvt.update(curve, _dt)
-
-        for j in range(_q.get_codom_dim()):
-            fix_to_lines(_axis[i, j])
 
         if hasattr(curve, 'get_domain_breakpoints'):
             dbp = VerticalLines(
@@ -39,6 +42,9 @@ def plot_derivatives_in_axes(_q,
                 linestyle='--', alpha=0.4, color=color)
             dbp.associate_axis(_axis[i, :])
             dbp.update(curve.get_domain_breakpoints())
+
+        for j in range(_q.get_codom_dim()):
+            fix_to_lines(_axis[i, j])
 
     if hasattr(_q, 'get_waypoints'):
         wp = _q.get_waypoints()
@@ -59,7 +65,7 @@ def plot(_q, _up_to_deriv: int = 3,
 
     fig, axis = plt.subplots(_up_to_deriv+1, _q.get_codom_dim())
 
-    plot_derivatives_in_axes(_q, axis)
+    plot_derivatives_in_axes(_q, axis, _dt=_dt, _up_to_deriv=_up_to_deriv)
 
     plt.subplots_adjust(
         left=0.05,
