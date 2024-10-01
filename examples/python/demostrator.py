@@ -59,7 +59,11 @@ def main():
                             for j in range(2)] for i in range(4)])
 
     def on_click(event):
-        if event.inaxes == ax_big:  # Only respond to clicks in the big axis
+        toolbar = plt.get_current_fig_manager().toolbar
+        # Only respond to clicks in the big axis
+        # print(toolbar.mode)
+        if event.inaxes == ax_big \
+                and toolbar.mode not in ['zoom rect', 'pan/zoom']:
             waypoints.append([event.xdata, event.ydata])
             wp = np.array(waypoints)
             ax_big.plot(wp[:, 0],
