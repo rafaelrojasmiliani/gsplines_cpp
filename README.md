@@ -1,3 +1,4 @@
+![alt text](img/logo.svg)
 # General Splines: A Library for Algebraically and Analytically Consistent Representation of Motions
 Library to represent and formulate motion and trajectory planning problems with generalized splines and piece-wise polynomials.
 
