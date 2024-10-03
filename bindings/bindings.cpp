@@ -9,6 +9,9 @@
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
 #include <vector>
+#ifdef HAS_RUCKIG
+#include <gsplines/Ruckig/Ruckig.hpp>
+#endif
 
 PYBIND11_MODULE(pygsplines, gsplines_module) {
   gsplines_module.doc() = "Generalized Splines Library with Optimization tools";
@@ -21,6 +24,8 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       gsplines_module.def_submodule("collocation");
   py::module functional_analysis_submodule =
       gsplines_module.def_submodule("functional_analysis");
+
+  py::module ruckig_submodule = gsplines_module.def_submodule("ruckig");
 
   // ----------------
   // Basis Submodule
@@ -422,4 +427,19 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
   functional_analysis_submodule.def(
       "l2_norm", &gsplines::functional_analysis::l2_norm, py::arg("_in"),
       py::arg("_n_glp") = 10, py::arg("_n_int") = 1);
+#ifdef HAS_RUCKIG
+  // ------------------------------
+  // Ruckig submodule
+  // ------------------------------
+  py::class_<gsplines::ruckig::RuckigCurve, gsplines::functions::FunctionBase>(
+      ruckig_submodule, "Ruckig")
+      .def(py::init([](Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+                       const std::vector<double>& _max_abs_vel,
+                       const std::vector<double>& _max_abs_acc,
+                       const std::vector<double>& _max_abs_jerk) {
+        return gsplines::ruckig::interpolator(_waypoints, _max_abs_vel,
+                                              _max_abs_acc, _max_abs_jerk)
+            .value();
+      }));
+#endif
 }

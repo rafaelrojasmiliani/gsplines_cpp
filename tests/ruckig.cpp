@@ -1,12 +1,66 @@
 #include <eigen3/Eigen/Core>
 #include <gtest/gtest.h>
 #include <ruckig/ruckig.hpp>
+#include <optional>
+
+std::optional<ruckig::InputParameter<ruckig::DynamicDOFs>> paramsFrom(
+    Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+    const std::vector<double>& _max_abs_vel,
+    const std::vector<double>& _max_abs_acc,
+    const std::vector<double>& _max_abs_jerk) {
+  //
+  std::size_t dof = static_cast<std::size_t>(_waypoints.cols());
+  ruckig::InputParameter<ruckig::DynamicDOFs> result(dof);
+
+  std::size_t number_of_waypoints = static_cast<std::size_t>(_waypoints.rows());
+
+  if (number_of_waypoints < 2) {
+    return std::nullopt;
+  }
+  if (_waypoints.cols() != dof) {
+    return std::nullopt;
+  }
+  if (_max_abs_vel.size() != dof) {
+    return std::nullopt;
+  }
+  if (_max_abs_acc.size() != dof) {
+    return std::nullopt;
+  }
+  if (_max_abs_jerk.size() != dof) {
+    return std::nullopt;
+  }
+
+  result.max_velocity = _max_abs_vel;
+  result.min_acceleration = _max_abs_acc;
+  result.max_jerk = _max_abs_jerk;
+  result.current_velocity.assign(dof, 0.0);
+  result.current_acceleration.assign(dof, 0.0);
+
+  for (int i = 0; i < dof; ++i) {
+    result.current_position[i] = _waypoints.topRows(1)(0, i);
+    result.target_position[i] = _waypoints.bottomRows(1)(0, i);
+  }
+
+  std::vector<double> vec(dof, 0.0);
+  result.intermediate_positions.reserve(number_of_waypoints - 2);
+  for (int i = 1; i < number_of_waypoints - 1; ++i) {
+    for (int j = 0; j < dof; ++j) {
+      vec[j] = _waypoints(i, j);
+    }
+    result.intermediate_positions.emplace_back(vec);
+  }
+  ruckig::Ruckig<ruckig::DynamicDOFs> otg(dof, 0.001);
+  ruckig::Trajectory<ruckig::DynamicDOFs> trajectory(dof);
+  otg.calculate(result, trajectory);
+  return result;
+}
 
 TEST(RUCKIG, ControlTest) {
 #ifdef HAS_RUCKIG
-  ruckig::Ruckig<3> otg(0.01);  // control cycle
-  ruckig::InputParameter<3> input;
-  ruckig::OutputParameter<3> output;
+  int dof = 5;
+  ruckig::Ruckig<ruckig::DynamicDOFs> otg(dof, 0.001);
+  ruckig::InputParameter<ruckig::DynamicDOFs> input(dof);
+  ruckig::OutputParameter<ruckig::DynamicDOFs> output(dof);
 
   // Set input parameters
   input.current_position = {0.0, 0.0, 0.5};

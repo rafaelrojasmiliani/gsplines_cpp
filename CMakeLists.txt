@@ -46,7 +46,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoLagrange.cpp
   ${PROJECT_SOURCE_DIR}/src/Collocation/GaussLobattoLagrangeFunctionals.cpp
   # --
-)
+  ${PROJECT_SOURCE_DIR}/src/Ruckig/Ruckig.cpp)
 
 target_link_libraries(gsplines PUBLIC ${ifopt_LIBRARIES})
 
