@@ -433,13 +433,16 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
   // ------------------------------
   py::class_<gsplines::ruckig::RuckigCurve, gsplines::functions::FunctionBase>(
       ruckig_submodule, "Ruckig")
-      .def(py::init([](Eigen::Ref<const Eigen::MatrixXd> _waypoints,
+      .def(py::init([](const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
                        const std::vector<double>& _max_abs_vel,
                        const std::vector<double>& _max_abs_acc,
                        const std::vector<double>& _max_abs_jerk) {
         return gsplines::ruckig::interpolator(_waypoints, _max_abs_vel,
                                               _max_abs_acc, _max_abs_jerk)
             .value();
-      }));
+      }))
+      .def("deriv", &gsplines::ruckig::RuckigCurve::derivate,
+           py::arg("_deg") = 1);
+  ruckig_submodule.def("interpolator", &gsplines::ruckig::interpolator);
 #endif
 }
