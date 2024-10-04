@@ -87,10 +87,12 @@ def plot_compare(_q: List, _colors: List = [], _legends: List = [],
         _colors = [cmap(val) for val in np.linspace(0, 1, len(_q))]
 
     fig, axis = plt.subplots(_up_to_deriv + 1, _q[0].get_codom_dim())
+    if _q[0].get_codom_dim() == 1:
+        axis = np.atleast_2d(axis).transpose()
 
     for curve, color in zip(_q, _colors):
         plot_derivatives_in_axes(
-            curve, axis, color=color, _up_to_deriv=_up_to_deriv)
+            curve, axis, color=color, _up_to_deriv=_up_to_deriv, _dt=_dt)
 
     for j in range(0, _q[0].get_codom_dim()):
         axis[0, j].set_title('coordinate {:d}'.format(j))
