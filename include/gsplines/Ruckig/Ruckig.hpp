@@ -6,13 +6,9 @@
 #include <gsplines/Functions/FunctionExpression.hpp>
 #include <gsplines/Functions/FunctionInheritanceHelper.hpp>
 #include <ruckig/ruckig.hpp>
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <functional>
-#include <memory>
 #include <optional>
-#include <stdexcept>
 #include <vector>
 
 namespace gsplines::ruckig {

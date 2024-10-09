@@ -1,5 +1,3 @@
-
-
 """
 This examples shows how to use the interpolator to joint waypoints with a
 gspline.
@@ -19,7 +17,7 @@ try:
     import gsplines
     import gsplines.plot
     import gsplines.optimization
-    import gsplines.ruckig
+    import gsplines.kdl
 except ImportError:
     import pathlib
     import sys
@@ -36,7 +34,7 @@ except ImportError:
         import gsplines
         import gsplines.plot
         import gsplines.optimization
-        import gsplines.ruckig
+        import gsplines.kdl
 
     except ImportError:
         print('Import Error: Seems that you failed to compile properly')
@@ -44,9 +42,11 @@ except ImportError:
 
 
 def main():
-    dimensionOfAmbientSpace = 1
 
-    waypoints = [[0], [2]]
+    numberOfWaypoints = 4
+    dimensionOfAmbientSpace = 2
+
+    waypoints = np.random.rand(numberOfWaypoints, dimensionOfAmbientSpace)
 
     # https://forum.universal-robots.com/t/maximum-axis-speed-acceleration/13338
     max_acc = 800*np.pi/180
@@ -54,20 +54,19 @@ def main():
 
     max_vel = dimensionOfAmbientSpace*[max_vel]
     max_acc = dimensionOfAmbientSpace*[max_acc]
-    max_jerk = dimensionOfAmbientSpace*[400.5]
 
-    r = gsplines.ruckig.interpolator(waypoints, max_vel, max_acc, max_jerk)
+    r = gsplines.kdl.interpolator(waypoints, max_vel, max_acc)
     z = gsplines.optimization.minimum_jerk_path(
         waypoints).linear_scaling_new_execution_time(r.get_domain()[1])
 
     if r is None:
-        print('error creatign ruckig trajectory')
+        print('error')
         return
     print(r.get_domain())
     # gsplines.plot.plot_compare([r, z], ['red', 'magenta'])
 
     z = gsplines.optimization.rojas_path(
-        waypoints, 0.3).linear_scaling_new_execution_time(r.get_domain()[1])
+        waypoints, 1.8).linear_scaling_new_execution_time(r.get_domain()[1])
     gsplines.plot.plot_compare([r, z], ['red', 'magenta'], _dt=0.01)
 
 

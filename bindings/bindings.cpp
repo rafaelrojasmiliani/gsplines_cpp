@@ -12,6 +12,9 @@
 #ifdef HAS_RUCKIG
 #include <gsplines/Ruckig/Ruckig.hpp>
 #endif
+#ifdef HAS_KDL
+#include <gsplines/kdl/kdl.hpp>
+#endif
 
 PYBIND11_MODULE(pygsplines, gsplines_module) {
   gsplines_module.doc() = "Generalized Splines Library with Optimization tools";
@@ -24,8 +27,6 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       gsplines_module.def_submodule("collocation");
   py::module functional_analysis_submodule =
       gsplines_module.def_submodule("functional_analysis");
-
-  py::module ruckig_submodule = gsplines_module.def_submodule("ruckig");
 
   // ----------------
   // Basis Submodule
@@ -431,6 +432,7 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
   // ------------------------------
   // Ruckig submodule
   // ------------------------------
+  py::module ruckig_submodule = gsplines_module.def_submodule("ruckig");
   py::class_<gsplines::ruckig::RuckigCurve, gsplines::functions::FunctionBase>(
       ruckig_submodule, "Ruckig")
       .def(py::init([](const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
@@ -444,5 +446,23 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
       .def("deriv", &gsplines::ruckig::RuckigCurve::derivate,
            py::arg("_deg") = 1);
   ruckig_submodule.def("interpolator", &gsplines::ruckig::interpolator);
+#endif
+#ifdef HAS_KDL
+  // ------------------------------
+  // KDL submodule
+  // ------------------------------
+  py::module kdl_submodule = gsplines_module.def_submodule("kdl");
+  py::class_<gsplines::kdl::KdlTrap, gsplines::functions::FunctionBase>(
+      kdl_submodule, "KdlTrap")
+      .def(py::init([](const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
+                       const std::vector<double>& _max_abs_vel,
+                       const std::vector<double>& _max_abs_acc) {
+        return gsplines::kdl::interpolator(_waypoints, _max_abs_vel,
+                                           _max_abs_acc)
+            .value();
+      }))
+      .def("deriv", &gsplines::kdl::KdlTrap::derivate, py::arg("_deg") = 1);
+
+  kdl_submodule.def("interpolator", &gsplines::kdl::interpolator);
 #endif
 }
