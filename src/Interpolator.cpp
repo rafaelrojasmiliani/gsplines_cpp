@@ -7,47 +7,52 @@
 namespace gsplines {
 
 Interpolator::Interpolator(std::size_t _codom_dim, std::size_t _num_intervals,
-                           const basis::Basis &_basis)
-    : basis_(_basis.clone()), codom_dim_(_codom_dim),
+                           const basis::Basis& _basis)
+    : basis_(_basis.clone()),
+      codom_dim_(_codom_dim),
       num_intervals_(_num_intervals),
       matrix_size_(_basis.get_dim() * _codom_dim * _num_intervals),
       boundary_buffer_tranposed_(_basis.get_dim(), _basis.get_dim() / 2) {
-
   if (basis_->get_dim() % 2 != 0) {
     throw std::invalid_argument(
         "Interpolator: The dimension of the basis must be pair");
   }
-  interpolating_matrix_.resize(matrix_size_, matrix_size_);
-  interpolating_vector_.resize(matrix_size_);
+  interpolating_matrix_.resize(static_cast<Eigen::Index>(matrix_size_),
+                               static_cast<Eigen::Index>(matrix_size_));
+  interpolating_vector_.resize(static_cast<Eigen::Index>(matrix_size_));
   interpolating_vector_.setZero();
-  coefficients_vector_.resize(matrix_size_);
+  coefficients_vector_.resize(static_cast<Eigen::Index>(matrix_size_));
 
-  derivative_buffer_tranposed_.resize(basis_->get_dim(), basis_->get_dim() - 2);
+  derivative_buffer_tranposed_.resize(
+      static_cast<Eigen::Index>(basis_->get_dim()),
+      static_cast<Eigen::Index>(basis_->get_dim() - 2));
 
-  position_buffer_.resize(basis_->get_dim());
+  position_buffer_.resize(static_cast<Eigen::Index>(basis_->get_dim()));
 
   std::size_t nnz_per_col =
-      2 * (basis_->get_dim() / 2 - 1) + 2 + 2 * (basis_->get_dim() - 2);
-  interpolating_matrix_.reserve(
-      Eigen::VectorXi::Constant(matrix_size_, nnz_per_col));
+      (2 * (basis_->get_dim() / 2 - 1)) + 2 + (2 * (basis_->get_dim() - 2));
+  interpolating_matrix_.reserve(Eigen::VectorXi::Constant(
+      static_cast<Eigen::Index>(matrix_size_), static_cast<int>(nnz_per_col)));
   interpolating_matrix_.makeCompressed();
 
   for (std::size_t i = 0; i < _num_intervals; i++) {
     {
       Eigen::SparseMatrix<double> mat;
       interpolation_matrix_ders_.push_back(mat);
-      interpolation_matrix_ders_.back().resize(matrix_size_, matrix_size_);
-      interpolation_matrix_ders_.back().reserve(nnz_per_col *
-                                                basis_->get_dim() * codom_dim_);
+      interpolation_matrix_ders_.back().resize(
+          static_cast<Eigen::Index>(matrix_size_),
+          static_cast<Eigen::Index>(matrix_size_));
+      interpolation_matrix_ders_.back().reserve(static_cast<Eigen::Index>(
+          nnz_per_col * basis_->get_dim() * codom_dim_));
       interpolation_matrix_ders_.back().makeCompressed();
     }
   }
 }
 
-Interpolator::~Interpolator() {}
-void Interpolator::fill_interpolating_matrix(
-    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths) {
+Interpolator::~Interpolator() = default;
 
+void Interpolator::fill_interpolating_matrix(
+    const Eigen::Ref<const Eigen::VectorXd>& _interval_lengths) {
   unsigned int interval_coor = 0;
   unsigned int i0 = 0;
   unsigned int j0 = 0;
@@ -95,7 +100,8 @@ void Interpolator::fill_interpolating_matrix(
     fill_continuity_derivative_block(i0, j0, false, interpolating_matrix_);
     j0 += codom_dim_ * basis_->get_dim();
   }
-  fill_buffers(-1.0, _interval_lengths(num_intervals_ - 1));
+  fill_buffers(
+      -1.0, _interval_lengths(static_cast<Eigen::Index>(num_intervals_ - 1)));
 
   fill_continuity_derivative_block(i0, j0, true, interpolating_matrix_);
   i0 += codom_dim_ * (basis_->get_dim() - 2);
@@ -103,15 +109,15 @@ void Interpolator::fill_interpolating_matrix(
   fill_position_block(i0, j0, interpolating_matrix_);
   i0 += codom_dim_;
 
-  fill_buffers(1.0, _interval_lengths(num_intervals_ - 1));
+  fill_buffers(
+      1.0, _interval_lengths(static_cast<Eigen::Index>(num_intervals_ - 1)));
   fill_boundary_derivative_block(i0, j0, interpolating_matrix_);
   i0 += codom_dim_ * (basis_->get_dim() / 2 - 1);
 
   fill_position_block(i0, j0, interpolating_matrix_);
 }
 void Interpolator::fill_interpolating_vector(
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
-
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   unsigned int interval_coor = 0;
   unsigned int codom_coor = 0;
   unsigned int vector_coor = 0;
@@ -143,25 +149,29 @@ void Interpolator::fill_interpolating_vector(
   }
   for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
     interpolating_vector_(vector_coor) =
-        _waypoints(num_intervals_ - 1, codom_coor);
+        _waypoints(static_cast<Eigen::Index>(num_intervals_) - 1, codom_coor);
     vector_coor++;
   }
   vector_coor += codom_dim_ * (basis_->get_dim() / 2 - 1);
   for (codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
-    interpolating_vector_(vector_coor) = _waypoints(num_intervals_, codom_coor);
+    interpolating_vector_(vector_coor) =
+        _waypoints(static_cast<Eigen::Index>(num_intervals_), codom_coor);
     vector_coor++;
   }
 }
 
 GSpline Interpolator::interpolate(
-    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
-
-  const Eigen::VectorXd &vector_resut =
+    const Eigen::Ref<const Eigen::VectorXd>& _interval_lengths,
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
+  const Eigen::VectorXd& vector_resut =
       solve_interpolation(_interval_lengths, _waypoints);
 
-  return GSpline({0.0, _interval_lengths.sum()}, codom_dim_, num_intervals_,
-                 *basis_, vector_resut, _interval_lengths);
+  return {{0.0, _interval_lengths.sum()},
+          codom_dim_,
+          num_intervals_,
+          *basis_,
+          vector_resut,
+          _interval_lengths};
 }
 
 void Interpolator::print_interpolating_matrix() {
@@ -180,8 +190,9 @@ void Interpolator::print_interpolating_vector() {
   std::cout << Eigen::MatrixXd(interpolating_vector_).format(CleanFmt) << '\n';
 }
 void Interpolator::fill_position_block(unsigned int i0, unsigned int j0,
-                                       Eigen::SparseMatrix<double> &_mat) {
-  unsigned int i, j;
+                                       Eigen::SparseMatrix<double>& _mat) {
+  unsigned int i = 0;
+  unsigned int j = 0;
   for (unsigned int codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
     for (unsigned int basis_coor = 0; basis_coor < basis_->get_dim();
          basis_coor++) {
@@ -193,29 +204,33 @@ void Interpolator::fill_position_block(unsigned int i0, unsigned int j0,
 }
 void Interpolator::fill_continuity_derivative_block(
     unsigned int _i0, unsigned int _j0, bool _minus,
-    Eigen::SparseMatrix<double> &_mat) {
-  double mutiplier;
-  if (_minus) {
-    mutiplier = -1.0;
-  } else {
-    mutiplier = 1.0;
-  }
+    Eigen::SparseMatrix<double>& _mat) {
+  const double mutiplier = [&_minus]() {
+    if (_minus) {
+      return -1.0;
+    }
+    return 1.0;
+  }();
+
   for (std::size_t codom_coor = 0; codom_coor < codom_dim_; codom_coor++) {
     for (std::size_t basis_coor = 0; basis_coor < basis_->get_dim();
          basis_coor++) {
       for (std::size_t der_coor = 0; der_coor < basis_->get_dim() - 2;
            der_coor++) {
-        std::size_t i = _i0 + codom_coor * (basis_->get_dim() - 2) + der_coor;
-        std::size_t j = _j0 + basis_->get_dim() * codom_coor + basis_coor;
-        _mat.coeffRef(i, j) =
-            mutiplier * derivative_buffer_tranposed_(basis_coor, der_coor);
+        std::size_t i = _i0 + (codom_coor * (basis_->get_dim() - 2)) + der_coor;
+        std::size_t j = _j0 + (basis_->get_dim() * codom_coor) + basis_coor;
+        _mat.coeffRef(static_cast<Eigen::Index>(i),
+                      static_cast<Eigen::Index>(j)) =
+            mutiplier *
+            derivative_buffer_tranposed_(static_cast<Eigen::Index>(basis_coor),
+                                         static_cast<Eigen::Index>(der_coor));
       }
     }
   }
 }
 
 void Interpolator::fill_boundary_derivative_block(
-    unsigned int _i0, unsigned int _j0, Eigen::SparseMatrix<double> &_mat) {
+    unsigned int _i0, unsigned int _j0, Eigen::SparseMatrix<double>& _mat) {
   unsigned int i, j;
   unsigned int codom_coor;
   unsigned int basis_coor;
@@ -233,7 +248,6 @@ void Interpolator::fill_boundary_derivative_block(
   }
 }
 void Interpolator::fill_buffers(double s, double tau) {
-
   basis_->eval_derivative_on_window(s, tau, 0, position_buffer_);
 
   for (unsigned int der = 0; der < basis_->get_dim() - 2; der++) {
@@ -243,7 +257,6 @@ void Interpolator::fill_buffers(double s, double tau) {
 }
 
 void Interpolator::fill_buffers_deriv_wrt_tau(double s, double tau) {
-
   basis_->eval_derivative_wrt_tau_on_window(s, tau, 0, position_buffer_);
 
   for (unsigned int der = 0; der < basis_->get_dim() - 2; der++) {
@@ -255,7 +268,6 @@ void Interpolator::fill_buffers_deriv_wrt_tau(double s, double tau) {
 Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     Eigen::Ref<const Eigen::VectorXd> _coeff,
     Eigen::Ref<const Eigen::VectorXd> _interval_lengths, std::size_t _tau_idx) {
-
   if ((_interval_lengths.array() < 1.0e-6).any()) {
     throw std::invalid_argument(
         "get_coeff_derivative_wrt_tau: Interval lenghts cannot be negative !");
@@ -266,11 +278,10 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     return coefficients_vector_;
   }
 
-  Eigen::SparseMatrix<double> &mat = interpolation_matrix_ders_[_tau_idx];
+  Eigen::SparseMatrix<double>& mat = interpolation_matrix_ders_[_tau_idx];
   unsigned int i0 = 0;
   unsigned int j0 = 0;
   if (_tau_idx == 0) {
-
     fill_buffers_deriv_wrt_tau(-1.0, _interval_lengths(0));
 
     fill_position_block(i0, j0, mat);
@@ -290,7 +301,6 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
       fill_continuity_derivative_block(i0, j0, false, mat);
     }
   } else if (0 < _tau_idx and _tau_idx < num_intervals_ - 1) {
-
     // rows added in the first interval
     i0 = 2 * codom_dim_ + codom_dim_ * (basis_->get_dim() / 2 - 1);
 
@@ -299,7 +309,8 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
 
     j0 = _tau_idx * basis_->get_dim() * codom_dim_;
 
-    fill_buffers_deriv_wrt_tau(-1.0, _interval_lengths(_tau_idx));
+    fill_buffers_deriv_wrt_tau(
+        -1.0, _interval_lengths(static_cast<Eigen::Index>(_tau_idx)));
 
     fill_continuity_derivative_block(i0, j0, true, mat);
     i0 += codom_dim_ * (basis_->get_dim() - 2);
@@ -307,7 +318,8 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     fill_position_block(i0, j0, mat);
     i0 += codom_dim_;
 
-    fill_buffers_deriv_wrt_tau(1.0, _interval_lengths(_tau_idx));
+    fill_buffers_deriv_wrt_tau(
+        1.0, _interval_lengths(static_cast<Eigen::Index>(_tau_idx)));
 
     fill_position_block(i0, j0, mat);
     i0 += codom_dim_;
@@ -315,13 +327,13 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     fill_continuity_derivative_block(i0, j0, false, mat);
 
   } else if (_tau_idx == num_intervals_ - 1) {
-
     i0 = (basis_->get_dim() / 2 + 1) * codom_dim_ +
          basis_->get_dim() * codom_dim_ * (_tau_idx - 1);
 
     j0 = _tau_idx * basis_->get_dim() * codom_dim_;
 
-    fill_buffers_deriv_wrt_tau(-1.0, _interval_lengths(num_intervals_ - 1));
+    fill_buffers_deriv_wrt_tau(
+        -1.0, _interval_lengths(static_cast<Eigen::Index>(num_intervals_) - 1));
 
     fill_continuity_derivative_block(i0, j0, true, mat);
     i0 += codom_dim_ * (basis_->get_dim() - 2);
@@ -329,7 +341,8 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
     fill_position_block(i0, j0, mat);
     i0 += codom_dim_;
 
-    fill_buffers_deriv_wrt_tau(1.0, _interval_lengths(num_intervals_ - 1));
+    fill_buffers_deriv_wrt_tau(
+        1.0, _interval_lengths(static_cast<Eigen::Index>(num_intervals_) - 1));
     fill_boundary_derivative_block(i0, j0, mat);
     i0 += codom_dim_ * (basis_->get_dim() / 2 - 1);
 
@@ -343,10 +356,9 @@ Eigen::Ref<const Eigen::VectorXd> Interpolator::get_coeff_derivative_wrt_tau(
   coefficients_vector_ = -solver.solve(coefficients_vector_);
   return coefficients_vector_;
 }
-const Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
-    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints) {
-
+Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
+    const Eigen::Ref<const Eigen::VectorXd>& _interval_lengths,
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints) {
   if ((_interval_lengths.array() < 1.0e-6).any()) {
     throw std::invalid_argument(" Interval lenghts cannot be negative !");
   }
@@ -369,17 +381,17 @@ const Eigen::Ref<const Eigen::VectorXd> Interpolator::solve_interpolation(
   return sol_buffer_;
 }
 
-GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-                    const Eigen::Ref<const Eigen::MatrixXd> _waypoints,
-                    const basis::Basis &_basis) {
+GSpline interpolate(const Eigen::Ref<const Eigen::VectorXd>& _interval_lengths,
+                    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints,
+                    const basis::Basis& _basis) {
   return Interpolator(_waypoints.cols(), _waypoints.rows() - 1, _basis)
       .interpolate(_interval_lengths, _waypoints);
 }
 
 GSpline pw_polynomial_interpolation(
-    const Eigen::Ref<const Eigen::VectorXd> _interval_lengths,
-    const Eigen::Ref<const Eigen::MatrixXd> _waypoints, std::size_t _nc) {
+    const Eigen::Ref<const Eigen::VectorXd>& _interval_lengths,
+    const Eigen::Ref<const Eigen::MatrixXd>& _waypoints, std::size_t _nc) {
   return interpolate(_interval_lengths, _waypoints,
                      *basis::BasisLegendre::get(_nc));
 }
-} // namespace gsplines
+}  // namespace gsplines
