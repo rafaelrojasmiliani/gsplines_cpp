@@ -1,6 +1,3 @@
-#include "gsplines/Basis/BasisLagrange.hpp"
-#include "gsplines/Collocation/GaussLobattoLagrange.hpp"
-#include "gsplines/Collocation/GaussLobattoPointsWeights.hpp"
 #include <gsplines/Basis/BasisLegendre.hpp>
 #include <gsplines/Collocation/GaussLobattoLagrangeFunctionals.hpp>
 #include <gsplines/GSpline.hpp>
@@ -8,13 +5,12 @@
 #include <gsplines/Optimization/ipopt_interface.hpp>
 #include <gsplines/Optimization/ipopt_solver.hpp>
 #include <ifopt/ipopt_solver.h>
-#include <iostream>
 #include <memory>
 
 namespace gsplines {
 namespace optimization {
 
-enum class IpoptReturnStatus : int {
+enum class IpoptReturnStatus : std::int16_t {
   Solve_Succeeded = 0,
   Solved_To_Acceptable_Level = 1,
   Infeasible_Problem_Detected = 2,

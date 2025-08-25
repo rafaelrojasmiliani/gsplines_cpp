@@ -336,7 +336,19 @@ PYBIND11_MODULE(pygsplines, gsplines_module) {
 
   optimization_submodule.def("optimal_sobolev_norm",
                              &gsplines::optimization::optimal_sobolev_norm);
-
+  optimization_submodule.def(
+      "set_ipopt_string_option",
+      [](const std::string& name, const std::string& value) {
+        gsplines::optimization::IpoptSolverOptions::set_option(name, value);
+      });
+  optimization_submodule.def(
+      "set_ipopt_int_option", [](const std::string& name, int value) {
+        gsplines::optimization::IpoptSolverOptions::set_option(name, value);
+      });
+  optimization_submodule.def(
+      "set_ipopt_real_option", [](const std::string& name, double value) {
+        gsplines::optimization::IpoptSolverOptions::set_option(name, value);
+      });
   // ---------------
   // Gsplines module
   // ---------------
